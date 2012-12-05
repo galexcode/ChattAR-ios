@@ -128,6 +128,9 @@
     NSMutableArray *annotationsToCluster = [[NSMutableArray alloc] initWithArray:[self filterAnnotationsForVisibleMap:bufferArray]];
     [bufferArray release];
     
+    MKZoomScale currentZoomScale = self.bounds.size.width / self.visibleMapRect.size.width;
+    NSLog(@"%f",currentZoomScale);
+    
     
     MKMapRect visibleRegion = self.visibleMapRect;
     
@@ -144,6 +147,11 @@
     
     // Do clustering
     NSArray *clusteredAnnotations;
+    
+                // if zoom level is enough for displaying all annotations
+    if (fabs(currentZoomScale - MAX_ZOOM_LEVEL) <= EPSILON ) {
+        clusteringEnabled = NO;
+    }
     
     // Check if clustering is enabled and map is above the minZoom
     if (clusteringEnabled && (self.region.span.longitudeDelta > minLongitudeDeltaToCluster)) {

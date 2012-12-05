@@ -14,6 +14,9 @@
 
 #import <dispatch/dispatch.h>
 
+#define MAX_ZOOM_LEVEL 0.000977
+#define EPSILON 0.0001
+
 /// MapView which should be used instead of MKMapView
 /** OCMapView works like the standard MKMapView but creates clusters form its containing Annotations.*/
 @interface OCMapView : MKMapView{

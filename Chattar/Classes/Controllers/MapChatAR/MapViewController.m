@@ -259,6 +259,7 @@
         [self.compass setAlpha:1.0f];
         
     }
+        
     
     // rotate map to init state
     if(((self.mapView.region.span.longitudeDelta / longitudeDeltaZoomIn) > zoomIn) && canRotate){
