@@ -90,6 +90,8 @@
     [self.compass setFrame:compassFrame];
     [self.view addSubview:compass];
     [compass release];
+    
+    annotationsForClustering = [[NSMutableArray alloc] init];
 }
 
 - (void)spin:(UIRotationGestureRecognizer *)gestureRecognizer {
@@ -139,15 +141,22 @@
 
 - (void)addPoints:(NSArray *)mapPoints{
     // add new
-	for (UserAnnotation* ann in mapPoints){
-		if ([ann isKindOfClass:[UserAnnotation class]]){
+    CLLocationDistance clusterRadius = mapView.region.span.longitudeDelta * kDEFAULT_CLUSTER_SIZE;
+
+    NSArray* clusterizedAnnotations = [OCAlgorithms bubbleClusteringWithAnnotations:mapPoints andClusterRadius:clusterRadius grouped:YES];
+	for (OCAnnotation* ann in clusterizedAnnotations){
+		if ([ann isKindOfClass:[OCAnnotation class]]){
 			[mapView addAnnotation:ann];
 		}
 	}
+    
+    [mapView doClustering];
 }
 
 - (void)addPoint:(UserAnnotation *)mapPoint{
     [mapView addAnnotation:mapPoint];
+    
+    [mapView doClustering];
 }
 
 - (void)clear{
@@ -165,32 +174,63 @@
 - (MKAnnotationView *)mapView:(MKMapView *)_mapView viewForAnnotation:(id < MKAnnotation >)annotation{
 	static NSString* reuseidentifier = @"MapAnnotationIdentifier";
 
-    MapMarkerView *marker = (MapMarkerView *)[_mapView dequeueReusableAnnotationViewWithIdentifier:reuseidentifier];
-    if(marker == nil){
-        marker = [[[MapMarkerView alloc] initWithAnnotation:annotation 
-                                    reuseIdentifier:reuseidentifier] autorelease];
-    }else{
-        [marker updateAnnotation:(UserAnnotation *)annotation];
-    }
-    
-    // set touch action
-    marker.target = delegate;
-    marker.action = @selector(touchOnMarker:);
+                        // if this is
+    if ([annotation isKindOfClass:[OCAnnotation class]]) {
 
-    if (IS_IOS_6) {
-        [marker setTransform:CGAffineTransformMakeRotation(0.001)];
-        if(count){
-            [marker setTransform:CGAffineTransformMakeRotation(-count)];
+        OCAnnotation* ann = (OCAnnotation*) annotation;
+        MKPinAnnotationView* annotationView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"ClusterView"];
+        [annotationView retain];
+        
+        if (!annotationView) {
+            annotationView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"ClusterView"];
+            annotationView.canShowCallout = YES;
+            annotationView.centerOffset = CGPointMake(0, -20);
+            annotationView.pinColor = MKPinAnnotationColorGreen;
         }
-    } else{
-        double delayInSeconds = 0;
-        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
-        dispatch_after(popTime, dispatch_get_main_queue(), ^{
-            [marker setTransform:CGAffineTransformMakeRotation(-count)];
-        });
+        //calculate cluster region
+        
+        UILabel* numberOfAnnotationsInCluster = [[UILabel alloc] initWithFrame:CGRectMake(20, 0, 20, 20)];
+        [numberOfAnnotationsInCluster setText:[NSString stringWithFormat:@"%d",ann.annotationsInCluster.count]];
+        [numberOfAnnotationsInCluster setBackgroundColor:[UIColor clearColor]];
+        
+        [annotationView addSubview:numberOfAnnotationsInCluster];
+        
+        [numberOfAnnotationsInCluster release];
+        
+        return [annotationView autorelease];
     }
     
-	return marker;
+    else if([annotation isKindOfClass:[UserAnnotation class]])
+    {
+        MapMarkerView *marker = (MapMarkerView *)[_mapView dequeueReusableAnnotationViewWithIdentifier:reuseidentifier];
+        if(marker == nil){
+            marker = [[[MapMarkerView alloc] initWithAnnotation:annotation 
+                                        reuseIdentifier:reuseidentifier] autorelease];
+        }else{
+            [marker updateAnnotation:(UserAnnotation *)annotation];
+        }
+        
+        // set touch action
+        marker.target = delegate;
+        marker.action = @selector(touchOnMarker:);
+
+        if (IS_IOS_6) {
+            [marker setTransform:CGAffineTransformMakeRotation(0.001)];
+            if(count){
+                [marker setTransform:CGAffineTransformMakeRotation(-count)];
+            }
+        } else{
+            double delayInSeconds = 0;
+            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+            dispatch_after(popTime, dispatch_get_main_queue(), ^{
+                [marker setTransform:CGAffineTransformMakeRotation(-count)];
+            });
+        }
+        
+        return marker;
+    }
+    
+    return nil;
 }
 
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated{

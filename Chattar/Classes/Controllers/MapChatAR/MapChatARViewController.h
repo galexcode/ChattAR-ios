@@ -12,11 +12,13 @@
 #import "FBServiceResultDelegate.h"
 
 #define kGetGeoDataCount 100
+#define kDEFAULT_CLUSTER_SIZE 0.2
 
 @class ChatViewController;
 @class MapViewController;
 
-@interface MapChatARViewController : UIViewController <QBActionStatusDelegate, FBServiceResultDelegate, UIActionSheetDelegate, FBRequestDelegate, CLLocationManagerDelegate>{
+@interface MapChatARViewController : UIViewController <QBActionStatusDelegate, FBServiceResultDelegate, UIActionSheetDelegate, FBRequestDelegate, CLLocationManagerDelegate,
+MKMapViewDelegate>{
     
     NSTimer *updateTimre;
     

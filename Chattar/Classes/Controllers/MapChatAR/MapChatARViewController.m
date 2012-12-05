@@ -179,9 +179,13 @@
 	[self.view addSubview:allFriendsSwitch];
 	
     
-    // map/chat delefates
+    // map/chat delegates
     mapViewController.delegate = self;
     chatViewController.delegate = self;
+    
+    mapViewController.mapView.delegate = self;
+    mapViewController.mapView.clusterSize = kDEFAULT_CLUSTER_SIZE;
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated{
@@ -567,9 +571,11 @@
 	searchChatMessagesRequest.perPage = kGetGeoDataCount; // Pins limit for each page
 	searchChatMessagesRequest.status = YES;
 	searchChatMessagesRequest.sortBy = GeoDataSortByKindCreatedAt;
+    
     if(lastMessageDate){
         searchChatMessagesRequest.minCreatedAt = lastMessageDate;
     }
+    
 	[QBLocation geoDataWithRequest:searchChatMessagesRequest delegate:self context:chatSearch];
 	[searchChatMessagesRequest release];
 }

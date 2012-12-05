@@ -110,6 +110,10 @@
 		8ADCA8D615A4767B00C015E7 /* Marker.png in Resources */ = {isa = PBXBuildFile; fileRef = 8ADCA8D215A4767B00C015E7 /* Marker.png */; };
 		8ADCA8D715A4767B00C015E7 /* Marker@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8ADCA8D315A4767B00C015E7 /* Marker@2x.png */; };
 		BB6616171605DF5800DBADD4 /* ChattARApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = BB6616161605DF5800DBADD4 /* ChattARApplication.m */; };
+		ED644BFE166D05AE00007117 /* OCAlgorithms.m in Sources */ = {isa = PBXBuildFile; fileRef = ED644BF6166D05AE00007117 /* OCAlgorithms.m */; };
+		ED644BFF166D05AE00007117 /* OCAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = ED644BF8166D05AE00007117 /* OCAnnotation.m */; };
+		ED644C00166D05AE00007117 /* OCDistance.m in Sources */ = {isa = PBXBuildFile; fileRef = ED644BFA166D05AE00007117 /* OCDistance.m */; };
+		ED644C01166D05AE00007117 /* OCMapView.m in Sources */ = {isa = PBXBuildFile; fileRef = ED644BFD166D05AE00007117 /* OCMapView.m */; };
 		FA0BBEF015AD6062005F4D63 /* allSwitch.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0BBEEA15AD6062005F4D63 /* allSwitch.png */; };
 		FA0BBEF115AD6062005F4D63 /* allSwitch@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0BBEEB15AD6062005F4D63 /* allSwitch@2x.png */; };
 		FA0BBEF215AD6062005F4D63 /* circle.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0BBEEC15AD6062005F4D63 /* circle.png */; };
@@ -340,6 +344,15 @@
 		8ADCA8D315A4767B00C015E7 /* Marker@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Marker@2x.png"; sourceTree = "<group>"; };
 		BB6616151605DF5700DBADD4 /* ChattARApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChattARApplication.h; sourceTree = "<group>"; };
 		BB6616161605DF5800DBADD4 /* ChattARApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChattARApplication.m; sourceTree = "<group>"; };
+		ED644BF5166D05AE00007117 /* OCAlgorithms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCAlgorithms.h; sourceTree = "<group>"; };
+		ED644BF6166D05AE00007117 /* OCAlgorithms.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCAlgorithms.m; sourceTree = "<group>"; };
+		ED644BF7166D05AE00007117 /* OCAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCAnnotation.h; sourceTree = "<group>"; };
+		ED644BF8166D05AE00007117 /* OCAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCAnnotation.m; sourceTree = "<group>"; };
+		ED644BF9166D05AE00007117 /* OCDistance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCDistance.h; sourceTree = "<group>"; };
+		ED644BFA166D05AE00007117 /* OCDistance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCDistance.m; sourceTree = "<group>"; };
+		ED644BFB166D05AE00007117 /* OCGrouping.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCGrouping.h; sourceTree = "<group>"; };
+		ED644BFC166D05AE00007117 /* OCMapView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCMapView.h; sourceTree = "<group>"; };
+		ED644BFD166D05AE00007117 /* OCMapView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCMapView.m; sourceTree = "<group>"; };
 		FA0BBEEA15AD6062005F4D63 /* allSwitch.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = allSwitch.png; sourceTree = "<group>"; };
 		FA0BBEEB15AD6062005F4D63 /* allSwitch@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "allSwitch@2x.png"; sourceTree = "<group>"; };
 		FA0BBEEC15AD6062005F4D63 /* circle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = circle.png; sourceTree = "<group>"; };
@@ -829,6 +842,22 @@
 			path = tabbar;
 			sourceTree = "<group>";
 		};
+		ED644BF4166D05AE00007117 /* Clusterization */ = {
+			isa = PBXGroup;
+			children = (
+				ED644BF5166D05AE00007117 /* OCAlgorithms.h */,
+				ED644BF6166D05AE00007117 /* OCAlgorithms.m */,
+				ED644BF7166D05AE00007117 /* OCAnnotation.h */,
+				ED644BF8166D05AE00007117 /* OCAnnotation.m */,
+				ED644BF9166D05AE00007117 /* OCDistance.h */,
+				ED644BFA166D05AE00007117 /* OCDistance.m */,
+				ED644BFB166D05AE00007117 /* OCGrouping.h */,
+				ED644BFC166D05AE00007117 /* OCMapView.h */,
+				ED644BFD166D05AE00007117 /* OCMapView.m */,
+			);
+			path = Clusterization;
+			sourceTree = "<group>";
+		};
 		FA0BBEE915AD6062005F4D63 /* FriendsAllSwitch */ = {
 			isa = PBXGroup;
 			children = (
@@ -845,6 +874,7 @@
 		FA0BBEF915AD6113005F4D63 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				ED644BF4166D05AE00007117 /* Clusterization */,
 				FA99E78815C95BFB0031F54F /* CustomButtonWithQuote.h */,
 				FA99E78915C95BFB0031F54F /* CustomButtonWithQuote.m */,
 				FA0BBEFA15AD6113005F4D63 /* ARMarkerView.h */,
@@ -1413,6 +1443,10 @@
 				4388BA7D1647C5B30052AB59 /* ProvisionManager.m in Sources */,
 				FAD8E4EC164BB6B500CBCB79 /* DatetimeConverter.m in Sources */,
 				FAD8E4FD164BEC6500CBCB79 /* ChattARModel.xcdatamodeld in Sources */,
+				ED644BFE166D05AE00007117 /* OCAlgorithms.m in Sources */,
+				ED644BFF166D05AE00007117 /* OCAnnotation.m in Sources */,
+				ED644C00166D05AE00007117 /* OCDistance.m in Sources */,
+				ED644C01166D05AE00007117 /* OCMapView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

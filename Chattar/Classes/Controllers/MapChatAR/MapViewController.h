@@ -9,7 +9,8 @@
 #import <UIKit/UIKit.h>
 #import "MapMarkerView.h"
 #import "CustomSwitch.h"
-
+#import "OCMapView.h"
+#import "OCAnnotation.h"
 @interface MapViewController : UIViewController <MKMapViewDelegate, UIGestureRecognizerDelegate>{
     CGFloat count;
     CGFloat lastCount;
@@ -21,10 +22,13 @@
     int annotationsViewCount;
     
     MKCoordinateRegion initialRegion;
+    
+    NSMutableArray* annotationsForClustering;
 }
 
 @property (nonatomic, assign) id delegate;
-@property (nonatomic, assign) IBOutlet MKMapView *mapView;
+                                        // add custom map view with clusterization
+@property (nonatomic, assign) OCMapView *mapView;
 @property (nonatomic, retain) UIImageView *compass;
 
 - (void)refreshWithNewPoints:(NSArray *)mapPoints;
