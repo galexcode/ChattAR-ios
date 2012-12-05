@@ -10,6 +10,7 @@
 #import "OCDistance.h"
 #import "OCAnnotation.h"
 #import "OCAlgorithms.h"
+#import "UserAnnotation.h"
 
 #import <dispatch/dispatch.h>
 

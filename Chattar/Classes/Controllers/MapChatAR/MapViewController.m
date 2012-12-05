@@ -92,6 +92,7 @@
     [compass release];
     
     annotationsForClustering = [[NSMutableArray alloc] init];
+    
 }
 
 - (void)spin:(UIRotationGestureRecognizer *)gestureRecognizer {
@@ -141,16 +142,10 @@
 
 - (void)addPoints:(NSArray *)mapPoints{
     // add new
-    CLLocationDistance clusterRadius = mapView.region.span.longitudeDelta * kDEFAULT_CLUSTER_SIZE;
-
-    NSArray* clusterizedAnnotations = [OCAlgorithms bubbleClusteringWithAnnotations:mapPoints andClusterRadius:clusterRadius grouped:YES];
-	for (OCAnnotation* ann in clusterizedAnnotations){
-		if ([ann isKindOfClass:[OCAnnotation class]]){
-			[mapView addAnnotation:ann];
-		}
-	}
+    for (UserAnnotation* ann in mapPoints) {
+        [mapView addAnnotation:ann];
+    }
     
-    [mapView doClustering];
 }
 
 - (void)addPoint:(UserAnnotation *)mapPoint{
@@ -172,9 +167,9 @@
 #pragma mark MKMapViewDelegate
 
 - (MKAnnotationView *)mapView:(MKMapView *)_mapView viewForAnnotation:(id < MKAnnotation >)annotation{
-	static NSString* reuseidentifier = @"MapAnnotationIdentifier";
-
-                        // if this is
+    
+    NSLog(@"%@",[annotation class]);
+                        // if this is cluster 
     if ([annotation isKindOfClass:[OCAnnotation class]]) {
 
         OCAnnotation* ann = (OCAnnotation*) annotation;
@@ -186,26 +181,36 @@
             annotationView.canShowCallout = YES;
             annotationView.centerOffset = CGPointMake(0, -20);
             annotationView.pinColor = MKPinAnnotationColorGreen;
+            
+            UILabel* numberOfAnnotationsInCluster = [[UILabel alloc] initWithFrame:CGRectMake(20, 0, 20, 20)];
+            [numberOfAnnotationsInCluster setText:[NSString stringWithFormat:@"%d",ann.annotationsInCluster.count]];
+            [numberOfAnnotationsInCluster setBackgroundColor:[UIColor clearColor]];
+            
+            [annotationView addSubview:numberOfAnnotationsInCluster];
+            
+            [numberOfAnnotationsInCluster release];
+
         }
-        //calculate cluster region
         
-        UILabel* numberOfAnnotationsInCluster = [[UILabel alloc] initWithFrame:CGRectMake(20, 0, 20, 20)];
-        [numberOfAnnotationsInCluster setText:[NSString stringWithFormat:@"%d",ann.annotationsInCluster.count]];
-        [numberOfAnnotationsInCluster setBackgroundColor:[UIColor clearColor]];
-        
-        [annotationView addSubview:numberOfAnnotationsInCluster];
-        
-        [numberOfAnnotationsInCluster release];
+        else{
+                            // remove old text and set new text
+            for (UIView* subview in annotationView.subviews) {
+                if ([subview isKindOfClass:[UILabel class]]) {
+                    UILabel* number = (UILabel*)subview;
+                    [number setText:[NSString stringWithFormat:@"%d",ann.annotationsInCluster.count]];
+                }
+            }
+        }
         
         return [annotationView autorelease];
     }
     
     else if([annotation isKindOfClass:[UserAnnotation class]])
     {
-        MapMarkerView *marker = (MapMarkerView *)[_mapView dequeueReusableAnnotationViewWithIdentifier:reuseidentifier];
+        MapMarkerView *marker = (MapMarkerView *)[_mapView dequeueReusableAnnotationViewWithIdentifier:@"pinView"];
         if(marker == nil){
             marker = [[[MapMarkerView alloc] initWithAnnotation:annotation 
-                                        reuseIdentifier:reuseidentifier] autorelease];
+                                        reuseIdentifier:@"pinView"] autorelease];
         }else{
             [marker updateAnnotation:(UserAnnotation *)annotation];
         }
@@ -277,6 +282,9 @@
                          }
          ];
     }
+    
+    
+    [self.mapView doClustering];
 }
 
 #pragma mark -

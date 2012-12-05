@@ -128,6 +128,17 @@
     NSMutableArray *annotationsToCluster = [[NSMutableArray alloc] initWithArray:[self filterAnnotationsForVisibleMap:bufferArray]];
     [bufferArray release];
     
+    
+    MKMapRect visibleRegion = self.visibleMapRect;
+    
+    
+    for (OCAnnotation* ann in self.annotations) {
+        MKMapPoint point = MKMapPointForCoordinate(ann.coordinate);
+        if (!MKMapRectContainsPoint(visibleRegion, point)) {
+            [annotationsToCluster removeObject:ann];
+        }
+    }
+    
     //calculate cluster radius
     CLLocationDistance clusterRadius = self.region.span.longitudeDelta * clusterSize;
     

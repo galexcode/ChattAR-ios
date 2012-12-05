@@ -76,14 +76,14 @@
     NSMutableArray *returnArray = [[NSMutableArray alloc] init];
     
     // whipe all empty or single annotations
-//    for (OCAnnotation *anAnnotation in clusteredAnnotations) {
-//        if ([anAnnotation.annotationsInCluster count] <= 1) {
-//            [returnArray addObject:[anAnnotation.annotationsInCluster lastObject]];
-//        }
-//        else{
-//            [returnArray addObject:anAnnotation];
-//        }
-//    }
+    for (OCAnnotation *anAnnotation in clusteredAnnotations) {
+        if ([anAnnotation.annotationsInCluster count] <= 1) {
+            [returnArray addObject:[anAnnotation.annotationsInCluster lastObject]];
+        }
+        else{
+            [returnArray addObject:anAnnotation];
+        }
+    }
     
     // memory
     [annotationsToCluster release];
@@ -148,14 +148,14 @@
     NSMutableArray *returnArray = [[NSMutableArray alloc] init];
     
     // whipe all empty or single annotations
-//    for (OCAnnotation *anAnnotation in [clusteredAnnotations allValues]) {
-//        if ([anAnnotation.annotationsInCluster count] <= 1) {
-//            [returnArray addObject:[anAnnotation.annotationsInCluster lastObject]];
-//        }
-//        else{
-//            [returnArray addObject:anAnnotation];
-//        }
-//    }
+    for (OCAnnotation *anAnnotation in [clusteredAnnotations allValues]) {
+        if ([anAnnotation.annotationsInCluster count] <= 1) {
+            [returnArray addObject:[anAnnotation.annotationsInCluster lastObject]];
+        }
+        else{
+            [returnArray addObject:anAnnotation];
+        }
+    }
     
     // memory
     [annotationsToCluster release];
