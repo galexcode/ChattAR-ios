@@ -14,5 +14,5 @@
 
 -(void)setNumberOfAnnotations:(NSInteger)numberOfAnnotations;
 
-
+@property (nonatomic, assign) NSInteger numberOfAnnotations;
 @end

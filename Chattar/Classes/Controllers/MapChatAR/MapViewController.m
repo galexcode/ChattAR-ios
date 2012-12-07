@@ -173,26 +173,7 @@
                         // if this is cluster 
     if ([annotation isKindOfClass:[OCAnnotation class]]) {
 
-        OCAnnotation* ann = (OCAnnotation*) annotation;
-//        MKPinAnnotationView* annotationView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"ClusterView"];
-//        [annotationView retain];
-//        
-//        if (!annotationView) {
-//            annotationView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"ClusterView"];
-//            annotationView.canShowCallout = YES;
-//            annotationView.centerOffset = CGPointMake(0, -20);
-//            annotationView.pinColor = MKPinAnnotationColorGreen;
-//            
-//            UILabel* numberOfAnnotationsInCluster = [[UILabel alloc] initWithFrame:CGRectMake(20, 0, 20, 20)];
-//            [numberOfAnnotationsInCluster setText:[NSString stringWithFormat:@"%d",ann.annotationsInCluster.count]];
-//            [numberOfAnnotationsInCluster setBackgroundColor:[UIColor clearColor]];
-//            
-//            [annotationView addSubview:numberOfAnnotationsInCluster];
-//            
-//            [numberOfAnnotationsInCluster release];
-//
-//        }
-        
+        OCAnnotation* ann = (OCAnnotation*) annotation;        
         ClusterMarkerView* clusterView = (ClusterMarkerView*)[mapView dequeueReusableAnnotationViewWithIdentifier:@"ClusterView"];
         [clusterView retain];
         
@@ -200,15 +181,16 @@
             // find annotation which is closest to cluster center
             UserAnnotation* closest = (UserAnnotation*)[OCAlgorithms calculateClusterCenter:ann fromAnnotations:annotationsForClustering];
             
-            clusterView = [[ClusterMarkerView alloc] initWithAnnotation:closest reuseIdentifier:@"ClusterView"];
             
-            [clusterView setNumberOfAnnotations:ann.annotationsInCluster.count];
+            clusterView = [[ClusterMarkerView alloc] initWithAnnotation:closest reuseIdentifier:@"ClusterView"];
+            [clusterView setCanShowCallout:YES];
         }
         
-        else{
-            [clusterView setNumberOfAnnotations:ann.annotationsInCluster.count];
-        }
+        clusterView.target = self;
+        clusterView.action = @selector(tapToZoom:);
         
+        [clusterView setNumberOfAnnotations:ann.annotationsInCluster.count];
+      
         return [clusterView autorelease];
     }
     
@@ -243,6 +225,24 @@
     }
     
     return nil;
+}
+
+-(void)tapToZoom:(ClusterMarkerView*) clusterView{
+//    MKMapRect currentVisibleRect = self.mapView.visibleMapRect;
+//    
+//    currentVisibleRect.origin.x = clusterView.center.x - clusterView.frame.size.width/2;
+//    currentVisibleRect.origin.y = clusterView.center.y - clusterView.frame.size.height/2;
+//
+//    self.mapView.visibleMapRect = currentVisibleRect;
+//    
+    MKCoordinateRegion region = self.mapView.region;
+
+    region.span.longitudeDelta = 2;
+    region.span.latitudeDelta = 2;
+    
+    [self.mapView setRegion:region];
+
+    
 }
 
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated{

@@ -11,8 +11,11 @@
 @implementation ClusterMarkerView
 
 #define NUMBER_MARKER_SIZE 30
+@synthesize numberOfAnnotations = _numberOfAnnotations;
 
 -(void)setNumberOfAnnotations:(NSInteger)numberOfAnnotations{
+    _numberOfAnnotations = numberOfAnnotations;
+    
     NSString* number = [NSString stringWithFormat:@"%d",numberOfAnnotations];
     
     CGSize stringSize = [number sizeWithFont:numberOfAnnotationsInCluster.font];
@@ -40,6 +43,7 @@
         
         [self addSubview:numberMarker];
         [numberMarker release];
+
         
     }
     
