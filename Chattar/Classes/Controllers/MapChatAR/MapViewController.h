@@ -11,6 +11,8 @@
 #import "CustomSwitch.h"
 #import "OCMapView.h"
 #import "OCAnnotation.h"
+#import "ClusterMarkerView.h"
+
 @interface MapViewController : UIViewController <MKMapViewDelegate, UIGestureRecognizerDelegate>{
     CGFloat count;
     CGFloat lastCount;

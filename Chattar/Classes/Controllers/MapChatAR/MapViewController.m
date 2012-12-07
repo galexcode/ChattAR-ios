@@ -146,6 +146,8 @@
         [mapView addAnnotation:ann];
     }
     
+    [annotationsForClustering addObjectsFromArray:mapPoints];
+    
 }
 
 - (void)addPoint:(UserAnnotation *)mapPoint{
@@ -168,41 +170,46 @@
 
 - (MKAnnotationView *)mapView:(MKMapView *)_mapView viewForAnnotation:(id < MKAnnotation >)annotation{
     
-    NSLog(@"%@",[annotation class]);
                         // if this is cluster 
     if ([annotation isKindOfClass:[OCAnnotation class]]) {
 
         OCAnnotation* ann = (OCAnnotation*) annotation;
-        MKPinAnnotationView* annotationView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"ClusterView"];
-        [annotationView retain];
+//        MKPinAnnotationView* annotationView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"ClusterView"];
+//        [annotationView retain];
+//        
+//        if (!annotationView) {
+//            annotationView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"ClusterView"];
+//            annotationView.canShowCallout = YES;
+//            annotationView.centerOffset = CGPointMake(0, -20);
+//            annotationView.pinColor = MKPinAnnotationColorGreen;
+//            
+//            UILabel* numberOfAnnotationsInCluster = [[UILabel alloc] initWithFrame:CGRectMake(20, 0, 20, 20)];
+//            [numberOfAnnotationsInCluster setText:[NSString stringWithFormat:@"%d",ann.annotationsInCluster.count]];
+//            [numberOfAnnotationsInCluster setBackgroundColor:[UIColor clearColor]];
+//            
+//            [annotationView addSubview:numberOfAnnotationsInCluster];
+//            
+//            [numberOfAnnotationsInCluster release];
+//
+//        }
         
-        if (!annotationView) {
-            annotationView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"ClusterView"];
-            annotationView.canShowCallout = YES;
-            annotationView.centerOffset = CGPointMake(0, -20);
-            annotationView.pinColor = MKPinAnnotationColorGreen;
+        ClusterMarkerView* clusterView = (ClusterMarkerView*)[mapView dequeueReusableAnnotationViewWithIdentifier:@"ClusterView"];
+        [clusterView retain];
+        
+        if (!clusterView) {
+            // find annotation which is closest to cluster center
+            UserAnnotation* closest = (UserAnnotation*)[OCAlgorithms calculateClusterCenter:ann fromAnnotations:annotationsForClustering];
             
-            UILabel* numberOfAnnotationsInCluster = [[UILabel alloc] initWithFrame:CGRectMake(20, 0, 20, 20)];
-            [numberOfAnnotationsInCluster setText:[NSString stringWithFormat:@"%d",ann.annotationsInCluster.count]];
-            [numberOfAnnotationsInCluster setBackgroundColor:[UIColor clearColor]];
+            clusterView = [[ClusterMarkerView alloc] initWithAnnotation:closest reuseIdentifier:@"ClusterView"];
             
-            [annotationView addSubview:numberOfAnnotationsInCluster];
-            
-            [numberOfAnnotationsInCluster release];
-
+            [clusterView setNumberOfAnnotations:ann.annotationsInCluster.count];
         }
         
         else{
-                            // remove old text and set new text
-            for (UIView* subview in annotationView.subviews) {
-                if ([subview isKindOfClass:[UILabel class]]) {
-                    UILabel* number = (UILabel*)subview;
-                    [number setText:[NSString stringWithFormat:@"%d",ann.annotationsInCluster.count]];
-                }
-            }
+            [clusterView setNumberOfAnnotations:ann.annotationsInCluster.count];
         }
         
-        return [annotationView autorelease];
+        return [clusterView autorelease];
     }
     
     else if([annotation isKindOfClass:[UserAnnotation class]])

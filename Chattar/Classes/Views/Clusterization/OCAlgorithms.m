@@ -72,7 +72,7 @@
 			}
 		}
 	}
-    
+
     NSMutableArray *returnArray = [[NSMutableArray alloc] init];
     
     // whipe all empty or single annotations
@@ -92,6 +92,24 @@
     return [returnArray autorelease];
 }
 
++(UserAnnotation*)calculateClusterCenter:(OCAnnotation*) cluster fromAnnotations:(NSArray*) annotations{
+    NSMutableArray* distances = [[NSMutableArray alloc] init];
+    
+    for (UserAnnotation* annotation in annotations) {
+        NSNumber* distance = @(getDistance(annotation.coordinate, cluster.coordinate));
+        [distances addObject:distance];
+    }
+    
+    int minIndex = 0;
+    
+    for(int i = 1; i < distances.count; i++){
+        if (distances[i] < distances[minIndex] ) {
+            minIndex = i;
+        }
+    }
+    
+    return [annotations objectAtIndex:minIndex];
+}
 
 // Grid clustering with predefined size
 + (NSArray*) gridClusteringWithAnnotations:(NSArray *) annotationsToCluster andClusterRect:(MKCoordinateSpan)tileRect grouped:(BOOL) grouped{

@@ -7,7 +7,7 @@
 
 #import <Foundation/Foundation.h>
 #import <MapKit/MapKit.h>
-
+#import "UserAnnotation.h"
 
 /// Enumaration for the clustering methods
 /** Contains all clustering methods which are aviable in OCMapView yet*/
@@ -57,6 +57,7 @@ typedef enum {
  It iterates through all annotations in the array and compare their distances. If they are near engough, they will be clustered.*/
 + (NSArray*) bubbleClusteringWithAnnotations:(NSArray *) annotationsToCluster andClusterRadius:(CLLocationDistance)radius grouped:(BOOL) grouped;
 
++(id<MKAnnotation>)calculateClusterCenter:(id<MKAnnotation>) cluster fromAnnotations:(NSArray*) annotations;
 
 
 /// Grid clustering with predefined size

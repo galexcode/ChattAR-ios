@@ -114,6 +114,8 @@
 		ED644BFF166D05AE00007117 /* OCAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = ED644BF8166D05AE00007117 /* OCAnnotation.m */; };
 		ED644C00166D05AE00007117 /* OCDistance.m in Sources */ = {isa = PBXBuildFile; fileRef = ED644BFA166D05AE00007117 /* OCDistance.m */; };
 		ED644C01166D05AE00007117 /* OCMapView.m in Sources */ = {isa = PBXBuildFile; fileRef = ED644BFD166D05AE00007117 /* OCMapView.m */; };
+		ED75489D1671EDB8001E3192 /* numberOfFriendBg.png in Resources */ = {isa = PBXBuildFile; fileRef = ED75489C1671EDB5001E3192 /* numberOfFriendBg.png */; };
+		ED7548A11671F10F001E3192 /* ClusterMarkerView.m in Sources */ = {isa = PBXBuildFile; fileRef = ED7548A01671F10F001E3192 /* ClusterMarkerView.m */; };
 		FA0BBEF015AD6062005F4D63 /* allSwitch.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0BBEEA15AD6062005F4D63 /* allSwitch.png */; };
 		FA0BBEF115AD6062005F4D63 /* allSwitch@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0BBEEB15AD6062005F4D63 /* allSwitch@2x.png */; };
 		FA0BBEF215AD6062005F4D63 /* circle.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0BBEEC15AD6062005F4D63 /* circle.png */; };
@@ -353,6 +355,9 @@
 		ED644BFB166D05AE00007117 /* OCGrouping.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCGrouping.h; sourceTree = "<group>"; };
 		ED644BFC166D05AE00007117 /* OCMapView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCMapView.h; sourceTree = "<group>"; };
 		ED644BFD166D05AE00007117 /* OCMapView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCMapView.m; sourceTree = "<group>"; };
+		ED75489C1671EDB5001E3192 /* numberOfFriendBg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = numberOfFriendBg.png; sourceTree = "<group>"; };
+		ED75489F1671F10F001E3192 /* ClusterMarkerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClusterMarkerView.h; sourceTree = "<group>"; };
+		ED7548A01671F10F001E3192 /* ClusterMarkerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClusterMarkerView.m; sourceTree = "<group>"; };
 		FA0BBEEA15AD6062005F4D63 /* allSwitch.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = allSwitch.png; sourceTree = "<group>"; };
 		FA0BBEEB15AD6062005F4D63 /* allSwitch@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "allSwitch@2x.png"; sourceTree = "<group>"; };
 		FA0BBEEC15AD6062005F4D63 /* circle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = circle.png; sourceTree = "<group>"; };
@@ -774,6 +779,7 @@
 		8A7CBF01157684D5009F1A76 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				ED75489C1671EDB5001E3192 /* numberOfFriendBg.png */,
 				FA0BBEE915AD6062005F4D63 /* FriendsAllSwitch */,
 				8A566CB61578ACA0006CEFF6 /* RadarMarker */,
 				FAC6B88115D8F07B00F3B10F /* bubble_green-1.png */,
@@ -893,6 +899,8 @@
 				FA0BBF0715AD6113005F4D63 /* MBProgressHUD.m */,
 				FA0BBF0815AD6113005F4D63 /* ViewTouch.h */,
 				FA0BBF0915AD6113005F4D63 /* ViewTouch.m */,
+				ED75489F1671F10F001E3192 /* ClusterMarkerView.h */,
+				ED7548A01671F10F001E3192 /* ClusterMarkerView.m */,
 			);
 			name = Views;
 			path = Classes/Views;
@@ -1347,6 +1355,7 @@
 				FAD8E4E7164BB61300CBCB79 /* Icon~ipad@2x.png in Resources */,
 				43892AE716512901008B32BC /* Compass.png in Resources */,
 				43892AE816512901008B32BC /* Compass@2x.png in Resources */,
+				ED75489D1671EDB8001E3192 /* numberOfFriendBg.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1447,6 +1456,7 @@
 				ED644BFF166D05AE00007117 /* OCAnnotation.m in Sources */,
 				ED644C00166D05AE00007117 /* OCDistance.m in Sources */,
 				ED644C01166D05AE00007117 /* OCMapView.m in Sources */,
+				ED7548A11671F10F001E3192 /* ClusterMarkerView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
