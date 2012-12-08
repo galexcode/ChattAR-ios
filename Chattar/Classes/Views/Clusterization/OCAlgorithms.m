@@ -103,7 +103,9 @@
     int minIndex = 0;
     
     for(int i = 1; i < distances.count; i++){
-        if (distances[i] < distances[minIndex] ) {
+        double t1 = [[distances objectAtIndex:i] doubleValue];
+        double t2 = [[distances objectAtIndex:minIndex] doubleValue];
+        if (t1 < t2) {
             minIndex = i;
         }
     }

@@ -12,6 +12,7 @@
 
 #define NUMBER_MARKER_SIZE 30
 @synthesize numberOfAnnotations = _numberOfAnnotations;
+@synthesize clusterCenter = _clusterCenter;
 
 -(void)setNumberOfAnnotations:(NSInteger)numberOfAnnotations{
     _numberOfAnnotations = numberOfAnnotations;

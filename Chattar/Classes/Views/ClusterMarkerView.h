@@ -15,4 +15,5 @@
 -(void)setNumberOfAnnotations:(NSInteger)numberOfAnnotations;
 
 @property (nonatomic, assign) NSInteger numberOfAnnotations;
+@property (nonatomic,assign) CLLocationCoordinate2D clusterCenter;
 @end
