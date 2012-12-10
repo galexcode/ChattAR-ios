@@ -53,7 +53,7 @@
     annotationsToIgnore = [[NSMutableSet alloc] init];
     clusteringMethod = OCClusteringMethodBubble;
     clusterSize = 0.2;
-    minLongitudeDeltaToCluster = 0.0;
+    minLongitudeDeltaToCluster = 0;
     clusteringEnabled = YES;
     clusterByGroupTag = NO;
     backgroundClusterQueue = dispatch_queue_create("com.OCMapView.clustering", NULL);  
@@ -129,13 +129,12 @@
     [bufferArray release];
     
     MKZoomScale currentZoomScale = self.bounds.size.width / self.visibleMapRect.size.width;
-    NSLog(@"%f",currentZoomScale);
     
     
     MKMapRect visibleRegion = self.visibleMapRect;
     
     
-    for (OCAnnotation* ann in self.annotations) {
+    for (UserAnnotation* ann in self.annotations) {
         MKMapPoint point = MKMapPointForCoordinate(ann.coordinate);
         if (!MKMapRectContainsPoint(visibleRegion, point)) {
             [annotationsToCluster removeObject:ann];

@@ -233,19 +233,20 @@
 }
 
 -(void)tapToZoom:(ClusterMarkerView*) clusterView{
-    MKCoordinateRegion region = self.mapView.region;
+//    MKCoordinateRegion region = self.mapView.region;
+//
+//    region.span.longitudeDelta = mapView.region.span.longitudeDelta/4;
+//    region.span.latitudeDelta = mapView.region.span.latitudeDelta/4;
+//    
+//    CLLocationCoordinate2D location = clusterView.clusterCenter;
+//    region.center.latitude = location.latitude;
+//    region.center.longitude = location.longitude;
+//    
+//    region = [self.mapView regionThatFits:region];
+//    
+    //[self.mapView setRegion:region animated:YES];
 
-    region.span.longitudeDelta = region.span.longitudeDelta/4;
-    region.span.latitudeDelta = region.span.latitudeDelta/4;
-    
-    CLLocationCoordinate2D location = clusterView.clusterCenter;
-    region.center.latitude = location.latitude;
-    region.center.longitude = location.longitude;
-
-    
-    [self.mapView setRegion:region animated:YES];
-    
-    
+    [self.mapView doClustering];
 }
 
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated{
