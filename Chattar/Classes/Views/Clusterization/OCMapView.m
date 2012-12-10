@@ -152,6 +152,9 @@
     if (fabs(currentZoomScale - MAX_ZOOM_LEVEL) <= EPSILON ) {
         clusteringEnabled = NO;
     }
+    else{
+        clusteringEnabled = YES;
+    }
     
     // Check if clustering is enabled and map is above the minZoom
     if (clusteringEnabled && (self.region.span.longitudeDelta > minLongitudeDeltaToCluster)) {
