@@ -93,6 +93,7 @@
     
     annotationsForClustering = [[NSMutableArray alloc] init];
     
+    
 }
 
 - (void)spin:(UIRotationGestureRecognizer *)gestureRecognizer {
@@ -185,14 +186,17 @@
             clusterView = [[ClusterMarkerView alloc] initWithAnnotation:closest reuseIdentifier:@"ClusterView"];
             [clusterView setCanShowCallout:YES];
             
-            clusterView.target = self;
+//            clusterView.target = self;
+//            
+//            clusterView.action = @selector(tapToZoom:);
             
-            clusterView.action = @selector(tapToZoom:);
+            UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapToZoom:)];
+            [clusterView addGestureRecognizer:tap];
+            [tap release];
 
         }
-        
+               
         clusterView.clusterCenter = closest.coordinate;
-
         
         [clusterView setNumberOfAnnotations:ann.annotationsInCluster.count];
       
@@ -232,21 +236,23 @@
     return nil;
 }
 
--(void)tapToZoom:(ClusterMarkerView*) clusterView{
-//    MKCoordinateRegion region = self.mapView.region;
-//
-//    region.span.longitudeDelta = mapView.region.span.longitudeDelta/4;
-//    region.span.latitudeDelta = mapView.region.span.latitudeDelta/4;
-//    
-//    CLLocationCoordinate2D location = clusterView.clusterCenter;
-//    region.center.latitude = location.latitude;
-//    region.center.longitude = location.longitude;
-//    
-//    region = [self.mapView regionThatFits:region];
-//    
-    //[self.mapView setRegion:region animated:YES];
+-(void)tapToZoom:(UITapGestureRecognizer*) tap{
+    
+    ClusterMarkerView* clusterView = (ClusterMarkerView*)[tap view];
+    MKCoordinateRegion region = self.mapView.region;
 
-    [self.mapView doClustering];
+    region.span.longitudeDelta = self.mapView.region.span.longitudeDelta/4;
+    region.span.latitudeDelta = self.mapView.region.span.latitudeDelta/4;
+    
+    CLLocationCoordinate2D location = clusterView.clusterCenter;
+    region.center.latitude = location.latitude;
+    region.center.longitude = location.longitude;
+    
+    region = [self.mapView regionThatFits:region];
+
+    [self.mapView setRegion:region animated:YES];
+        
+
 }
 
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated{
@@ -268,7 +274,6 @@
         canRotate = YES;
         
         [self.compass setAlpha:1.0f];
-        
     }
         
     

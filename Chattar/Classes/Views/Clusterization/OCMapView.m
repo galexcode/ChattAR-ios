@@ -116,10 +116,8 @@
     clusteringEnabled = enabled;
     [self doClustering];
 }
-
 // ======================================
 #pragma mark - Clustering
-
 - (void)doClustering{
     
     // Remove the annotation which should be ignored

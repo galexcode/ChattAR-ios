@@ -164,6 +164,8 @@
 	UITouch* touch = [[touches allObjects] objectAtIndex:0];
 	CGPoint location = [touch locationInView:self];
 	CGRect rect = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height/2);
+    
+    NSLog(@"%@",[target class]);
 	
 	if (CGRectContainsPoint(rect, location))
 	{
