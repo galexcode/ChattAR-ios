@@ -114,6 +114,7 @@
 		ED644BFF166D05AE00007117 /* OCAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = ED644BF8166D05AE00007117 /* OCAnnotation.m */; };
 		ED644C00166D05AE00007117 /* OCDistance.m in Sources */ = {isa = PBXBuildFile; fileRef = ED644BFA166D05AE00007117 /* OCDistance.m */; };
 		ED644C01166D05AE00007117 /* OCMapView.m in Sources */ = {isa = PBXBuildFile; fileRef = ED644BFD166D05AE00007117 /* OCMapView.m */; };
+		ED6ED77D1680961300857108 /* nonFBclusterBg.png in Resources */ = {isa = PBXBuildFile; fileRef = ED6ED77C1680961300857108 /* nonFBclusterBg.png */; };
 		ED75489D1671EDB8001E3192 /* numberOfFriendBg.png in Resources */ = {isa = PBXBuildFile; fileRef = ED75489C1671EDB5001E3192 /* numberOfFriendBg.png */; };
 		ED7548A11671F10F001E3192 /* ClusterMarkerView.m in Sources */ = {isa = PBXBuildFile; fileRef = ED7548A01671F10F001E3192 /* ClusterMarkerView.m */; };
 		FA0BBEF015AD6062005F4D63 /* allSwitch.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0BBEEA15AD6062005F4D63 /* allSwitch.png */; };
@@ -355,6 +356,7 @@
 		ED644BFB166D05AE00007117 /* OCGrouping.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCGrouping.h; sourceTree = "<group>"; };
 		ED644BFC166D05AE00007117 /* OCMapView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCMapView.h; sourceTree = "<group>"; };
 		ED644BFD166D05AE00007117 /* OCMapView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCMapView.m; sourceTree = "<group>"; };
+		ED6ED77C1680961300857108 /* nonFBclusterBg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = nonFBclusterBg.png; sourceTree = "<group>"; };
 		ED75489C1671EDB5001E3192 /* numberOfFriendBg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = numberOfFriendBg.png; sourceTree = "<group>"; };
 		ED75489F1671F10F001E3192 /* ClusterMarkerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClusterMarkerView.h; sourceTree = "<group>"; };
 		ED7548A01671F10F001E3192 /* ClusterMarkerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClusterMarkerView.m; sourceTree = "<group>"; };
@@ -779,12 +781,13 @@
 		8A7CBF01157684D5009F1A76 /* images */ = {
 			isa = PBXGroup;
 			children = (
-				ED75489C1671EDB5001E3192 /* numberOfFriendBg.png */,
+				ED6ED77C1680961300857108 /* nonFBclusterBg.png */,
 				FA0BBEE915AD6062005F4D63 /* FriendsAllSwitch */,
 				8A566CB61578ACA0006CEFF6 /* RadarMarker */,
 				FAC6B88115D8F07B00F3B10F /* bubble_green-1.png */,
 				8A79B8FB15862B4D0015B3A7 /* sendButton.png */,
 				8A79B8FC15862B4D0015B3A7 /* sendButton@2x.png */,
+				ED75489C1671EDB5001E3192 /* numberOfFriendBg.png */,
 				FAAD8AA0158DFC5700176682 /* 3item.png */,
 				FAAD8AA1158DFC5700176682 /* 3item@2x.png */,
 				8A79B8F21585ECDE0015B3A7 /* replyArrow.png */,
@@ -1356,6 +1359,7 @@
 				43892AE716512901008B32BC /* Compass.png in Resources */,
 				43892AE816512901008B32BC /* Compass@2x.png in Resources */,
 				ED75489D1671EDB8001E3192 /* numberOfFriendBg.png in Resources */,
+				ED6ED77D1680961300857108 /* nonFBclusterBg.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

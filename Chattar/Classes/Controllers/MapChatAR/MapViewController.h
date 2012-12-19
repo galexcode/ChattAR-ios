@@ -26,7 +26,7 @@
     MKCoordinateRegion initialRegion;
     
     NSMutableArray* annotationsForClustering;
-    
+    MKMapRect previousRect;
 }
 
 @property (nonatomic, assign) id delegate;

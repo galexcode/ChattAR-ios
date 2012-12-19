@@ -10,7 +10,7 @@
 
 @implementation ClusterMarkerView
 
-#define NUMBER_MARKER_SIZE 30
+#define NUMBER_MARKER_SIZE 35
 @synthesize numberOfAnnotations = _numberOfAnnotations;
 @synthesize clusterCenter = _clusterCenter;
 
@@ -32,7 +32,7 @@
 -(id)initWithAnnotation:(UserAnnotation*)annotation reuseIdentifier:(NSString *)reuseIdentifier{
     self = [super initWithAnnotation:annotation reuseIdentifier:reuseIdentifier];
     if (self) {
-        UIImageView* numberMarker = [[UIImageView alloc] initWithFrame:CGRectMake(90, -10, NUMBER_MARKER_SIZE, NUMBER_MARKER_SIZE)];
+        UIImageView* numberMarker = [[UIImageView alloc] initWithFrame:CGRectMake(80, -10, NUMBER_MARKER_SIZE, NUMBER_MARKER_SIZE)];
         [numberMarker setImage:[UIImage imageNamed:@"numberOfFriendBg.png"]];
         
         numberOfAnnotationsInCluster = [[UILabel alloc] initWithFrame:CGRectMake(8, 5, 15, 15)];
@@ -42,7 +42,13 @@
         
         [numberMarker addSubview:numberOfAnnotationsInCluster];
         
+        UIImageView* backGround = [[UIImageView alloc] initWithFrame:CGRectMake(-20, -20, self.frame.size.width + 40, self.frame.size.height-20)];
+        [backGround setImage:[UIImage imageNamed:@"nonFBclusterBg.png"]];
+        
         [self addSubview:numberMarker];
+        [self addSubview:backGround];
+        [self sendSubviewToBack:backGround];
+        [backGround release];
         [numberMarker release];
 
         

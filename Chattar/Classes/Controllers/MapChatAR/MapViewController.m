@@ -93,6 +93,8 @@
     
     annotationsForClustering = [[NSMutableArray alloc] init];
     
+    previousRect = mapView.visibleMapRect;
+    
     
 }
 
@@ -139,6 +141,7 @@
 	
     // add new
 	[self addPoints:mapPoints];
+    [mapView doClustering];
 }
 
 - (void)addPoints:(NSArray *)mapPoints{
@@ -148,13 +151,10 @@
     }
     
     [annotationsForClustering addObjectsFromArray:mapPoints];
-    
 }
 
 - (void)addPoint:(UserAnnotation *)mapPoint{
     [mapView addAnnotation:mapPoint];
-    
-    [mapView doClustering];
 }
 
 - (void)clear{
@@ -185,18 +185,14 @@
             
             clusterView = [[ClusterMarkerView alloc] initWithAnnotation:closest reuseIdentifier:@"ClusterView"];
             [clusterView setCanShowCallout:YES];
-            
-//            clusterView.target = self;
-//            
-//            clusterView.action = @selector(tapToZoom:);
-            
+                        
             UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapToZoom:)];
             [clusterView addGestureRecognizer:tap];
             [tap release];
 
         }
-               
-        clusterView.clusterCenter = closest.coordinate;
+        
+            clusterView.clusterCenter = closest.coordinate;
         
         [clusterView setNumberOfAnnotations:ann.annotationsInCluster.count];
       
@@ -299,9 +295,11 @@
                          }
          ];
     }
-    
-    
+        
+    // determ type of region changing - zooming or moving
+       
     [self.mapView doClustering];
+    
 }
 
 #pragma mark -

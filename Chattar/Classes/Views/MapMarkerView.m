@@ -111,7 +111,6 @@
         [self addSubview: arrow];
         [arrow release];
 
-        
         //[self updateContainer:_annotation];
     }
     

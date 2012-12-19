@@ -44,6 +44,7 @@
     if (self) {
         // call actual initializer
         [self initSetUp];
+        oldClusters = [[NSMutableArray alloc] init];
     }
     return self;
 }
@@ -77,7 +78,6 @@
 
 - (void)addAnnotations:(NSArray *)annotations{
     [allAnnotations addObjectsFromArray:annotations];
-    [self doClustering];
 }
 
 - (void)removeAnnotation:(id < MKAnnotation >)annotation{
@@ -91,7 +91,6 @@
         [allAnnotations removeObject:annotation];
     }
     [annotations release];
-    [self doClustering];
 }
 
 
@@ -139,11 +138,10 @@
         }
     }
     
+    
     //calculate cluster radius
     CLLocationDistance clusterRadius = self.region.span.longitudeDelta * clusterSize;
     
-    // Do clustering
-    NSArray *clusteredAnnotations;
     
                 // if zoom level is enough for displaying all annotations
     if (fabs(currentZoomScale - MAX_ZOOM_LEVEL) <= EPSILON ) {
@@ -153,17 +151,23 @@
         clusteringEnabled = YES;
     }
     
+    NSArray* clusteredAnnotations;
+    
+    
     // Check if clustering is enabled and map is above the minZoom
     if (clusteringEnabled && (self.region.span.longitudeDelta > minLongitudeDeltaToCluster)) {
         
-        // switch to selected algoritm
+        // fill newClusters
+        
         switch (clusteringMethod) {
             case OCClusteringMethodBubble:{
                 clusteredAnnotations = [[NSArray alloc] initWithArray:[OCAlgorithms bubbleClusteringWithAnnotations:annotationsToCluster andClusterRadius:clusterRadius grouped:self.clusterByGroupTag]];
+
                 break;
             }
-            case OCClusteringMethodGrid:{
+            case OCClusteringMethodGrid:{                
                 clusteredAnnotations =[[NSArray alloc] initWithArray:[OCAlgorithms gridClusteringWithAnnotations:annotationsToCluster andClusterRect:MKCoordinateSpanMake(clusterRadius, clusterRadius)  grouped:self.clusterByGroupTag]];
+
                 break;
             }
             default:{
@@ -172,12 +176,13 @@
             }
         }
     }
+    
+    
     // pass through without when not
     else{
         clusteredAnnotations = [annotationsToCluster retain];
     }
     
-    // Clear map but leave Userlcoation
     NSMutableArray *annotationsToRemove = [[NSMutableArray alloc] initWithArray:self.displayedAnnotations];
     [annotationsToRemove removeObject:self.userLocation];
     
@@ -185,16 +190,27 @@
     [super addAnnotations: clusteredAnnotations];
     
     // fix for flickering
-    [annotationsToRemove removeObjectsInArray: clusteredAnnotations];
+
+    NSMutableArray* tmp = [[NSMutableArray alloc] init];
+    
+    for (id<MKAnnotation> ann in annotationsToRemove) {
+        for (OCAnnotation* cluster in clusteredAnnotations) {
+            if ( fabs(cluster.coordinate.longitude - ann.coordinate.longitude) < EPSILON && fabs(cluster.coordinate.latitude - ann.coordinate.latitude) < EPSILON ) {
+                [tmp addObject:ann];
+            }
+        }
+    }
+    
+    [annotationsToRemove removeObjectsInArray: tmp];
+
+
     [super removeAnnotations:annotationsToRemove];
     
     // add ignored annotations
     [super addAnnotations: [annotationsToIgnore allObjects]];
     
     // memory
-    [clusteredAnnotations release];
     [annotationsToCluster release];
-    [annotationsToRemove release];
 }
 
 // ======================================
