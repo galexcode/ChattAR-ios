@@ -44,7 +44,6 @@
     if (self) {
         // call actual initializer
         [self initSetUp];
-        oldClusters = [[NSMutableArray alloc] init];
     }
     return self;
 }
@@ -202,7 +201,7 @@
     }
     
     [annotationsToRemove removeObjectsInArray: tmp];
-
+    [tmp release];
 
     [super removeAnnotations:annotationsToRemove];
     

@@ -35,7 +35,6 @@
     // Backround Clustering
     dispatch_queue_t backgroundClusterQueue;
     
-    NSMutableArray* oldClusters;
 }
 
 // ======================================
