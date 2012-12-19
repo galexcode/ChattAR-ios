@@ -186,7 +186,21 @@
     [annotationsToRemove removeObject:self.userLocation];
     
     // add clustered and ignored annotations to map
-    [super addAnnotations: clusteredAnnotations];
+    if ([super annotations].count != 0) {
+        for (id<MKAnnotation> ann in [super annotations]) {
+            for (OCAnnotation* cluster in clusteredAnnotations) {
+                if (![self isAnnotation:cluster equalToAnotherAnnotation:ann]) {
+                    [super addAnnotation:ann];
+                }
+            }
+        }
+    }
+    
+    else{
+        [super addAnnotations:clusteredAnnotations];
+    }
+
+    
     
     
     // fix for flickering
@@ -194,8 +208,8 @@
     NSMutableArray* tmp = [[NSMutableArray alloc] init];
     
     for (id<MKAnnotation> ann in annotationsToRemove) {
-        for (OCAnnotation* cluster in clusteredAnnotations) {
-            if ( fabs(cluster.coordinate.longitude - ann.coordinate.longitude) < EPSILON && fabs(cluster.coordinate.latitude - ann.coordinate.latitude) < EPSILON ) {
+        for (OCAnnotation* cluster in clusteredAnnotations) {            
+            if ([self isAnnotation:cluster equalToAnotherAnnotation:ann]) {
                 [tmp addObject:ann];
             }
         }
@@ -233,6 +247,14 @@
     }
     
     return [filteredAnnotations autorelease];
+}
+
+-(BOOL)isAnnotation:(id<MKAnnotation>)annotation equalToAnotherAnnotation:(id<MKAnnotation>) anotherAnnotation{
+    if ( fabs(annotation.coordinate.longitude - anotherAnnotation.coordinate.longitude) < EPSILON &&
+         fabs(annotation.coordinate.latitude - anotherAnnotation.coordinate.latitude) < EPSILON ) {
+        return YES;
+    }
+    return NO;
 }
 
 @end

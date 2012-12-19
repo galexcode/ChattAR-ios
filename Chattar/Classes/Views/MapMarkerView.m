@@ -107,7 +107,7 @@
         //
         UIImageView *arrow = [[UIImageView alloc] init];
         [arrow setImage:[UIImage imageNamed:@"radarMarkerArrow@2x.png"]];
-        [arrow setFrame:CGRectMake(45, 45, 10, 8)];
+        [arrow setFrame:CGRectMake(45, 43, 10, 9)];
         [self addSubview: arrow];
         [arrow release];
 

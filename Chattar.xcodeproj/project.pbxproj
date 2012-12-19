@@ -56,10 +56,7 @@
 		8A21DBAA1580E0E800D0144B /* kmBG2@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A21DBA51580E0E800D0144B /* kmBG2@2x.png */; };
 		8A21DBAB1580E0E800D0144B /* navBar.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A21DBA61580E0E800D0144B /* navBar.png */; };
 		8A21DBAC1580E0E800D0144B /* navBar@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A21DBA71580E0E800D0144B /* navBar@2x.png */; };
-		8A566CBD1578ACA0006CEFF6 /* radarMarkerArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A566CB71578ACA0006CEFF6 /* radarMarkerArrow.png */; };
-		8A566CBE1578ACA0006CEFF6 /* radarMarkerArrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A566CB81578ACA0006CEFF6 /* radarMarkerArrow@2x.png */; };
 		8A566CBF1578ACA0006CEFF6 /* radarMarkerName.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A566CB91578ACA0006CEFF6 /* radarMarkerName.png */; };
-		8A566CC01578ACA0006CEFF6 /* radarMarkerName@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A566CBA1578ACA0006CEFF6 /* radarMarkerName@2x.png */; };
 		8A566CC11578ACA0006CEFF6 /* radarMarkerStatus.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A566CBB1578ACA0006CEFF6 /* radarMarkerStatus.png */; };
 		8A566CC21578ACA0006CEFF6 /* radarMarkerStatus@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A566CBC1578ACA0006CEFF6 /* radarMarkerStatus@2x.png */; };
 		8A6344D215A359E900FF2C2B /* grey_arrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A6344D015A359E900FF2C2B /* grey_arrow.png */; };
@@ -114,10 +111,14 @@
 		ED644BFF166D05AE00007117 /* OCAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = ED644BF8166D05AE00007117 /* OCAnnotation.m */; };
 		ED644C00166D05AE00007117 /* OCDistance.m in Sources */ = {isa = PBXBuildFile; fileRef = ED644BFA166D05AE00007117 /* OCDistance.m */; };
 		ED644C01166D05AE00007117 /* OCMapView.m in Sources */ = {isa = PBXBuildFile; fileRef = ED644BFD166D05AE00007117 /* OCMapView.m */; };
-		ED6ED77D1680961300857108 /* clusterBg.png in Resources */ = {isa = PBXBuildFile; fileRef = ED6ED77C1680961300857108 /* clusterBg.png */; };
 		ED6ED7831681DABF00857108 /* numberOfFriendFBBg.png in Resources */ = {isa = PBXBuildFile; fileRef = ED6ED7821681DABF00857108 /* numberOfFriendFBBg.png */; };
+		ED6ED7871682174B00857108 /* radarMarkerName@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = ED6ED7851682174A00857108 /* radarMarkerName@2x.png */; };
+		ED6ED7881682174B00857108 /* radarMarkerName2@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = ED6ED7861682174A00857108 /* radarMarkerName2@2x.png */; };
+		ED6ED79016821D3C00857108 /* clusterBg.png in Resources */ = {isa = PBXBuildFile; fileRef = ED6ED78F16821D3C00857108 /* clusterBg.png */; };
 		ED75489D1671EDB8001E3192 /* numberOfFriendBg.png in Resources */ = {isa = PBXBuildFile; fileRef = ED75489C1671EDB5001E3192 /* numberOfFriendBg.png */; };
 		ED7548A11671F10F001E3192 /* ClusterMarkerView.m in Sources */ = {isa = PBXBuildFile; fileRef = ED7548A01671F10F001E3192 /* ClusterMarkerView.m */; };
+		ED8C505C168222A800993E34 /* radarMarkerArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = ED8C505A168222A800993E34 /* radarMarkerArrow.png */; };
+		ED8C505D168222A800993E34 /* radarMarkerArrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = ED8C505B168222A800993E34 /* radarMarkerArrow@2x.png */; };
 		FA0BBEF015AD6062005F4D63 /* allSwitch.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0BBEEA15AD6062005F4D63 /* allSwitch.png */; };
 		FA0BBEF115AD6062005F4D63 /* allSwitch@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0BBEEB15AD6062005F4D63 /* allSwitch@2x.png */; };
 		FA0BBEF215AD6062005F4D63 /* circle.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0BBEEC15AD6062005F4D63 /* circle.png */; };
@@ -133,7 +134,6 @@
 		FA0BBF1015AD6114005F4D63 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = FA0BBF0715AD6113005F4D63 /* MBProgressHUD.m */; };
 		FA0BBF1115AD6114005F4D63 /* ViewTouch.m in Sources */ = {isa = PBXBuildFile; fileRef = FA0BBF0915AD6113005F4D63 /* ViewTouch.m */; };
 		FA4EF0A71590A8010007CB3A /* radarMarkerName2.png in Resources */ = {isa = PBXBuildFile; fileRef = FA4EF0A51590A8010007CB3A /* radarMarkerName2.png */; };
-		FA4EF0A81590A8010007CB3A /* radarMarkerName2@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FA4EF0A61590A8010007CB3A /* radarMarkerName2@2x.png */; };
 		FA4EF0E51590D16A0007CB3A /* UIColor+hex.m in Sources */ = {isa = PBXBuildFile; fileRef = FA4EF0E41590D16A0007CB3A /* UIColor+hex.m */; };
 		FA52C8CA158DF43E00620918 /* offLine.png in Resources */ = {isa = PBXBuildFile; fileRef = FA52C8C6158DF43E00620918 /* offLine.png */; };
 		FA52C8CB158DF43E00620918 /* offLine@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FA52C8C7158DF43E00620918 /* offLine@2x.png */; };
@@ -293,10 +293,7 @@
 		8A21DBA51580E0E800D0144B /* kmBG2@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "kmBG2@2x.png"; sourceTree = "<group>"; };
 		8A21DBA61580E0E800D0144B /* navBar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = navBar.png; sourceTree = "<group>"; };
 		8A21DBA71580E0E800D0144B /* navBar@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "navBar@2x.png"; sourceTree = "<group>"; };
-		8A566CB71578ACA0006CEFF6 /* radarMarkerArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = radarMarkerArrow.png; sourceTree = "<group>"; };
-		8A566CB81578ACA0006CEFF6 /* radarMarkerArrow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "radarMarkerArrow@2x.png"; sourceTree = "<group>"; };
 		8A566CB91578ACA0006CEFF6 /* radarMarkerName.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = radarMarkerName.png; sourceTree = "<group>"; };
-		8A566CBA1578ACA0006CEFF6 /* radarMarkerName@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "radarMarkerName@2x.png"; sourceTree = "<group>"; };
 		8A566CBB1578ACA0006CEFF6 /* radarMarkerStatus.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = radarMarkerStatus.png; sourceTree = "<group>"; };
 		8A566CBC1578ACA0006CEFF6 /* radarMarkerStatus@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "radarMarkerStatus@2x.png"; sourceTree = "<group>"; };
 		8A6344D015A359E900FF2C2B /* grey_arrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = grey_arrow.png; sourceTree = "<group>"; };
@@ -357,11 +354,15 @@
 		ED644BFB166D05AE00007117 /* OCGrouping.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCGrouping.h; sourceTree = "<group>"; };
 		ED644BFC166D05AE00007117 /* OCMapView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCMapView.h; sourceTree = "<group>"; };
 		ED644BFD166D05AE00007117 /* OCMapView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCMapView.m; sourceTree = "<group>"; };
-		ED6ED77C1680961300857108 /* clusterBg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = clusterBg.png; sourceTree = "<group>"; };
 		ED6ED7821681DABF00857108 /* numberOfFriendFBBg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = numberOfFriendFBBg.png; sourceTree = "<group>"; };
+		ED6ED7851682174A00857108 /* radarMarkerName@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "radarMarkerName@2x.png"; sourceTree = "<group>"; };
+		ED6ED7861682174A00857108 /* radarMarkerName2@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "radarMarkerName2@2x.png"; sourceTree = "<group>"; };
+		ED6ED78F16821D3C00857108 /* clusterBg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = clusterBg.png; sourceTree = "<group>"; };
 		ED75489C1671EDB5001E3192 /* numberOfFriendBg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = numberOfFriendBg.png; sourceTree = "<group>"; };
 		ED75489F1671F10F001E3192 /* ClusterMarkerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClusterMarkerView.h; sourceTree = "<group>"; };
 		ED7548A01671F10F001E3192 /* ClusterMarkerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClusterMarkerView.m; sourceTree = "<group>"; };
+		ED8C505A168222A800993E34 /* radarMarkerArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = radarMarkerArrow.png; sourceTree = "<group>"; };
+		ED8C505B168222A800993E34 /* radarMarkerArrow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "radarMarkerArrow@2x.png"; sourceTree = "<group>"; };
 		FA0BBEEA15AD6062005F4D63 /* allSwitch.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = allSwitch.png; sourceTree = "<group>"; };
 		FA0BBEEB15AD6062005F4D63 /* allSwitch@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "allSwitch@2x.png"; sourceTree = "<group>"; };
 		FA0BBEEC15AD6062005F4D63 /* circle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = circle.png; sourceTree = "<group>"; };
@@ -385,7 +386,6 @@
 		FA0BBF0815AD6113005F4D63 /* ViewTouch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewTouch.h; sourceTree = "<group>"; };
 		FA0BBF0915AD6113005F4D63 /* ViewTouch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewTouch.m; sourceTree = "<group>"; };
 		FA4EF0A51590A8010007CB3A /* radarMarkerName2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = radarMarkerName2.png; sourceTree = "<group>"; };
-		FA4EF0A61590A8010007CB3A /* radarMarkerName2@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "radarMarkerName2@2x.png"; sourceTree = "<group>"; };
 		FA4EF0E31590D16A0007CB3A /* UIColor+hex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+hex.h"; sourceTree = "<group>"; };
 		FA4EF0E41590D16A0007CB3A /* UIColor+hex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+hex.m"; sourceTree = "<group>"; };
 		FA52C8C6158DF43E00620918 /* offLine.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = offLine.png; sourceTree = "<group>"; };
@@ -760,6 +760,10 @@
 		8A566CB61578ACA0006CEFF6 /* RadarMarker */ = {
 			isa = PBXGroup;
 			children = (
+				ED8C505A168222A800993E34 /* radarMarkerArrow.png */,
+				ED8C505B168222A800993E34 /* radarMarkerArrow@2x.png */,
+				ED6ED7851682174A00857108 /* radarMarkerName@2x.png */,
+				ED6ED7861682174A00857108 /* radarMarkerName2@2x.png */,
 				43892AE516512901008B32BC /* Compass.png */,
 				43892AE616512901008B32BC /* Compass@2x.png */,
 				8ADCA8D015A4767A00C015E7 /* Marker_arrow.png */,
@@ -768,14 +772,10 @@
 				8ADCA8D315A4767B00C015E7 /* Marker@2x.png */,
 				436C0AF115D50EA90054D9BC /* Marker2.png */,
 				436C0AF215D50EA90054D9BC /* Marker2@2x.png */,
-				8A566CB71578ACA0006CEFF6 /* radarMarkerArrow.png */,
-				8A566CB81578ACA0006CEFF6 /* radarMarkerArrow@2x.png */,
 				8A566CB91578ACA0006CEFF6 /* radarMarkerName.png */,
-				8A566CBA1578ACA0006CEFF6 /* radarMarkerName@2x.png */,
 				8A566CBB1578ACA0006CEFF6 /* radarMarkerStatus.png */,
 				8A566CBC1578ACA0006CEFF6 /* radarMarkerStatus@2x.png */,
 				FA4EF0A51590A8010007CB3A /* radarMarkerName2.png */,
-				FA4EF0A61590A8010007CB3A /* radarMarkerName2@2x.png */,
 			);
 			path = RadarMarker;
 			sourceTree = "<group>";
@@ -783,8 +783,8 @@
 		8A7CBF01157684D5009F1A76 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				ED6ED78F16821D3C00857108 /* clusterBg.png */,
 				ED6ED7821681DABF00857108 /* numberOfFriendFBBg.png */,
-				ED6ED77C1680961300857108 /* clusterBg.png */,
 				FA0BBEE915AD6062005F4D63 /* FriendsAllSwitch */,
 				8A566CB61578ACA0006CEFF6 /* RadarMarker */,
 				FAC6B88115D8F07B00F3B10F /* bubble_green-1.png */,
@@ -1294,10 +1294,7 @@
 				8A7CBF52157684D5009F1A76 /* DockSettings@2x.png in Resources */,
 				8A7CBF53157684D5009F1A76 /* textFieldBG.png in Resources */,
 				8A7CBF54157684D5009F1A76 /* textFieldBG@2x.png in Resources */,
-				8A566CBD1578ACA0006CEFF6 /* radarMarkerArrow.png in Resources */,
-				8A566CBE1578ACA0006CEFF6 /* radarMarkerArrow@2x.png in Resources */,
 				8A566CBF1578ACA0006CEFF6 /* radarMarkerName.png in Resources */,
-				8A566CC01578ACA0006CEFF6 /* radarMarkerName@2x.png in Resources */,
 				8A566CC11578ACA0006CEFF6 /* radarMarkerStatus.png in Resources */,
 				8A566CC21578ACA0006CEFF6 /* radarMarkerStatus@2x.png in Resources */,
 				FA8E4DC8158084FE00476EF7 /* ContactsController.xib in Resources */,
@@ -1334,7 +1331,6 @@
 				FAAD8AA6158DFE6700176682 /* sound.mp3 in Resources */,
 				FA82C784158F6E2E005AFE00 /* replyCellBodyBG_Pressed.png in Resources */,
 				FA4EF0A71590A8010007CB3A /* radarMarkerName2.png in Resources */,
-				FA4EF0A81590A8010007CB3A /* radarMarkerName2@2x.png in Resources */,
 				8A6344D215A359E900FF2C2B /* grey_arrow.png in Resources */,
 				8A6344D315A359E900FF2C2B /* grey_arrow@2x.png in Resources */,
 				8ADCA8D415A4767B00C015E7 /* Marker_arrow.png in Resources */,
@@ -1362,8 +1358,12 @@
 				43892AE716512901008B32BC /* Compass.png in Resources */,
 				43892AE816512901008B32BC /* Compass@2x.png in Resources */,
 				ED75489D1671EDB8001E3192 /* numberOfFriendBg.png in Resources */,
-				ED6ED77D1680961300857108 /* clusterBg.png in Resources */,
 				ED6ED7831681DABF00857108 /* numberOfFriendFBBg.png in Resources */,
+				ED6ED7871682174B00857108 /* radarMarkerName@2x.png in Resources */,
+				ED6ED7881682174B00857108 /* radarMarkerName2@2x.png in Resources */,
+				ED6ED79016821D3C00857108 /* clusterBg.png in Resources */,
+				ED8C505C168222A800993E34 /* radarMarkerArrow.png in Resources */,
+				ED8C505D168222A800993E34 /* radarMarkerArrow@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

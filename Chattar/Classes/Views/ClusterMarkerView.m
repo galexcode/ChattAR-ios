@@ -58,7 +58,7 @@
         [numberOfAnnotationsInCluster setTextAlignment:NSTextAlignmentCenter];
         [numberMarker addSubview:numberOfAnnotationsInCluster];
         
-        UIImageView* backGround = [[UIImageView alloc] initWithFrame:CGRectMake(-20, -20, self.frame.size.width + 40, self.frame.size.height-20)];
+        UIImageView* backGround = [[UIImageView alloc] initWithFrame:CGRectMake(-20, -20, self.frame.size.width + 30, self.frame.size.height-35)];
         [backGround setImage:[UIImage imageNamed:@"clusterBg.png"]];
         
         [self addSubview:numberMarker];
