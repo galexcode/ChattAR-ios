@@ -188,6 +188,7 @@
     // add clustered and ignored annotations to map
     [super addAnnotations: clusteredAnnotations];
     
+    
     // fix for flickering
 
     NSMutableArray* tmp = [[NSMutableArray alloc] init];

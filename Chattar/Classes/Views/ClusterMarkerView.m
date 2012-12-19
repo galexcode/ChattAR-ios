@@ -17,14 +17,14 @@
 -(void)setNumberOfAnnotations:(NSInteger)numberOfAnnotations{
     _numberOfAnnotations = numberOfAnnotations;
     
-    NSString* number = [NSString stringWithFormat:@"%d",numberOfAnnotations];
+//    NSString* number = [NSString stringWithFormat:@"%d",numberOfAnnotations];
     
-    CGSize stringSize = [number sizeWithFont:numberOfAnnotationsInCluster.font];
-    
-    CGRect newFrame = numberOfAnnotationsInCluster.frame;
-    newFrame.size = stringSize;
-    
-    [numberOfAnnotationsInCluster setFrame:newFrame];
+//    CGSize stringSize = [number sizeWithFont:numberOfAnnotationsInCluster.font];
+//    
+//    CGRect newFrame = numberOfAnnotationsInCluster.frame;
+//    newFrame.size = stringSize;
+//    
+//    [numberOfAnnotationsInCluster setFrame:newFrame];
     
     [numberOfAnnotationsInCluster setText:[NSString stringWithFormat:@"%d",numberOfAnnotations]];
 }
@@ -51,11 +51,11 @@
 
         
         
-        numberOfAnnotationsInCluster = [[UILabel alloc] initWithFrame:CGRectMake(8, 5, 15, 15)];
+        numberOfAnnotationsInCluster = [[UILabel alloc] initWithFrame:CGRectMake(9, 10, 17, 15)];
         [numberOfAnnotationsInCluster setBackgroundColor:[UIColor clearColor]];
         [numberOfAnnotationsInCluster setTextColor:[UIColor whiteColor]];
-        [numberOfAnnotationsInCluster setFont:[UIFont fontWithName:@"American Typewriter" size:15]];
-        
+        [numberOfAnnotationsInCluster setFont:[UIFont fontWithName:@"HelveticaNeue-Bold" size:15]];
+        [numberOfAnnotationsInCluster setTextAlignment:NSTextAlignmentCenter];
         [numberMarker addSubview:numberOfAnnotationsInCluster];
         
         UIImageView* backGround = [[UIImageView alloc] initWithFrame:CGRectMake(-20, -20, self.frame.size.width + 40, self.frame.size.height-20)];
@@ -67,7 +67,6 @@
         [backGround release];
         [numberMarker release];
 
-        
     }
     
     return self;

@@ -67,11 +67,11 @@
         if([friendsIds containsObject:[annotation.fbUser objectForKey:kId]]
            || [[DataManager shared].currentFBUserId isEqualToString:[annotation.fbUser objectForKey:kId]]){
             
-            [userNameBG setImage:[UIImage imageNamed:@"radarMarkerName@2x.png"]];
+            [userNameBG setImage:[UIImage imageNamed:@"radarMarkerName.png"]];
         }
         else
         {
-            [userNameBG setImage:[UIImage imageNamed:@"radarMarkerName2@2x.png"] ];
+            [userNameBG setImage:[UIImage imageNamed:@"radarMarkerName2.png"] ];
         }
         
         [container addSubview: userNameBG];
@@ -81,7 +81,7 @@
         userName = [[UILabel alloc] initWithFrame:CGRectMake(2, 0, userNameBG.frame.size.width-3, userNameBG.frame.size.height)];
         [userName setBackgroundColor:[UIColor clearColor]];
         [userName setText:annotation.userName];
-        [userName setFont:[UIFont boldSystemFontOfSize:11]];
+        [userName setFont:[UIFont fontWithName:@"HelveticaNeue-Bold" size:12]];
         [userName setTextColor:[UIColor whiteColor]];
         [userNameBG addSubview:userName];
         [userName release];
@@ -91,12 +91,12 @@
         //
         UIImageView *userStatusBG = [[UIImageView alloc] init];
         [userStatusBG setFrame:CGRectMake(45, 23, 55, 22)];
-        [userStatusBG setImage:[UIImage imageNamed:@"radarMarkerStatus@2x.png"]];
+        [userStatusBG setImage:[UIImage imageNamed:@"radarMarkerStatus.png"]];
         [container addSubview: userStatusBG];
         [userStatusBG release];
         //
         userStatus = [[UILabel alloc] initWithFrame:CGRectMake(2, 0, userStatusBG.frame.size.width-3, userStatusBG.frame.size.height)];
-        [userStatus setFont:[UIFont systemFontOfSize:11]];
+        [userStatus setFont:[UIFont fontWithName:@"HelveticaNeue" size:12]];
         [userStatus setText:[[DataManager shared] messageFromQuote:annotation.userStatus]];
         [userStatus setBackgroundColor:[UIColor clearColor]];
         [userStatus setTextColor:[UIColor whiteColor]];
