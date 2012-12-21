@@ -16,23 +16,14 @@
 
 -(void)setNumberOfAnnotations:(NSInteger)numberOfAnnotations{
     _numberOfAnnotations = numberOfAnnotations;
-    
-//    NSString* number = [NSString stringWithFormat:@"%d",numberOfAnnotations];
-    
-//    CGSize stringSize = [number sizeWithFont:numberOfAnnotationsInCluster.font];
-//    
-//    CGRect newFrame = numberOfAnnotationsInCluster.frame;
-//    newFrame.size = stringSize;
-//    
-//    [numberOfAnnotationsInCluster setFrame:newFrame];
-    
+        
     [numberOfAnnotationsInCluster setText:[NSString stringWithFormat:@"%d",numberOfAnnotations]];
 }
 
 -(id)initWithAnnotation:(UserAnnotation*)annotation reuseIdentifier:(NSString *)reuseIdentifier{
     self = [super initWithAnnotation:annotation reuseIdentifier:reuseIdentifier];
     if (self) {
-        UIImageView* numberMarker = [[UIImageView alloc] initWithFrame:CGRectMake(85, -5, NUMBER_MARKER_SIZE, NUMBER_MARKER_SIZE)];
+        UIImageView* numberMarker = [[UIImageView alloc] initWithFrame:CGRectMake(85, -10, NUMBER_MARKER_SIZE, NUMBER_MARKER_SIZE)];
         
         NSArray *friendsIds =  [[DataManager shared].myFriendsAsDictionary allKeys];
         

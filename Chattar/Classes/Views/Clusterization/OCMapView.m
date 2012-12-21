@@ -129,17 +129,6 @@
     MKZoomScale currentZoomScale = self.bounds.size.width / self.visibleMapRect.size.width;
     
     
-    MKMapRect visibleRegion = self.visibleMapRect;
-    
-    
-    for (UserAnnotation* ann in self.annotations) {
-        MKMapPoint point = MKMapPointForCoordinate(ann.coordinate);
-        if (!MKMapRectContainsPoint(visibleRegion, point)) {
-            [annotationsToCluster removeObject:ann];
-        }
-    }
-    
-    
     //calculate cluster radius
     CLLocationDistance clusterRadius = self.region.span.longitudeDelta * clusterSize;
     
@@ -192,7 +181,7 @@
         for (id<MKAnnotation> ann in [super annotations]) {
             for (OCAnnotation* cluster in clusteredAnnotations) {
                 if (![self isAnnotation:cluster equalToAnotherAnnotation:ann]) {
-                    [super addAnnotation:ann];
+                    [super addAnnotation:cluster];
                 }
             }
         }
@@ -206,6 +195,7 @@
 
     NSMutableArray* tmp = [[NSMutableArray alloc] init];
     
+                    // remove repeating annotations
     for (id<MKAnnotation> ann in annotationsToRemove) {
         for (OCAnnotation* cluster in clusteredAnnotations) {            
             if ([self isAnnotation:cluster equalToAnotherAnnotation:ann]) {

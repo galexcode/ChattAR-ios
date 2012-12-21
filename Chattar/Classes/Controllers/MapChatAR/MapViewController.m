@@ -113,7 +113,7 @@
 }
 
 - (void)rotateAnnotations:(CGFloat) angle{
-                        // rotate ALL annotations, all annotations are stored in displayed annotations array
+                        // rotate ALL annotations, all annotations are stored in displayedAnnotations array
     [[self.mapView displayedAnnotations] enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         
             MKAnnotationView * view = [self.mapView viewForAnnotation:obj];
@@ -149,14 +149,14 @@
 - (void)addPoints:(NSArray *)mapPoints{
     // add new
     for (UserAnnotation* ann in mapPoints) {
-        [mapView addAnnotation:ann];
+        [self.mapView addAnnotation:ann];
     }
     
     [annotationsForClustering addObjectsFromArray:mapPoints];
 }
 
 - (void)addPoint:(UserAnnotation *)mapPoint{
-    [mapView addAnnotation:mapPoint];
+    [self.mapView addAnnotation:mapPoint];
 }
 
 - (void)clear{
@@ -249,8 +249,6 @@
     region = [self.mapView regionThatFits:region];
 
     [self.mapView setRegion:region animated:YES];
-        
-
 }
 
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated{
