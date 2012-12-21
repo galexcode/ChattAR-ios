@@ -123,6 +123,8 @@
     // Remove the annotation which should be ignored
     NSMutableArray *bufferArray = [[NSMutableArray alloc] initWithArray:[allAnnotations allObjects]];
     [bufferArray removeObjectsInArray:[annotationsToIgnore allObjects]];
+    
+                                                    // cluster only visible annotations
     NSMutableArray *annotationsToCluster = [[NSMutableArray alloc] initWithArray:[self filterAnnotationsForVisibleMap:bufferArray]];
     [bufferArray release];
     
@@ -178,10 +180,10 @@
     
     // add clustered and ignored annotations to map
     if ([super annotations].count != 0) {
-        for (id<MKAnnotation> ann in [super annotations]) {
+        for (id<MKAnnotation> ann in self.displayedAnnotations) {
             for (OCAnnotation* cluster in clusteredAnnotations) {
                 if (![self isAnnotation:cluster equalToAnotherAnnotation:ann]) {
-                    [super addAnnotation:cluster];
+                    [super addAnnotation:ann];
                 }
             }
         }
@@ -195,7 +197,7 @@
 
     NSMutableArray* tmp = [[NSMutableArray alloc] init];
     
-                    // remove repeating annotations
+    
     for (id<MKAnnotation> ann in annotationsToRemove) {
         for (OCAnnotation* cluster in clusteredAnnotations) {            
             if ([self isAnnotation:cluster equalToAnotherAnnotation:ann]) {

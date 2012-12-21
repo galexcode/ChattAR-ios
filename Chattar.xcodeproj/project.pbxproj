@@ -272,7 +272,6 @@
 		636735DA1552CF590061BF75 /* Chattar-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Chattar-Info.plist"; sourceTree = "<group>"; };
 		636735DC1552CF590061BF75 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		636735DE1552CF590061BF75 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		636735E01552CF590061BF75 /* Chatta-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Chatta-Prefix.pch"; sourceTree = "<group>"; };
 		636735E11552CF590061BF75 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		636735E21552CF590061BF75 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		6379C3F61552F40E00E0D314 /* ContactsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ContactsController.h; path = Classes/Controllers/ContactsController.h; sourceTree = "<group>"; };
@@ -371,6 +370,7 @@
 		ED8C5065168463F200993E34 /* blackBg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "blackBg@2x.png"; sourceTree = "<group>"; };
 		ED8C506816846A7200993E34 /* userPhotoBlackBg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = userPhotoBlackBg.png; sourceTree = "<group>"; };
 		ED8C506916846A7200993E34 /* userPhotoBlackBg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "userPhotoBlackBg@2x.png"; sourceTree = "<group>"; };
+		ED8C52221684DA7C00993E34 /* Chattar-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Chattar-Prefix.pch"; sourceTree = "<group>"; };
 		FA0BBEEA15AD6062005F4D63 /* allSwitch.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = allSwitch.png; sourceTree = "<group>"; };
 		FA0BBEEB15AD6062005F4D63 /* allSwitch@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "allSwitch@2x.png"; sourceTree = "<group>"; };
 		FA0BBEEC15AD6062005F4D63 /* circle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = circle.png; sourceTree = "<group>"; };
@@ -704,10 +704,10 @@
 		636735D91552CF590061BF75 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				ED8C52221684DA7C00993E34 /* Chattar-Prefix.pch */,
 				636735DA1552CF590061BF75 /* Chattar-Info.plist */,
 				636735DB1552CF590061BF75 /* InfoPlist.strings */,
 				636735DE1552CF590061BF75 /* main.m */,
-				636735E01552CF590061BF75 /* Chatta-Prefix.pch */,
 				FA58AFBD15AB2515002B7434 /* Extender.h */,
 				FAEF57AF15CADF0100614DBF /* Macro.h */,
 			);
@@ -1550,8 +1550,8 @@
 		636735FB1552CF590061BF75 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer: Taras Filatov (6AVH4TA956)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Taras Filatov (6AVH4TA956)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/Externals\"",
@@ -1569,8 +1569,8 @@
 				);
 				OTHER_LDFLAGS = "-lxml2";
 				PRODUCT_NAME = Chattar;
-				PROVISIONING_PROFILE = "95F3EABD-F7E1-4D80-B351-CC221D213D51";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "95F3EABD-F7E1-4D80-B351-CC221D213D51";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1578,7 +1578,7 @@
 		636735FC1552CF590061BF75 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Injoit LTD";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Injoit LTD";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1597,8 +1597,8 @@
 				);
 				OTHER_LDFLAGS = "-lxml2";
 				PRODUCT_NAME = Chattar;
-				PROVISIONING_PROFILE = "2B219950-DF90-4E98-A1C7-7C2DFB3A1832";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "6811ABB8-7064-4FE0-B6D4-54C1AFA42A2A";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "70814F24-7072-4BD7-878F-2F1394948909";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

@@ -117,10 +117,9 @@
     [[self.mapView displayedAnnotations] enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         
             MKAnnotationView * view = [self.mapView viewForAnnotation:obj];
-            [view setTransform:CGAffineTransformMakeRotation(angle)];
+                [view setTransform:CGAffineTransformMakeRotation(angle)];
         
         }];
-    
 }
 
 - (void)viewDidUnload
@@ -189,8 +188,11 @@
                         
             UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapToZoom:)];
             [clusterView addGestureRecognizer:tap];
-            [tap release];
+            if (IS_IOS_6) {
+                [clusterView setTransform:CGAffineTransformMakeRotation(0.001)];
+            }
 
+            [tap release];
         }
         
         clusterView.clusterCenter = closest.coordinate;
