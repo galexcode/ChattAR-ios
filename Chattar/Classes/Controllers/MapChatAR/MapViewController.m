@@ -179,12 +179,11 @@
         OCAnnotation* ann = (OCAnnotation*) annotation;        
         ClusterMarkerView* clusterView = (ClusterMarkerView*)[mapView dequeueReusableAnnotationViewWithIdentifier:@"ClusterView"];
         [clusterView retain];
-        UserAnnotation* closest = (UserAnnotation*)[OCAlgorithms calculateClusterCenter:ann fromAnnotations:annotationsForClustering];
+        UserAnnotation* closest = (UserAnnotation*)[OCAlgorithms calculateClusterCenter:ann fromAnnotations:self.mapView.annotations];
 
         if (!clusterView) {
+            
             // find annotation which is closest to cluster center
-            
-            
             clusterView = [[ClusterMarkerView alloc] initWithAnnotation:closest reuseIdentifier:@"ClusterView"];
             [clusterView setCanShowCallout:YES];
                         
@@ -194,7 +193,7 @@
 
         }
         
-            clusterView.clusterCenter = closest.coordinate;
+        clusterView.clusterCenter = closest.coordinate;
         
         [clusterView setNumberOfAnnotations:ann.annotationsInCluster.count];
       

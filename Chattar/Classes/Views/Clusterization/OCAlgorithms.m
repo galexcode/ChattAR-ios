@@ -93,24 +93,27 @@
 }
 
 +(UserAnnotation*)calculateClusterCenter:(OCAnnotation*) cluster fromAnnotations:(NSArray*) annotations{
-    NSMutableArray* distances = [[NSMutableArray alloc] init];
-    
-    for (UserAnnotation* annotation in annotations) {
-        NSNumber* distance = @(getDistance(annotation.coordinate, cluster.coordinate));
-        [distances addObject:distance];
-    }
-    
-    int minIndex = 0;
-    
-    for(int i = 1; i < distances.count; i++){
-        double t1 = [[distances objectAtIndex:i] doubleValue];
-        double t2 = [[distances objectAtIndex:minIndex] doubleValue];
-        if (t1 < t2) {
-            minIndex = i;
+    if (annotations.count > 0) {
+        NSMutableArray* distances = [[NSMutableArray alloc] init];
+        
+        for (UserAnnotation* annotation in annotations) {
+            NSNumber* distance = @(getDistance(annotation.coordinate, cluster.coordinate));
+            [distances addObject:distance];
         }
+        
+        int minIndex = 0;
+        
+        for(int i = 1; i < distances.count; i++){
+            double t1 = [[distances objectAtIndex:i] doubleValue];
+            double t2 = [[distances objectAtIndex:minIndex] doubleValue];
+            if (t1 < t2) {
+                minIndex = i;
+            }
+        }
+        
+        return [annotations objectAtIndex:minIndex];
     }
-    
-    return [annotations objectAtIndex:minIndex];
+    return nil;
 }
 
 // Grid clustering with predefined size
