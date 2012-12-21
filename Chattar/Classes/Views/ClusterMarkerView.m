@@ -32,7 +32,7 @@
 -(id)initWithAnnotation:(UserAnnotation*)annotation reuseIdentifier:(NSString *)reuseIdentifier{
     self = [super initWithAnnotation:annotation reuseIdentifier:reuseIdentifier];
     if (self) {
-        UIImageView* numberMarker = [[UIImageView alloc] initWithFrame:CGRectMake(80, -10, NUMBER_MARKER_SIZE, NUMBER_MARKER_SIZE)];
+        UIImageView* numberMarker = [[UIImageView alloc] initWithFrame:CGRectMake(85, -5, NUMBER_MARKER_SIZE, NUMBER_MARKER_SIZE)];
         
         NSArray *friendsIds =  [[DataManager shared].myFriendsAsDictionary allKeys];
         
@@ -51,7 +51,7 @@
 
         
         
-        numberOfAnnotationsInCluster = [[UILabel alloc] initWithFrame:CGRectMake(9, 10, 17, 15)];
+        numberOfAnnotationsInCluster = [[UILabel alloc] initWithFrame:CGRectMake(9, 11, 17, 15)];
         [numberOfAnnotationsInCluster setBackgroundColor:[UIColor clearColor]];
         [numberOfAnnotationsInCluster setTextColor:[UIColor whiteColor]];
         [numberOfAnnotationsInCluster setFont:[UIFont fontWithName:@"HelveticaNeue-Bold" size:15]];

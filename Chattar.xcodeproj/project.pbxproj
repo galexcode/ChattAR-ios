@@ -119,6 +119,10 @@
 		ED7548A11671F10F001E3192 /* ClusterMarkerView.m in Sources */ = {isa = PBXBuildFile; fileRef = ED7548A01671F10F001E3192 /* ClusterMarkerView.m */; };
 		ED8C505C168222A800993E34 /* radarMarkerArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = ED8C505A168222A800993E34 /* radarMarkerArrow.png */; };
 		ED8C505D168222A800993E34 /* radarMarkerArrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = ED8C505B168222A800993E34 /* radarMarkerArrow@2x.png */; };
+		ED8C5066168463F200993E34 /* blackBg.png in Resources */ = {isa = PBXBuildFile; fileRef = ED8C5064168463F200993E34 /* blackBg.png */; };
+		ED8C5067168463F200993E34 /* blackBg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = ED8C5065168463F200993E34 /* blackBg@2x.png */; };
+		ED8C506A16846A7200993E34 /* userPhotoBlackBg.png in Resources */ = {isa = PBXBuildFile; fileRef = ED8C506816846A7200993E34 /* userPhotoBlackBg.png */; };
+		ED8C506B16846A7200993E34 /* userPhotoBlackBg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = ED8C506916846A7200993E34 /* userPhotoBlackBg@2x.png */; };
 		FA0BBEF015AD6062005F4D63 /* allSwitch.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0BBEEA15AD6062005F4D63 /* allSwitch.png */; };
 		FA0BBEF115AD6062005F4D63 /* allSwitch@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0BBEEB15AD6062005F4D63 /* allSwitch@2x.png */; };
 		FA0BBEF215AD6062005F4D63 /* circle.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0BBEEC15AD6062005F4D63 /* circle.png */; };
@@ -363,6 +367,10 @@
 		ED7548A01671F10F001E3192 /* ClusterMarkerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClusterMarkerView.m; sourceTree = "<group>"; };
 		ED8C505A168222A800993E34 /* radarMarkerArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = radarMarkerArrow.png; sourceTree = "<group>"; };
 		ED8C505B168222A800993E34 /* radarMarkerArrow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "radarMarkerArrow@2x.png"; sourceTree = "<group>"; };
+		ED8C5064168463F200993E34 /* blackBg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = blackBg.png; sourceTree = "<group>"; };
+		ED8C5065168463F200993E34 /* blackBg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "blackBg@2x.png"; sourceTree = "<group>"; };
+		ED8C506816846A7200993E34 /* userPhotoBlackBg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = userPhotoBlackBg.png; sourceTree = "<group>"; };
+		ED8C506916846A7200993E34 /* userPhotoBlackBg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "userPhotoBlackBg@2x.png"; sourceTree = "<group>"; };
 		FA0BBEEA15AD6062005F4D63 /* allSwitch.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = allSwitch.png; sourceTree = "<group>"; };
 		FA0BBEEB15AD6062005F4D63 /* allSwitch@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "allSwitch@2x.png"; sourceTree = "<group>"; };
 		FA0BBEEC15AD6062005F4D63 /* circle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = circle.png; sourceTree = "<group>"; };
@@ -783,6 +791,10 @@
 		8A7CBF01157684D5009F1A76 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				ED8C506816846A7200993E34 /* userPhotoBlackBg.png */,
+				ED8C506916846A7200993E34 /* userPhotoBlackBg@2x.png */,
+				ED8C5064168463F200993E34 /* blackBg.png */,
+				ED8C5065168463F200993E34 /* blackBg@2x.png */,
 				ED6ED78F16821D3C00857108 /* clusterBg.png */,
 				ED6ED7821681DABF00857108 /* numberOfFriendFBBg.png */,
 				FA0BBEE915AD6062005F4D63 /* FriendsAllSwitch */,
@@ -1364,6 +1376,10 @@
 				ED6ED79016821D3C00857108 /* clusterBg.png in Resources */,
 				ED8C505C168222A800993E34 /* radarMarkerArrow.png in Resources */,
 				ED8C505D168222A800993E34 /* radarMarkerArrow@2x.png in Resources */,
+				ED8C5066168463F200993E34 /* blackBg.png in Resources */,
+				ED8C5067168463F200993E34 /* blackBg@2x.png in Resources */,
+				ED8C506A16846A7200993E34 /* userPhotoBlackBg.png in Resources */,
+				ED8C506B16846A7200993E34 /* userPhotoBlackBg@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

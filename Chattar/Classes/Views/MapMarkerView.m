@@ -39,7 +39,7 @@
         
         // add user photo 
         //
-        userPhotoView = [[AsyncImageView alloc] initWithFrame: CGRectMake(0, 0, 45, 45)];
+        userPhotoView = [[AsyncImageView alloc] initWithFrame: CGRectMake(-1, 0, 45, 45)];
 		
 		id picture = annotation.userPhotoUrl;
 		if ([picture isKindOfClass:[NSString class]])
@@ -53,15 +53,19 @@
 			[userPhotoView loadImageFromURL:[NSURL URLWithString:url]];
 			annotation.userPhotoUrl = url;
 		}
-        [container addSubview: userPhotoView];
-        [userPhotoView release];
         
+        UIImageView* photoBlackBgView = [[UIImageView alloc] initWithFrame:CGRectMake(0.5, 0, userPhotoView.frame.size.width, userPhotoView.frame.size.height)];
+        [photoBlackBgView setImage:[UIImage imageNamed:@"userPhotoBlackBg.png"]];
+        [container addSubview: userPhotoView];
+        [container insertSubview:photoBlackBgView belowSubview:userPhotoView];
+        [userPhotoView release];
+        [photoBlackBgView release];
         
         //add user marker
         userNameBG = [[UIImageView alloc] init];
-        [userNameBG setFrame:CGRectMake(45, 0, 55, 23)];
+        [userNameBG setFrame:CGRectMake(45, -0.7, 55, 23)];
         
-        
+       
         NSArray *friendsIds =  [[DataManager shared].myFriendsAsDictionary allKeys];
         
         if([friendsIds containsObject:[annotation.fbUser objectForKey:kId]]
@@ -77,6 +81,11 @@
         [container addSubview: userNameBG];
         [userNameBG release];
     
+        UIImageView* userNameBlackBg = [[UIImageView alloc] initWithFrame:CGRectMake(45, 1, userNameBG.frame.size.width, userNameBG.frame.size.height)];
+        [userNameBlackBg setImage:[UIImage imageNamed:@"blackBg.png"]];
+        [container insertSubview:userNameBlackBg belowSubview:userNameBG];
+        [userNameBlackBg release];
+
         // add userName
         userName = [[UILabel alloc] initWithFrame:CGRectMake(2, 0, userNameBG.frame.size.width-3, userNameBG.frame.size.height)];
         [userName setBackgroundColor:[UIColor clearColor]];
@@ -84,6 +93,8 @@
         [userName setFont:[UIFont fontWithName:@"HelveticaNeue-Bold" size:12]];
         [userName setTextColor:[UIColor whiteColor]];
         [userNameBG addSubview:userName];
+        
+
         [userName release];
         
         
@@ -102,7 +113,7 @@
         [userStatus setTextColor:[UIColor whiteColor]];
         [userStatusBG addSubview:userStatus];
         [userStatus release];
-        
+                
         // add arrow
         //
         UIImageView *arrow = [[UIImageView alloc] init];
@@ -110,7 +121,7 @@
         [arrow setFrame:CGRectMake(45, 43, 10, 9)];
         [self addSubview: arrow];
         [arrow release];
-
+        
         //[self updateContainer:_annotation];
     }
     
