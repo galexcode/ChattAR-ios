@@ -113,12 +113,14 @@
 }
 
 - (void)rotateAnnotations:(CGFloat) angle{
-    [[self.mapView annotations] enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            MKAnnotationView * view = [self.mapView viewForAnnotation:obj];
+                        // rotate ALL annotations, all annotations are stored in displayed annotations array
+    [[self.mapView displayedAnnotations] enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         
+            MKAnnotationView * view = [self.mapView viewForAnnotation:obj];
             [view setTransform:CGAffineTransformMakeRotation(angle)];
         
         }];
+    
 }
 
 - (void)viewDidUnload

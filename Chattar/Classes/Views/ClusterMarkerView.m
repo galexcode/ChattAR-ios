@@ -48,8 +48,6 @@
         {
             [numberMarker setImage:[UIImage imageNamed:@"numberOfFriendBg.png"]];
         }
-
-        
         
         numberOfAnnotationsInCluster = [[UILabel alloc] initWithFrame:CGRectMake(9, 11, 17, 15)];
         [numberOfAnnotationsInCluster setBackgroundColor:[UIColor clearColor]];

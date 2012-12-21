@@ -77,6 +77,7 @@
 
 - (void)addAnnotations:(NSArray *)annotations{
     [allAnnotations addObjectsFromArray:annotations];
+    [self doClustering];
 }
 
 - (void)removeAnnotation:(id < MKAnnotation >)annotation{
@@ -90,6 +91,7 @@
         [allAnnotations removeObject:annotation];
     }
     [annotations release];
+    [self doClustering];
 }
 
 
@@ -199,9 +201,6 @@
     else{
         [super addAnnotations:clusteredAnnotations];
     }
-
-    
-    
     
     // fix for flickering
 
