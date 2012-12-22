@@ -188,6 +188,7 @@
                         
             UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapToZoom:)];
             [clusterView addGestureRecognizer:tap];
+            
             if (IS_IOS_6) {
                 [clusterView setTransform:CGAffineTransformMakeRotation(0.001)];
             }

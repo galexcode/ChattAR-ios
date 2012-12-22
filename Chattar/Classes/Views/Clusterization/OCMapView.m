@@ -175,16 +175,18 @@
         clusteredAnnotations = [annotationsToCluster retain];
     }
     
-    NSMutableArray *annotationsToRemove = [[NSMutableArray alloc] initWithArray:self.displayedAnnotations];
-    [annotationsToRemove removeObject:self.userLocation];
     
-    // add clustered and ignored annotations to map
     if ([super annotations].count != 0) {
-        for (id<MKAnnotation> ann in self.displayedAnnotations) {
-            for (OCAnnotation* cluster in clusteredAnnotations) {
+        for (OCAnnotation* cluster in clusteredAnnotations) {
+            int originalAnnNumer = 0;
+            for (id<MKAnnotation> ann in self.displayedAnnotations) {
                 if (![self isAnnotation:cluster equalToAnotherAnnotation:ann]) {
-                    [super addAnnotation:ann];
+                    originalAnnNumer++;
                 }
+            }
+                    // if there is no equal to cluster annotation add it to map
+            if (originalAnnNumer == self.displayedAnnotations.count) {
+                [super addAnnotation:cluster];
             }
         }
     }
@@ -194,6 +196,8 @@
     }
     
     // fix for flickering
+    NSMutableArray *annotationsToRemove = [[NSMutableArray alloc] initWithArray:self.displayedAnnotations];
+    [annotationsToRemove removeObject:self.userLocation];
 
     NSMutableArray* tmp = [[NSMutableArray alloc] init];
     
@@ -210,7 +214,8 @@
     [tmp release];
 
     [super removeAnnotations:annotationsToRemove];
-    
+    [annotationsToRemove release];
+
     // add ignored annotations
     [super addAnnotations: [annotationsToIgnore allObjects]];
     
