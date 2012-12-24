@@ -25,5 +25,4 @@
 
 #define IS_HEIGHT_GTE_568 [[UIScreen mainScreen ] bounds].size.height >= 568.0f
 
-#define IS_IOS_6 [[[UIDevice currentDevice] systemVersion] floatValue] >= 6.0f
 #endif

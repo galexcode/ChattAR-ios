@@ -117,7 +117,7 @@
     [[self.mapView displayedAnnotations] enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         
             MKAnnotationView * view = [self.mapView viewForAnnotation:obj];
-                [view setTransform:CGAffineTransformMakeRotation(angle)];
+            [view setTransform:CGAffineTransformMakeRotation(angle)];
         
         }];
 }
@@ -178,24 +178,43 @@
         OCAnnotation* ann = (OCAnnotation*) annotation;        
         ClusterMarkerView* clusterView = (ClusterMarkerView*)[mapView dequeueReusableAnnotationViewWithIdentifier:@"ClusterView"];
         [clusterView retain];
+//        UserAnnotation* closest = (UserAnnotation*)[OCAlgorithms calculateClusterCenter:ann fromAnnotations:self.mapView.annotations
+//                                                                      withClusterRadius:self.mapView.clusterSize];
         UserAnnotation* closest = (UserAnnotation*)[OCAlgorithms calculateClusterCenter:ann fromAnnotations:self.mapView.annotations];
 
+        
         if (!clusterView) {
             
             // find annotation which is closest to cluster center
             clusterView = [[ClusterMarkerView alloc] initWithAnnotation:closest reuseIdentifier:@"ClusterView"];
             [clusterView setCanShowCallout:YES];
+            
                         
             UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapToZoom:)];
             [clusterView addGestureRecognizer:tap];
             
-            if (IS_IOS_6) {
-                [clusterView setTransform:CGAffineTransformMakeRotation(0.001)];
-            }
-
             [tap release];
+            NSLog(@"%f",atan2(self.mapView.transform.b, self.mapView.transform.a));
+
         }
         
+        if (IS_IOS_6) {
+            [clusterView setTransform:CGAffineTransformMakeRotation(0.001)];
+            if(count){
+                [clusterView setTransform:CGAffineTransformMakeRotation(-count)];
+            }
+        }
+        else{
+            double delayInSeconds = 0;
+            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+            dispatch_after(popTime, dispatch_get_main_queue(), ^{
+                [clusterView setTransform:CGAffineTransformMakeRotation(-count)];
+            });
+            
+        }
+
+        
+
         clusterView.clusterCenter = closest.coordinate;
         
         [clusterView setNumberOfAnnotations:ann.annotationsInCluster.count];

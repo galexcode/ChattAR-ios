@@ -111,7 +111,16 @@
             }
         }
         
+        [distances release];
         return [annotations objectAtIndex:minIndex];
+        
+//        for (int i = 0; i < annotations.count; i++) {
+//            UserAnnotation* ann = (UserAnnotation*)[annotations objectAtIndex:i];
+//            if (isLocationNearToOtherLocation(ann.coordinate, cluster.coordinate, radius)) {
+//                return ann;
+//            }
+//        }
+//        return nil;
     }
     return nil;
 }
