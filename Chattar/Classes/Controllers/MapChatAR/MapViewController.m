@@ -146,6 +146,8 @@
 }
 
 - (void)addPoints:(NSArray *)mapPoints{
+    NSLog(@"%f",self.mapView.clusterSize);
+
     // add new
     for (UserAnnotation* ann in mapPoints) {
         [self.mapView addAnnotation:ann];
@@ -175,14 +177,13 @@
                         // if this is cluster 
     if ([annotation isKindOfClass:[OCAnnotation class]]) {
 
-        OCAnnotation* ann = (OCAnnotation*) annotation;        
+        OCAnnotation* clusterAnnotation = (OCAnnotation*) annotation;
         ClusterMarkerView* clusterView = (ClusterMarkerView*)[mapView dequeueReusableAnnotationViewWithIdentifier:@"ClusterView"];
         [clusterView retain];
-//        UserAnnotation* closest = (UserAnnotation*)[OCAlgorithms calculateClusterCenter:ann fromAnnotations:self.mapView.annotations
-//                                                                      withClusterRadius:self.mapView.clusterSize];
-        UserAnnotation* closest = (UserAnnotation*)[OCAlgorithms calculateClusterCenter:ann fromAnnotations:self.mapView.annotations];
-
         
+        UserAnnotation* closest = (UserAnnotation*)[OCAlgorithms calculateClusterCenter:clusterAnnotation];
+
+       
         if (!clusterView) {
             
             // find annotation which is closest to cluster center
@@ -212,12 +213,13 @@
             });
             
         }
-
+        
+        [clusterView updateAnnotation:closest];
         
 
         clusterView.clusterCenter = closest.coordinate;
         
-        [clusterView setNumberOfAnnotations:ann.annotationsInCluster.count];
+        [clusterView setNumberOfAnnotations:clusterAnnotation.annotationsInCluster.count];
       
         return [clusterView autorelease];
     }

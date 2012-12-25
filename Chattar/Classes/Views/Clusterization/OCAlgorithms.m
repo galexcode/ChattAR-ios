@@ -57,9 +57,10 @@
 					break;
 				}
             }
-            
+                        
             // If the annotation is not in a Cluster make it to a new one
 			if (!isContaining){
+                
 				OCAnnotation *newCluster = [[OCAnnotation alloc] initWithAnnotation:annotation];
 				[clusteredAnnotations addObject:newCluster];
                 
@@ -75,6 +76,7 @@
 
     NSMutableArray *returnArray = [[NSMutableArray alloc] init];
     
+
     // whipe all empty or single annotations
     for (OCAnnotation *anAnnotation in clusteredAnnotations) {
         if ([anAnnotation.annotationsInCluster count] <= 1) {
@@ -85,6 +87,7 @@
         }
     }
     
+    
     // memory
     [annotationsToCluster release];
     [clusteredAnnotations release];
@@ -92,14 +95,25 @@
     return [returnArray autorelease];
 }
 
-+(UserAnnotation*)calculateClusterCenter:(OCAnnotation*) cluster fromAnnotations:(NSArray*) annotations{
-    if (annotations.count > 0) {
++(UserAnnotation*)calculateClusterCenter:(OCAnnotation*) cluster{
+    if (cluster.annotationsInCluster.count > 0) {
         NSMutableArray* distances = [[NSMutableArray alloc] init];
         
-        for (UserAnnotation* annotation in annotations) {
-            NSNumber* distance = @(getDistance(annotation.coordinate, cluster.coordinate));
-            [distances addObject:distance];
+        for (UserAnnotation* ann in cluster.annotationsInCluster) {
+            NSLog(@"%@",ann.userName);
         }
+        NSLog(@"___________________");
+        CLLocation* clusterLocation = [[CLLocation alloc] initWithLatitude:cluster.coordinate.latitude longitude:cluster.coordinate.longitude];
+        
+        for (id<MKAnnotation>annotation in cluster.annotationsInCluster) {
+            CLLocation* annotationLocation = [[CLLocation alloc] initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
+            CLLocationDistance locationsDistance = [clusterLocation distanceFromLocation:annotationLocation];
+            NSNumber* distance = @(locationsDistance);
+            [distances addObject:distance];
+            [annotationLocation release];
+        }
+        
+        [clusterLocation release];
         
         int minIndex = 0;
         
@@ -112,15 +126,9 @@
         }
         
         [distances release];
-        return [annotations objectAtIndex:minIndex];
+        NSLog(@"CLUSTER CENTER %@",((UserAnnotation*)[cluster.annotationsInCluster objectAtIndex:minIndex]).userName);
+        return [cluster.annotationsInCluster objectAtIndex:minIndex];
         
-//        for (int i = 0; i < annotations.count; i++) {
-//            UserAnnotation* ann = (UserAnnotation*)[annotations objectAtIndex:i];
-//            if (isLocationNearToOtherLocation(ann.coordinate, cluster.coordinate, radius)) {
-//                return ann;
-//            }
-//        }
-//        return nil;
     }
     return nil;
 }

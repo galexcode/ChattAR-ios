@@ -21,6 +21,7 @@
 }
 
 -(id)initWithAnnotation:(UserAnnotation*)annotation reuseIdentifier:(NSString *)reuseIdentifier{
+    NSLog(@"%@",annotation.userName);
     self = [super initWithAnnotation:annotation reuseIdentifier:reuseIdentifier];
     if (self) {
         UIImageView* numberMarker = [[UIImageView alloc] initWithFrame:CGRectMake(85, -10, NUMBER_MARKER_SIZE, NUMBER_MARKER_SIZE)];

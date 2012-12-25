@@ -191,9 +191,13 @@
         }
     }
     
+    
     else{
         [super addAnnotations:clusteredAnnotations];
     }
+    
+    [super removeAnnotation:self.userLocation];
+
     
     // fix for flickering
     NSMutableArray *annotationsToRemove = [[NSMutableArray alloc] initWithArray:self.displayedAnnotations];
@@ -212,6 +216,7 @@
     
     [annotationsToRemove removeObjectsInArray: tmp];
     [tmp release];
+    [clusteredAnnotations release];
 
     [super removeAnnotations:annotationsToRemove];
     [annotationsToRemove release];

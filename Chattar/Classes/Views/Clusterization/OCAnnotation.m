@@ -71,6 +71,7 @@
     
     // Add annotation to the cluster
     [annotationsInCluster addObject:annotation];
+    
     [annotation release];
 }
 
