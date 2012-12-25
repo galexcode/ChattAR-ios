@@ -115,6 +115,8 @@
 		ED6ED7871682174B00857108 /* radarMarkerName@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = ED6ED7851682174A00857108 /* radarMarkerName@2x.png */; };
 		ED6ED7881682174B00857108 /* radarMarkerName2@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = ED6ED7861682174A00857108 /* radarMarkerName2@2x.png */; };
 		ED6ED79016821D3C00857108 /* clusterBg.png in Resources */ = {isa = PBXBuildFile; fileRef = ED6ED78F16821D3C00857108 /* clusterBg.png */; };
+		ED70277B1689FA44003F6829 /* clusterBgFB.png in Resources */ = {isa = PBXBuildFile; fileRef = ED7027791689FA44003F6829 /* clusterBgFB.png */; };
+		ED70277C1689FA44003F6829 /* clusterBgFB@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = ED70277A1689FA44003F6829 /* clusterBgFB@2x.png */; };
 		ED75489D1671EDB8001E3192 /* numberOfFriendBg.png in Resources */ = {isa = PBXBuildFile; fileRef = ED75489C1671EDB5001E3192 /* numberOfFriendBg.png */; };
 		ED7548A11671F10F001E3192 /* ClusterMarkerView.m in Sources */ = {isa = PBXBuildFile; fileRef = ED7548A01671F10F001E3192 /* ClusterMarkerView.m */; };
 		ED8C505C168222A800993E34 /* radarMarkerArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = ED8C505A168222A800993E34 /* radarMarkerArrow.png */; };
@@ -362,6 +364,8 @@
 		ED6ED7851682174A00857108 /* radarMarkerName@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "radarMarkerName@2x.png"; sourceTree = "<group>"; };
 		ED6ED7861682174A00857108 /* radarMarkerName2@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "radarMarkerName2@2x.png"; sourceTree = "<group>"; };
 		ED6ED78F16821D3C00857108 /* clusterBg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = clusterBg.png; sourceTree = "<group>"; };
+		ED7027791689FA44003F6829 /* clusterBgFB.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = clusterBgFB.png; sourceTree = "<group>"; };
+		ED70277A1689FA44003F6829 /* clusterBgFB@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "clusterBgFB@2x.png"; sourceTree = "<group>"; };
 		ED75489C1671EDB5001E3192 /* numberOfFriendBg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = numberOfFriendBg.png; sourceTree = "<group>"; };
 		ED75489F1671F10F001E3192 /* ClusterMarkerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClusterMarkerView.h; sourceTree = "<group>"; };
 		ED7548A01671F10F001E3192 /* ClusterMarkerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClusterMarkerView.m; sourceTree = "<group>"; };
@@ -793,6 +797,8 @@
 		8A7CBF01157684D5009F1A76 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				ED7027791689FA44003F6829 /* clusterBgFB.png */,
+				ED70277A1689FA44003F6829 /* clusterBgFB@2x.png */,
 				ED8C52461689C47400993E34 /* clusterBg@2x.png */,
 				ED8C506816846A7200993E34 /* userPhotoBlackBg.png */,
 				ED8C506916846A7200993E34 /* userPhotoBlackBg@2x.png */,
@@ -1384,6 +1390,8 @@
 				ED8C506A16846A7200993E34 /* userPhotoBlackBg.png in Resources */,
 				ED8C506B16846A7200993E34 /* userPhotoBlackBg@2x.png in Resources */,
 				ED8C52471689C47400993E34 /* clusterBg@2x.png in Resources */,
+				ED70277B1689FA44003F6829 /* clusterBgFB.png in Resources */,
+				ED70277C1689FA44003F6829 /* clusterBgFB@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
