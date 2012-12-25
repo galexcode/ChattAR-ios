@@ -15,6 +15,7 @@
 #import <dispatch/dispatch.h>
 
 #define MAX_ZOOM_LEVEL 0.5
+#define MAX_ZOOM_LEVEL_IOS6 0.396886
 #define EPSILON 0.000001
 
 /// MapView which should be used instead of MKMapView

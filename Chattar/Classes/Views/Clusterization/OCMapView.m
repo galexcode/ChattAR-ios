@@ -136,7 +136,7 @@
     
     
                 // if zoom level is enough for displaying all annotations
-    if (fabs(currentZoomScale - MAX_ZOOM_LEVEL) <= EPSILON ) {
+    if (fabs(currentZoomScale - (IS_IOS_6 ? MAX_ZOOM_LEVEL_IOS6 : MAX_ZOOM_LEVEL) ) <= EPSILON ) {
         clusteringEnabled = NO;
     }
     else{
