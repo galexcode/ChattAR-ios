@@ -24,21 +24,24 @@
     NSLog(@"%@",annotation.userName);
     self = [super initWithAnnotation:annotation reuseIdentifier:reuseIdentifier];
     if (self) {
-        UIImageView* numberMarker = [[UIImageView alloc] initWithFrame:CGRectMake(85, -10, NUMBER_MARKER_SIZE, NUMBER_MARKER_SIZE)];
+        UIImageView* numberMarker = [[UIImageView alloc] initWithFrame:CGRectMake(85, -15, NUMBER_MARKER_SIZE, NUMBER_MARKER_SIZE)];
         
         NSArray *friendsIds =  [[DataManager shared].myFriendsAsDictionary allKeys];
         
-        
+        UIImageView* backGround = [[UIImageView alloc] initWithFrame:CGRectMake(-10, -11, self.frame.size.width + 18, self.frame.size.height-40)];
+
                             // check for facebook clustering view
         if([friendsIds containsObject:[annotation.fbUser objectForKey:kId]]
            || [[DataManager shared].currentFBUserId isEqualToString:[annotation.fbUser objectForKey:kId]])
         {
             [numberMarker setImage:[UIImage imageNamed:@"numberOfFriendFBBg.png"]];
-
+            [backGround setImage:[UIImage imageNamed:@"clusterBgFB.png"]];
         }
         else
         {
             [numberMarker setImage:[UIImage imageNamed:@"numberOfFriendBg.png"]];
+            [backGround setImage:[UIImage imageNamed:@"clusterBg.png"]];
+
         }
         
         numberOfAnnotationsInCluster = [[UILabel alloc] initWithFrame:CGRectMake(9, 11, 17, 15)];
@@ -48,8 +51,6 @@
         [numberOfAnnotationsInCluster setTextAlignment:NSTextAlignmentCenter];
         [numberMarker addSubview:numberOfAnnotationsInCluster];
         
-        UIImageView* backGround = [[UIImageView alloc] initWithFrame:CGRectMake(-20, -20, self.frame.size.width + 30, self.frame.size.height-35)];
-        [backGround setImage:[UIImage imageNamed:@"clusterBg.png"]];
         
         [self addSubview:numberMarker];
         [self addSubview:backGround];
