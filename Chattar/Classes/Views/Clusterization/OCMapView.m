@@ -129,7 +129,7 @@
     [bufferArray release];
     
     MKZoomScale currentZoomScale = self.bounds.size.width / self.visibleMapRect.size.width;
-    
+    NSLog(@"CURRENT ZOOM %f",currentZoomScale);
     
     //calculate cluster radius
     CLLocationDistance clusterRadius = self.region.span.longitudeDelta * clusterSize;
@@ -167,65 +167,68 @@
                 break;
             }
         }
-    }
     
-    
-    // pass through without when not
-    else{
-        clusteredAnnotations = [annotationsToCluster retain];
-    }
-    
-    
-    if ([super annotations].count != 0) {
-        for (OCAnnotation* cluster in clusteredAnnotations) {
-            int originalAnnNumer = 0;
-            for (id<MKAnnotation> ann in self.displayedAnnotations) {
-                if (![self isAnnotation:cluster equalToAnotherAnnotation:ann]) {
-                    originalAnnNumer++;
+        if ([super annotations].count != 0) {
+            for (OCAnnotation* cluster in clusteredAnnotations) {
+                int originalAnnNumer = 0;
+                
+                for (id<MKAnnotation> ann in self.displayedAnnotations) {
+
+                    if (![self isAnnotation:cluster equalToAnotherAnnotation:ann]) {
+                        originalAnnNumer++;
+                    }
+                }
+                // if there is no equal to cluster annotation add it to map
+                if (originalAnnNumer == self.displayedAnnotations.count) {
+                    [super addAnnotation:cluster];
                 }
             }
-                    // if there is no equal to cluster annotation add it to map
-            if (originalAnnNumer == self.displayedAnnotations.count) {
-                [super addAnnotation:cluster];
+        }
+        
+        
+        else{
+            [super addAnnotations:clusteredAnnotations];
+        }
+        
+        [super removeAnnotation:self.userLocation];
+        
+        
+        // fix for flickering
+        NSMutableArray *annotationsToRemove = [[NSMutableArray alloc] initWithArray:self.displayedAnnotations];
+        [annotationsToRemove removeObject:self.userLocation];
+        
+        NSMutableArray* tmp = [[NSMutableArray alloc] init];
+        
+        
+        for (id<MKAnnotation> ann in annotationsToRemove) {
+            for (OCAnnotation* cluster in clusteredAnnotations) {
+                if ([self isAnnotation:cluster equalToAnotherAnnotation:ann]) {
+                    [tmp addObject:ann];
+                }
             }
         }
-    }
+        
+        [annotationsToRemove removeObjectsInArray: tmp];
+        [tmp release];
+        [clusteredAnnotations release];
+        
+        [super removeAnnotations:annotationsToRemove];
+        [annotationsToRemove release];
+        
+        // add ignored annotations
+        [super addAnnotations: [annotationsToIgnore allObjects]];
+        
+        // memory
+        [annotationsToCluster release];
     
+    }
     
     else{
-        [super addAnnotations:clusteredAnnotations];
+        [super removeAnnotation:self.displayedAnnotations.lastObject];
+        [super addAnnotations:annotationsToCluster];
     }
     
-    [super removeAnnotation:self.userLocation];
-
     
-    // fix for flickering
-    NSMutableArray *annotationsToRemove = [[NSMutableArray alloc] initWithArray:self.displayedAnnotations];
-    [annotationsToRemove removeObject:self.userLocation];
-
-    NSMutableArray* tmp = [[NSMutableArray alloc] init];
-    
-    
-    for (id<MKAnnotation> ann in annotationsToRemove) {
-        for (OCAnnotation* cluster in clusteredAnnotations) {            
-            if ([self isAnnotation:cluster equalToAnotherAnnotation:ann]) {
-                [tmp addObject:ann];
-            }
-        }
-    }
-    
-    [annotationsToRemove removeObjectsInArray: tmp];
-    [tmp release];
-    [clusteredAnnotations release];
-
-    [super removeAnnotations:annotationsToRemove];
-    [annotationsToRemove release];
-
-    // add ignored annotations
-    [super addAnnotations: [annotationsToIgnore allObjects]];
-    
-    // memory
-    [annotationsToCluster release];
 }
 
 // ======================================

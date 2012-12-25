@@ -216,7 +216,6 @@
         
         [clusterView updateAnnotation:closest];
         
-
         clusterView.clusterCenter = closest.coordinate;
         
         [clusterView setNumberOfAnnotations:clusterAnnotation.annotationsInCluster.count];

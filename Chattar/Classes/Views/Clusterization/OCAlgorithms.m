@@ -99,10 +99,6 @@
     if (cluster.annotationsInCluster.count > 0) {
         NSMutableArray* distances = [[NSMutableArray alloc] init];
         
-        for (UserAnnotation* ann in cluster.annotationsInCluster) {
-            NSLog(@"%@",ann.userName);
-        }
-        NSLog(@"___________________");
         CLLocation* clusterLocation = [[CLLocation alloc] initWithLatitude:cluster.coordinate.latitude longitude:cluster.coordinate.longitude];
         
         for (id<MKAnnotation>annotation in cluster.annotationsInCluster) {
@@ -126,7 +122,6 @@
         }
         
         [distances release];
-        NSLog(@"CLUSTER CENTER %@",((UserAnnotation*)[cluster.annotationsInCluster objectAtIndex:minIndex]).userName);
         return [cluster.annotationsInCluster objectAtIndex:minIndex];
         
     }
