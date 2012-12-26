@@ -436,7 +436,9 @@
     
     // Map/AR points
     //
+    NSLog(@"%@",self.mapPoints);
     [self.mapPoints removeAllObjects];
+    
     //
     // add only friends QB points
     NSMutableArray *friendsIdsWhoAlreadyAdded = [NSMutableArray array];

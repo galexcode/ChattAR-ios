@@ -136,7 +136,7 @@
     
     
                 // if zoom level is enough for displaying all annotations
-    if (fabs(currentZoomScale - (IS_IOS_6 ? MAX_ZOOM_LEVEL_IOS6 : MAX_ZOOM_LEVEL) ) <= EPSILON ) {
+    if (fabs(currentZoomScale - (IS_IOS_6 ? MAX_ZOOM_LEVEL_IOS6 : MAX_ZOOM_LEVEL) ) <= EPSILON  || currentZoomScale > (IS_IOS_6 ? MAX_ZOOM_LEVEL_IOS6 : MAX_ZOOM_LEVEL)) {
         clusteringEnabled = NO;
     }
     else{
@@ -224,7 +224,9 @@
     }
     
     else{
-        [super removeAnnotation:self.displayedAnnotations.lastObject];
+        if (self.displayedAnnotations.lastObject) {
+            [super removeAnnotation:self.displayedAnnotations.lastObject];
+        }
         [super addAnnotations:annotationsToCluster];
     }
     

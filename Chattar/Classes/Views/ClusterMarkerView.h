@@ -10,6 +10,8 @@
 #import "OCAnnotation.h"
 @interface ClusterMarkerView : MapMarkerView{
     UILabel* numberOfAnnotationsInCluster;
+    UIImageView* backGround;
+    UIImageView* numberMarker;
 }
 
 -(void)setNumberOfAnnotations:(NSInteger)numberOfAnnotations;
