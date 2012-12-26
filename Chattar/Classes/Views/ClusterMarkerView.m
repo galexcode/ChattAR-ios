@@ -64,7 +64,6 @@
 
 -(void)updateAnnotation:(UserAnnotation *)_annotation{
     [super updateAnnotation:_annotation];
-    
     NSArray *friendsIds =  [[DataManager shared].myFriendsAsDictionary allKeys];
 
     if([friendsIds containsObject:[_annotation.fbUser objectForKey:kId]]

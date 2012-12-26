@@ -234,6 +234,7 @@
         conversation = [[DataManager shared].historyConversationAsArray objectAtIndex:indexPath.row];
     }
 	
+    
 	if ([[[[DataManager shared].myFriendsAsDictionary objectForKey:[conversation.to objectForKey:kId]] objectForKey:kOnOffStatus] intValue] == 0) // offline status
 	{
 		[onlineDot setImage:[UIImage imageNamed:@"offLine.png"]];

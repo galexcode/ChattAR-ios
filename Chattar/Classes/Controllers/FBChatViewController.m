@@ -211,6 +211,20 @@ static CGFloat const kChatBarHeight4    = 94.0f;
         [rightButton setBackgroundImage:[UIImage imageNamed:@"camera.png"] forState:UIControlStateNormal];
     }
     
+    UIImageView* onlineDot = [[UIImageView alloc] initWithFrame:CGRectMake(-20, 10, 12, 12)];
+    
+    if ([[[[DataManager shared].myFriendsAsDictionary objectForKey:userID] objectForKey:kOnOffStatus] intValue] == 0) // offline status
+	{
+		[onlineDot setImage:[UIImage imageNamed:@"offLine.png"]];
+	}
+	else // online
+	{
+		[onlineDot setImage:[UIImage imageNamed:@"onLine.png"]];
+	}
+    
+    [rightButton addSubview:onlineDot];
+    [onlineDot release];
+    
     [rightButton addTarget:self action:@selector(rightButtonDidPress:) forControlEvents:UIControlEventTouchUpInside];
     [self.navigationController.view addSubview:rightButton];
     [rightButton release];

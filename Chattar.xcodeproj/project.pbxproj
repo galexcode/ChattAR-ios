@@ -117,6 +117,7 @@
 		ED6ED79016821D3C00857108 /* clusterBg.png in Resources */ = {isa = PBXBuildFile; fileRef = ED6ED78F16821D3C00857108 /* clusterBg.png */; };
 		ED70277B1689FA44003F6829 /* clusterBgFB.png in Resources */ = {isa = PBXBuildFile; fileRef = ED7027791689FA44003F6829 /* clusterBgFB.png */; };
 		ED70277C1689FA44003F6829 /* clusterBgFB@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = ED70277A1689FA44003F6829 /* clusterBgFB@2x.png */; };
+		ED70277E168B3D4B003F6829 /* Quickblox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAD8E4E8164BB65700CBCB79 /* Quickblox.framework */; };
 		ED75489D1671EDB8001E3192 /* numberOfFriendBg.png in Resources */ = {isa = PBXBuildFile; fileRef = ED75489C1671EDB5001E3192 /* numberOfFriendBg.png */; };
 		ED7548A11671F10F001E3192 /* ClusterMarkerView.m in Sources */ = {isa = PBXBuildFile; fileRef = ED7548A01671F10F001E3192 /* ClusterMarkerView.m */; };
 		ED8C505C168222A800993E34 /* radarMarkerArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = ED8C505A168222A800993E34 /* radarMarkerArrow.png */; };
@@ -222,7 +223,6 @@
 		FAC6B89415D9006D00F3B10F /* QBCheckinModel.m in Sources */ = {isa = PBXBuildFile; fileRef = FAC6B89115D9006D00F3B10F /* QBCheckinModel.m */; };
 		FAD8E4E6164BB61300CBCB79 /* Icon~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = FAD8E4E4164BB61300CBCB79 /* Icon~ipad.png */; };
 		FAD8E4E7164BB61300CBCB79 /* Icon~ipad@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FAD8E4E5164BB61300CBCB79 /* Icon~ipad@2x.png */; };
-		FAD8E4E9164BB65700CBCB79 /* Quickblox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAD8E4E8164BB65700CBCB79 /* Quickblox.framework */; };
 		FAD8E4EC164BB6B500CBCB79 /* DatetimeConverter.m in Sources */ = {isa = PBXBuildFile; fileRef = FAD8E4EB164BB6B500CBCB79 /* DatetimeConverter.m */; };
 		FAD8E4FD164BEC6500CBCB79 /* ChattARModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FAD8E4FB164BEC6500CBCB79 /* ChattARModel.xcdatamodeld */; };
 /* End PBXBuildFile section */
@@ -563,6 +563,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ED70277E168B3D4B003F6829 /* Quickblox.framework in Frameworks */,
 				FA99E77F15C953410031F54F /* CoreData.framework in Frameworks */,
 				63891AF81573505300035EC2 /* libresolv.dylib in Frameworks */,
 				636735D31552CF590061BF75 /* UIKit.framework in Frameworks */,
@@ -584,7 +585,6 @@
 				636735D51552CF590061BF75 /* Foundation.framework in Frameworks */,
 				438B8EBC16392CC2003692E1 /* libFlurry.a in Frameworks */,
 				438B8EBE16392D54003692E1 /* libidn.a in Frameworks */,
-				FAD8E4E9164BB65700CBCB79 /* Quickblox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

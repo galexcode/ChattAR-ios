@@ -71,8 +71,6 @@
 - (void)createSessionWithDelegate:(id)delegate{
   	// Create extended application authorization request (for push notifications)
 	QBASessionCreationRequest *extendedAuthRequest = [[QBASessionCreationRequest alloc] init];
-	extendedAuthRequest.devicePlatorm = DevicePlatformiOS;
-	extendedAuthRequest.deviceUDID = [[UIDevice currentDevice] uniqueIdentifier];
     if([DataManager shared].currentFBUser){
         extendedAuthRequest.userLogin = [[NumberToLetterConverter instance] convertNumbersToLetters:[[DataManager shared].currentFBUser objectForKey:kId]];
         extendedAuthRequest.userPassword = [NSString stringWithFormat:@"%u", [[[DataManager shared].currentFBUser objectForKey:kId] hash]];
@@ -183,12 +181,8 @@
         [DataManager shared].currentFBUser = [[result.body mutableCopy] autorelease];
         [DataManager shared].currentFBUserId = [[DataManager shared].currentFBUser objectForKey:kId];
         
-        // try to auth
-        NSString *userLogin = [[NumberToLetterConverter instance] convertNumbersToLetters:[[DataManager shared].currentFBUser objectForKey:kId]];
-        NSString *passwordHash = [NSString stringWithFormat:@"%u", [[[DataManager shared].currentFBUser objectForKey:kId] hash]];
-        
-        // Authenticate user
-        [QBUsers logInWithUserLogin:userLogin password:passwordHash delegate:self];
+//        // try to auth
+        [QBUsers logInWithSocialProvider:@"facebook" accessToken:[[[DataManager shared] fbUserTokenAndDate] objectForKey:FBAccessTokenKey] accessTokenSecret:nil delegate:self];
     }
 }
 
@@ -203,7 +197,8 @@
     if([result isKindOfClass:[QBAAuthSessionCreationResult class]]){
         // Success result
 		if(result.success){
-
+            
+            NSLog(@"%@",[[[DataManager shared] fbUserTokenAndDate] objectForKey:FBAccessTokenKey]);
             // FB auth
             [FBService shared].facebook.accessToken = [[[DataManager shared] fbUserTokenAndDate] objectForKey:FBAccessTokenKey];
             [FBService shared].facebook.expirationDate = [[[DataManager shared] fbUserTokenAndDate] objectForKey:FBExpirationDateKey];

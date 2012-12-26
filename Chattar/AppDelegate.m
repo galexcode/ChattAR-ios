@@ -185,8 +185,6 @@
 {
 	// update access token (if it expired)
 	QBASessionCreationRequest *extendedAuthRequest = [[QBASessionCreationRequest alloc] init];
-	extendedAuthRequest.devicePlatorm = DevicePlatformiOS;
-	extendedAuthRequest.deviceUDID = [[UIDevice currentDevice] uniqueIdentifier];
     if([DataManager shared].currentFBUser){
         extendedAuthRequest.userLogin = [[NumberToLetterConverter instance] convertNumbersToLetters:[[DataManager shared].currentFBUser objectForKey:kId]];
         extendedAuthRequest.userPassword = [NSString stringWithFormat:@"%u", [[[DataManager shared].currentFBUser objectForKey:kId] hash]];
