@@ -17,7 +17,6 @@
 @implementation SplashController 
 
 @synthesize openedAtStartApp;
-
 #pragma mark -
 #pragma mark UIViewControllers & view methods
 
@@ -27,6 +26,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(startApplication)
                                                  name:UIApplicationDidBecomeActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(persistentStorageInitEnded:) name:@"persistentStorageInitSuccess" object:nil];
     
     if(IS_HEIGHT_GTE_568){
         [self.backgroundImage setImage:[UIImage imageNamed:@"Default-568h@2x.png"]];
@@ -38,10 +38,11 @@
         activityIndicatorFrame.origin.y -= 22;
         [self->activityIndicator setFrame:activityIndicatorFrame];
     }
+    
+    
 }
 
 - (void)startApplication{
-
     // QuickBlox application autorization
     if(openedAtStartApp){
 		
@@ -61,7 +62,20 @@
         
         [self showLoginButton:YES];
     }
+}
 
+-(void)viewDidAppear:(BOOL)animated{
+    if (![[DataManager shared] persistentStoreCoordinator]) {
+        hud = [[MBProgressHUD alloc] initWithView:self.view];
+        hud.labelText = @"Please wait - your application is updating";
+        [hud show:YES];
+        [self.view addSubview:hud];
+    }
+    
+}
+
+-(void)persistentStorageInitEnded:(NSNotification*)notification{
+    [hud removeFromSuperview];
 }
 
 - (void)showLoginButton:(BOOL)isShow{
@@ -125,7 +139,9 @@
 }
 
 - (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_backgroundImage release];
+    [hud release];
     [super dealloc];
 }
 
