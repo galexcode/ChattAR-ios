@@ -46,7 +46,8 @@
 #define kError              @"error"
 #define kPaging             @"paging"
 #define kNext               @"next"
-
+#define kSource             @"source"
+#define kPicture            @"picture"
 #define kGET                @"GET"
 
 // QB Chat 
@@ -83,6 +84,8 @@ typedef enum {
 	FBQueriesTypesUsersProfiles,
     //
     FBQueriesTypesWall,
-    FBQueriesTypesGetInboxMessages,	
+    FBQueriesTypesGetInboxMessages,
+    
+    FBQueriesTypesGetFriendsPhotosWithLocation
     
 } FBQueriesTypes;

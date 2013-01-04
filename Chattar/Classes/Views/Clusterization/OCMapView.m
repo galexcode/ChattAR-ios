@@ -129,7 +129,6 @@
     [bufferArray release];
     
     MKZoomScale currentZoomScale = self.bounds.size.width / self.visibleMapRect.size.width;
-    NSLog(@"CURRENT ZOOM %f",currentZoomScale);
     
     //calculate cluster radius
     CLLocationDistance clusterRadius = self.region.span.longitudeDelta * clusterSize;

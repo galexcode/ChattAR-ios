@@ -78,6 +78,7 @@ static const NSTimeInterval kTimeoutInterval = 180.0;
     
     FBRequest* request = [[[FBRequest alloc] init] autorelease];
     request.delegate = delegate;
+    NSLog(@"%@",url);
     request.url = url;
     request.httpMethod = httpMethod;
     request.params = params;
@@ -348,6 +349,7 @@ static const NSTimeInterval kTimeoutInterval = 180.0;
     }
 
     _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    NSLog(@"%@",_connection);
     self.state = kFBRequestStateLoading;
     self.sessionDidExpire = NO;
 }

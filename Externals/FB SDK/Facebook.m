@@ -200,10 +200,14 @@ static void *finishedContext = @"finishedContext";
     fbServiceDelegate:(id<FBServiceResultDelegate>)del
 				 type:(FBQueriesTypes)queryType
 {
-    
-    [params setValue:@"json" forKey:@"format"];
-    [params setValue:kSDK forKey:@"sdk"];
-    [params setValue:kSDKVersion forKey:@"sdk_version"];
+    NSLog(@"%@",params);
+    NSString* fqlPrefix = @"fql";
+    if ([url rangeOfString:fqlPrefix].location == NSNotFound) {
+        [params setValue:@"json" forKey:@"format"];
+        [params setValue:kSDK forKey:@"sdk"];
+        [params setValue:kSDKVersion forKey:@"sdk_version"];
+
+    }
     if ([self isSessionValid]) {
         [params setValue:self.accessToken forKey:@"access_token"];
     }
@@ -211,7 +215,7 @@ static void *finishedContext = @"finishedContext";
     [self extendAccessTokenIfNeeded];
     
 	FBRequest* _request = [FBRequest getRequestWithParams:params httpMethod:httpMethod delegate:delegate fBServiceDelegate:del type:queryType requestURL:url];
-	
+	NSLog(@"%@",_request);
     [_requests addObject:_request];
     [_request addObserver:self forKeyPath:requestFinishedKeyPath options:0 context:finishedContext];
     [_request connect];
@@ -697,6 +701,7 @@ static void *finishedContext = @"finishedContext";
 {
     
     NSString * fullURL = [kGraphBaseURL stringByAppendingString:graphPath];
+    NSLog(@"%@",fullURL);
     return [self openUrl:fullURL
                   params:params
               httpMethod:httpMethod

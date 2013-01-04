@@ -9,7 +9,6 @@
 #import "FBConnect.h"
 #import "FBServiceResultDelegate.h"
 
-
 @class XMPPStream;
 
 @interface FBService : NSObject <FBRequestDelegate>
@@ -51,6 +50,7 @@
 - (void) friendsGetWithDelegate:(NSObject <FBServiceResultDelegate>*)delegate;
 - (void) friendsCheckinsWithDelegate:(NSObject <FBServiceResultDelegate>*)delegate;
 
+-(void)friendsPhotosWithLocationWithDelegate:(NSObject <FBServiceResultDelegate>*)delegate;
 
 #pragma mark -
 #pragma mark Messages & Chat

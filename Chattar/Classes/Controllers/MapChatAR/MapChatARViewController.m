@@ -20,6 +20,7 @@
 #import "QBCheckinModel.h"
 #import "QBChatMessageModel.h"
 #import "FBCheckinModel.h"
+#import "PhotoWithLocationObject.h"
 
 #import "JSON.h"
 
@@ -208,6 +209,8 @@
         numberOfCheckinsRetrieved = ceil([[[DataManager shared].myPopularFriends allObjects] count]/fmaxRequestsInBatch);
         NSLog(@"Checkins Parts=%d", numberOfCheckinsRetrieved);
         [self getFBCheckins];
+        
+        [self retrievePhotosWithLocations];
         
 
         isInitialized = YES;
@@ -422,7 +425,7 @@
         }
     }
     
-    
+    // Photos with locations
     
     // notify controllers
     [mapViewController refreshWithNewPoints:self.mapPoints];
@@ -599,6 +602,10 @@
     if(numberOfCheckinsRetrieved != 0){
         [[FBService shared] performSelector:@selector(friendsCheckinsWithDelegate:) withObject:self afterDelay:1];
     }
+}
+
+-(void)retrievePhotosWithLocations{
+    [[FBService shared] performSelector:@selector(friendsPhotosWithLocationWithDelegate:) withObject:self afterDelay:1];
 }
 
 // get new points from QuickBlox Location
@@ -1334,6 +1341,67 @@
     });
 }
 
+-(void)processPhotosWithLocations:(NSDictionary*)responseData{
+    NSLog(@"%@",responseData);
+
+    NSArray* fqlResults = [responseData objectForKey:kData];
+    
+    NSArray* firstFqlResults = [(NSDictionary*)[fqlResults objectAtIndex:0] objectForKey:@"fql_result_set"];
+    NSArray* secondFqlResults = [(NSDictionary*)[fqlResults objectAtIndex:1] objectForKey:@"fql_result_set"];
+    
+    NSMutableArray* photosWithLocations = [[NSMutableArray alloc] init];
+   
+    for (NSDictionary*fqlResult in firstFqlResults) {
+        PhotoWithLocationObject* photoObject = [[PhotoWithLocationObject alloc] init];
+        
+        NSDecimalNumber* placeId = [fqlResult objectForKey:@"place_id"];
+        NSString* thumbnailUrl = [fqlResult objectForKey:@"src_small"];
+        AsyncImageView* thumbnail = [[AsyncImageView alloc] init];
+        [thumbnail loadImageFromURL:[NSURL URLWithString:thumbnailUrl]];
+        
+        [photoObject setPhotoThumbNail:thumbnail];
+        [thumbnail release];
+        
+        [photoObject setLocationID:placeId];
+        
+        NSString* fullPhotoUrl = [fqlResult objectForKey:@"src"];
+        AsyncImageView* fullPhoto = [[AsyncImageView alloc] init];
+        [fullPhoto loadImageFromURL:[NSURL URLWithString:fullPhotoUrl]];
+        
+        [photoObject setFullPhoto:fullPhoto];
+        [fullPhoto release];
+        
+        [photosWithLocations addObject:photoObject];
+        [photoObject release];
+    }
+    NSLog(@"%@",photosWithLocations);
+    
+    for (NSDictionary* fqlResult in secondFqlResults) {
+        NSDecimalNumber* pageID = [fqlResult objectForKey:@"page_id"];
+        NSDecimalNumber* latitude = [fqlResult objectForKey:@"latitude"];
+        NSDecimalNumber* longitude = [fqlResult objectForKey:@"longitude"];
+        NSString* locationName = [fqlResult objectForKey:@"name"];
+        
+        for (PhotoWithLocationObject* photo in photosWithLocations) {
+            if (fabs(photo.locationID.doubleValue - pageID.doubleValue) < EPSILON ) {
+                [photo setLocationName:locationName];
+                [photo setPhotoLocation:CLLocationCoordinate2DMake(latitude.doubleValue, longitude.doubleValue)];
+            }
+        }
+    }
+    
+    for (PhotoWithLocationObject* photo in photosWithLocations) {
+        NSLog(@"%@",photo.locationName);
+        NSLog(@"%@",photo.locationID);
+        NSLog(@"Coordinates %f,%f",photo.photoLocation.latitude,photo.photoLocation.longitude);
+        NSLog(@"%@",photo.photoThumbNail);
+        NSLog(@"%@",photo.fullPhoto);
+    }
+    
+    [[DataManager shared] addPhotosWithLocations:photosWithLocations];
+    [photosWithLocations release];
+}
+
 // Add Quote data to annotation
 - (void)addQuoteDataToAnnotation:(UserAnnotation *)annotation geoData:(QBLGeoData *)geoData{
     // get quoted geodata
@@ -1557,6 +1625,7 @@
 
 -(void)completedWithFBResult:(FBServiceResult *)result
 {
+    NSLog(@"%d",result.queryType);
     switch (result.queryType) 
     {
         // Get Friends checkins
@@ -1593,7 +1662,17 @@
             }
         }
         break;
-            
+        case FBQueriesTypesGetFriendsPhotosWithLocation:{
+            if ([result.body isKindOfClass:[NSDictionary class]]) {
+                NSDictionary* resultError = [result.body objectForKey:kError];
+                if (resultError) {
+                    NSLog(@"resultError=%@",resultError);
+                    return;
+                }
+            }
+                                // TO-DO add asynchronous processing
+           [self processPhotosWithLocations:(NSDictionary*)result.body];
+        }
         default:
             break;
     }

@@ -38,7 +38,6 @@ static DataManager *instance = nil;
 @synthesize currentFBUserId;
 
 @synthesize myFriends, myFriendsAsDictionary, myPopularFriends;
-
 @synthesize historyConversation, historyConversationAsArray;
 
 + (DataManager *)shared {
@@ -83,6 +82,7 @@ static DataManager *instance = nil;
     [managedObjectContext release];
     [managedObjectModel release];
     [persistentStoreCoordinator release];
+    [photosWithLocations release];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kNotificationLogout object:nil];
 	
@@ -695,4 +695,32 @@ static DataManager *instance = nil;
 }
 
 
+#pragma mark -
+#pragma  mark Photos With Locations Methods
+-(void)addPhotoWithLocation:(PhotoWithLocationObject*)photo{
+    if (!photosWithLocations) {
+        photosWithLocations = [[NSMutableArray alloc] init];
+    }
+    
+    [photosWithLocations addObject:photo];
+}
+
+-(void)addPhotosWithLocations:(NSArray*)_photosWithLocations{
+    if (!photosWithLocations) {
+        photosWithLocations = [[NSMutableArray alloc] init];
+    }
+    [photosWithLocations addObjectsFromArray:_photosWithLocations];
+}
+
+-(void)removePhotoWithLocation:(PhotoWithLocationObject *)photo{
+    [photosWithLocations removeObject:photo];
+}
+
+-(void)removePhotosWithLocations:(NSArray *)photos{
+    [photosWithLocations removeObjectsInArray:photos];
+}
+
+-(NSMutableArray*)photosWithLocations{
+    return photosWithLocations;
+}
 @end

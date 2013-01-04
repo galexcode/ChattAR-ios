@@ -107,6 +107,7 @@
 		8ADCA8D615A4767B00C015E7 /* Marker.png in Resources */ = {isa = PBXBuildFile; fileRef = 8ADCA8D215A4767B00C015E7 /* Marker.png */; };
 		8ADCA8D715A4767B00C015E7 /* Marker@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8ADCA8D315A4767B00C015E7 /* Marker@2x.png */; };
 		BB6616171605DF5800DBADD4 /* ChattARApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = BB6616161605DF5800DBADD4 /* ChattARApplication.m */; };
+		ED5C5BF01696FCB10039909E /* PhotoWithLocationAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = ED5C5BEF1696FCB10039909E /* PhotoWithLocationAnnotation.m */; };
 		ED644BFE166D05AE00007117 /* OCAlgorithms.m in Sources */ = {isa = PBXBuildFile; fileRef = ED644BF6166D05AE00007117 /* OCAlgorithms.m */; };
 		ED644BFF166D05AE00007117 /* OCAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = ED644BF8166D05AE00007117 /* OCAnnotation.m */; };
 		ED644C00166D05AE00007117 /* OCDistance.m in Sources */ = {isa = PBXBuildFile; fileRef = ED644BFA166D05AE00007117 /* OCDistance.m */; };
@@ -118,6 +119,7 @@
 		ED70277B1689FA44003F6829 /* clusterBgFB.png in Resources */ = {isa = PBXBuildFile; fileRef = ED7027791689FA44003F6829 /* clusterBgFB.png */; };
 		ED70277C1689FA44003F6829 /* clusterBgFB@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = ED70277A1689FA44003F6829 /* clusterBgFB@2x.png */; };
 		ED70277E168B3D4B003F6829 /* Quickblox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAD8E4E8164BB65700CBCB79 /* Quickblox.framework */; };
+		ED70278C168DB19E003F6829 /* PhotoWithLocationObject.m in Sources */ = {isa = PBXBuildFile; fileRef = ED70278B168DB19E003F6829 /* PhotoWithLocationObject.m */; };
 		ED75489D1671EDB8001E3192 /* numberOfFriendBg.png in Resources */ = {isa = PBXBuildFile; fileRef = ED75489C1671EDB5001E3192 /* numberOfFriendBg.png */; };
 		ED7548A11671F10F001E3192 /* ClusterMarkerView.m in Sources */ = {isa = PBXBuildFile; fileRef = ED7548A01671F10F001E3192 /* ClusterMarkerView.m */; };
 		ED8C505C168222A800993E34 /* radarMarkerArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = ED8C505A168222A800993E34 /* radarMarkerArrow.png */; };
@@ -351,6 +353,8 @@
 		8ADCA8D315A4767B00C015E7 /* Marker@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Marker@2x.png"; sourceTree = "<group>"; };
 		BB6616151605DF5700DBADD4 /* ChattARApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChattARApplication.h; sourceTree = "<group>"; };
 		BB6616161605DF5800DBADD4 /* ChattARApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChattARApplication.m; sourceTree = "<group>"; };
+		ED5C5BEE1696FCB10039909E /* PhotoWithLocationAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoWithLocationAnnotation.h; sourceTree = "<group>"; };
+		ED5C5BEF1696FCB10039909E /* PhotoWithLocationAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoWithLocationAnnotation.m; sourceTree = "<group>"; };
 		ED644BF5166D05AE00007117 /* OCAlgorithms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCAlgorithms.h; sourceTree = "<group>"; };
 		ED644BF6166D05AE00007117 /* OCAlgorithms.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCAlgorithms.m; sourceTree = "<group>"; };
 		ED644BF7166D05AE00007117 /* OCAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCAnnotation.h; sourceTree = "<group>"; };
@@ -366,6 +370,8 @@
 		ED6ED78F16821D3C00857108 /* clusterBg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = clusterBg.png; sourceTree = "<group>"; };
 		ED7027791689FA44003F6829 /* clusterBgFB.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = clusterBgFB.png; sourceTree = "<group>"; };
 		ED70277A1689FA44003F6829 /* clusterBgFB@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "clusterBgFB@2x.png"; sourceTree = "<group>"; };
+		ED70278A168DB19E003F6829 /* PhotoWithLocationObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoWithLocationObject.h; sourceTree = "<group>"; };
+		ED70278B168DB19E003F6829 /* PhotoWithLocationObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoWithLocationObject.m; sourceTree = "<group>"; };
 		ED75489C1671EDB5001E3192 /* numberOfFriendBg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = numberOfFriendBg.png; sourceTree = "<group>"; };
 		ED75489F1671F10F001E3192 /* ClusterMarkerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClusterMarkerView.h; sourceTree = "<group>"; };
 		ED7548A01671F10F001E3192 /* ClusterMarkerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClusterMarkerView.m; sourceTree = "<group>"; };
@@ -985,6 +991,10 @@
 				FA8E4DDD1580851C00476EF7 /* UserAnnotation.m */,
 				FAC31289158B8C0000A1ABE4 /* Conversation.h */,
 				FAC3128A158B8C0000A1ABE4 /* Conversation.m */,
+				ED70278A168DB19E003F6829 /* PhotoWithLocationObject.h */,
+				ED70278B168DB19E003F6829 /* PhotoWithLocationObject.m */,
+				ED5C5BEE1696FCB10039909E /* PhotoWithLocationAnnotation.h */,
+				ED5C5BEF1696FCB10039909E /* PhotoWithLocationAnnotation.m */,
 			);
 			name = Objects;
 			path = Classes/Objects;
@@ -1493,6 +1503,8 @@
 				ED644C00166D05AE00007117 /* OCDistance.m in Sources */,
 				ED644C01166D05AE00007117 /* OCMapView.m in Sources */,
 				ED7548A11671F10F001E3192 /* ClusterMarkerView.m in Sources */,
+				ED70278C168DB19E003F6829 /* PhotoWithLocationObject.m in Sources */,
+				ED5C5BF01696FCB10039909E /* PhotoWithLocationAnnotation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

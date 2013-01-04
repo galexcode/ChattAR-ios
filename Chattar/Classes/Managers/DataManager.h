@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
+#import "PhotoWithLocationObject.h"
 #define maxPopularFriends 40
 
 @interface DataManager : NSObject{
@@ -15,6 +15,7 @@
     NSManagedObjectModel *managedObjectModel;
     NSManagedObjectContext *managedObjectContext;
     NSPersistentStoreCoordinator *persistentStoreCoordinator;
+    NSMutableArray* photosWithLocations;
 }
 
 // FB access
@@ -39,6 +40,7 @@
 @property (nonatomic, retain, readonly) NSManagedObjectModel *managedObjectModel;
 @property (nonatomic, retain, readonly) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, retain, readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
+
 
 + (DataManager *) shared;
 
@@ -70,6 +72,13 @@
 -(BOOL) friendIDInFavorities:(NSString *)_friendID;
 
 
+#pragma mark -
+#pragma mark Photos With Locations
+-(NSMutableArray*)photosWithLocations;
+-(void)addPhotoWithLocation:(PhotoWithLocationObject*)photo;
+-(void)addPhotosWithLocations:(NSArray*)photos;
+-(void)removePhotoWithLocation:(PhotoWithLocationObject*)photo;
+-(void)removePhotosWithLocations:(NSArray*)photos;
 #pragma mark -
 #pragma mark First switch All/Friends
 
