@@ -355,7 +355,7 @@
 		BB6616161605DF5800DBADD4 /* ChattARApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChattARApplication.m; sourceTree = "<group>"; };
 		ED5C5BEE1696FCB10039909E /* PhotoWithLocationAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoWithLocationAnnotation.h; sourceTree = "<group>"; };
 		ED5C5BEF1696FCB10039909E /* PhotoWithLocationAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoWithLocationAnnotation.m; sourceTree = "<group>"; };
-		ED5C5C03169732CD0039909E /* ChattARModel 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ChattARModel 2.xcdatamodel"; sourceTree = "<group>"; };
+		ED5C5C03169732CD0039909E /* ChattARModel 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "ChattARModel 2.xcdatamodel"; sourceTree = "<group>"; };
 		ED644BF5166D05AE00007117 /* OCAlgorithms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCAlgorithms.h; sourceTree = "<group>"; };
 		ED644BF6166D05AE00007117 /* OCAlgorithms.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCAlgorithms.m; sourceTree = "<group>"; };
 		ED644BF7166D05AE00007117 /* OCAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCAnnotation.h; sourceTree = "<group>"; };
