@@ -20,7 +20,7 @@
 #import "QBCheckinModel.h"
 #import "QBChatMessageModel.h"
 #import "FBCheckinModel.h"
-#import "PhotoWithLocationObject.h"
+#import "PhotoWithLocationModel.h"
 
 #import "JSON.h"
 
@@ -49,7 +49,8 @@
 @synthesize initedFromCache;
 @synthesize allFriendsSwitch;
 @synthesize initState;
-
+@synthesize allPhotosWithLocations;
+@synthesize photoPoints;
 
 #pragma mark -
 #pragma mark UIViewController life
@@ -107,6 +108,10 @@
         dispatch_release(processCheckinsQueue);
     }
     
+    if (processPhotosWithLocationsQueue != NULL) {
+        dispatch_release(processPhotosWithLocationsQueue);
+    }
+    
     self.mapViewController = nil;
     self.chatViewController = nil;
     self.arViewController = nil;
@@ -116,6 +121,7 @@
     [allChatPoints release];
 	[allCheckins release];
 	[allMapPoints release];
+    [allPhotosWithLocations release];
 	
     [mapPoints release];
     [chatPoints release];
@@ -187,6 +193,7 @@
     mapViewController.mapView.delegate = self;
     mapViewController.mapView.clusterSize = kDEFAULT_CLUSTER_SIZE;
     
+
 }
 
 - (void)viewWillAppear:(BOOL)animated{
@@ -200,6 +207,7 @@
         [segmentControl setSelectedSegmentIndex:0];
         [self segmentValueDidChanged:segmentControl];
         
+
         
         // get data from QuickBlox
         [self getQBGeodatas];
@@ -211,7 +219,7 @@
         [self getFBCheckins];
         
         [self retrievePhotosWithLocations];
-        
+
 
         isInitialized = YES;
         
@@ -409,8 +417,7 @@
         }
     }
     [allCheckinsCopy release];
-    
-    
+        
     // Chat points
     //
     [self.chatPoints removeAllObjects];
@@ -426,6 +433,12 @@
     }
     
     // Photos with locations
+    for (UserAnnotation* photoWithLocation in allPhotosWithLocations) {
+        if (![self.photoPoints containsObject:photoWithLocation]) {
+            [self.photoPoints addObject:photoWithLocation];
+            [self.mapPoints addObject:photoWithLocation];
+        }
+    }
     
     // notify controllers
     [mapViewController refreshWithNewPoints:self.mapPoints];
@@ -605,7 +618,57 @@
 }
 
 -(void)retrievePhotosWithLocations{
-    [[FBService shared] performSelector:@selector(friendsPhotosWithLocationWithDelegate:) withObject:self afterDelay:1];
+    
+    [self checkForCacheing];
+    [[FBService shared] performSelector:@selector(friendsPhotosWithLocationWithDelegate:) withObject:self];
+    
+    for (UserAnnotation* ann in allPhotosWithLocations) {
+        NSLog(@"%@",ann.locationName);
+        NSLog(@"%f",ann.locationLatitude.doubleValue);
+        NSLog(@"%f",ann.locationLongitude.doubleValue);
+        NSLog(@"%@",ann.locationId);
+        NSLog(@"%@",ann.fullImageURL);
+        NSLog(@"%@",ann.thumbnailURL);        
+    }
+    
+}
+
+-(void)checkForCacheing{
+    NSArray* popularFriendsIds = [[[DataManager shared] myPopularFriends] allObjects];
+    NSMutableArray* cachedPhotos = [[NSMutableArray alloc] init];
+    
+    for (NSString* popularFriendId in popularFriendsIds) {
+        NSDecimalNumber* friendID = [NSDecimalNumber decimalNumberWithString:popularFriendId];
+        NSArray* friendPhotos = [[DataManager shared] photosWithLocationsFromStorageFromUserWithId:friendID];
+        [cachedPhotos addObjectsFromArray:friendPhotos];
+    }
+    
+    NSLog(@"%@",cachedPhotos);
+    
+    
+    if (!allPhotosWithLocations) {
+        allPhotosWithLocations = [[NSMutableArray alloc] init];
+    }
+    
+    if (cachedPhotos.count > 0) {
+        
+        for (PhotoWithLocationModel* photo in cachedPhotos) {
+            NSLog(@"%@",photo);
+            UserAnnotation* photoAnnotation = [[UserAnnotation alloc] init];
+            [photoAnnotation setFullImageURL:photo.fullImageURL];
+            [photoAnnotation setThumbnailURL:photo.thumbnailURL];
+            [photoAnnotation setLocationId:photo.locationId];
+            [photoAnnotation setCoordinate:CLLocationCoordinate2DMake(photo.locationLatitude.doubleValue, photo.locationLongitude.doubleValue)];
+            [photoAnnotation setLocationName:photo.locationName];
+            [photoAnnotation setOwnerId:photo.ownerId];
+            [photoAnnotation setPhotoId:photo.photoId];
+            [photoAnnotation setPhotoTimeStamp:photo.photoTimeStamp];
+            [allPhotosWithLocations addObject:photoAnnotation];
+            [photoAnnotation release];
+        }
+        [self showWorld];
+    }
+    [cachedPhotos release];
 }
 
 // get new points from QuickBlox Location
@@ -1348,31 +1411,37 @@
     
     NSArray* firstFqlResults = [(NSDictionary*)[fqlResults objectAtIndex:0] objectForKey:@"fql_result_set"];
     NSArray* secondFqlResults = [(NSDictionary*)[fqlResults objectAtIndex:1] objectForKey:@"fql_result_set"];
+    NSArray* thirdFqlResults = [(NSDictionary*)[fqlResults objectAtIndex:2] objectForKey:@"fql_result_set"];
     
     NSMutableArray* photosWithLocations = [[NSMutableArray alloc] init];
    
     for (NSDictionary*fqlResult in firstFqlResults) {
-        PhotoWithLocationObject* photoObject = [[PhotoWithLocationObject alloc] init];
+        UserAnnotation* photoObject = [[UserAnnotation alloc] init];
         
         NSDecimalNumber* placeId = [fqlResult objectForKey:@"place_id"];
         NSString* thumbnailUrl = [fqlResult objectForKey:@"src_small"];
-        AsyncImageView* thumbnail = [[AsyncImageView alloc] init];
-        [thumbnail loadImageFromURL:[NSURL URLWithString:thumbnailUrl]];
         
-        [photoObject setPhotoThumbNail:thumbnail];
-        [thumbnail release];
+        [photoObject setThumbnailURL:thumbnailUrl];
         
-        [photoObject setLocationID:placeId];
+        [photoObject setLocationId:placeId];
         
         NSString* fullPhotoUrl = [fqlResult objectForKey:@"src"];
-        AsyncImageView* fullPhoto = [[AsyncImageView alloc] init];
-        [fullPhoto loadImageFromURL:[NSURL URLWithString:fullPhotoUrl]];
         
-        [photoObject setFullPhoto:fullPhoto];
-        [fullPhoto release];
+        [photoObject setFullImageURL:fullPhotoUrl];
+        
+        NSString* photoId = [fqlResult objectForKey:@"pid"];
+        [photoObject setPhotoId:photoId];
+        
+        NSDecimalNumber* photoTimeStamp = [fqlResult objectForKey:@"created"];
+        [photoObject setPhotoTimeStamp:photoTimeStamp];
+        
+        NSDecimalNumber* ownerId = [fqlResult objectForKey:@"created"];
+        [photoObject setOwnerId:ownerId];
         
         [photosWithLocations addObject:photoObject];
         [photoObject release];
+        
+        
     }
     NSLog(@"%@",photosWithLocations);
     
@@ -1382,23 +1451,33 @@
         NSDecimalNumber* longitude = [fqlResult objectForKey:@"longitude"];
         NSString* locationName = [fqlResult objectForKey:@"name"];
         
-        for (PhotoWithLocationObject* photo in photosWithLocations) {
-            if (fabs(photo.locationID.doubleValue - pageID.doubleValue) < EPSILON ) {
+        for (UserAnnotation* photo in photosWithLocations) {
+            if (fabs(photo.locationId.doubleValue - pageID.doubleValue) < EPSILON ) {
                 [photo setLocationName:locationName];
-                [photo setPhotoLocation:CLLocationCoordinate2DMake(latitude.doubleValue, longitude.doubleValue)];
+                [photo setLocationLatitude:latitude];
+                [photo setLocationLongitude:longitude];
             }
         }
     }
     
-    for (PhotoWithLocationObject* photo in photosWithLocations) {
-        NSLog(@"%@",photo.locationName);
-        NSLog(@"%@",photo.locationID);
-        NSLog(@"Coordinates %f,%f",photo.photoLocation.latitude,photo.photoLocation.longitude);
-        NSLog(@"%@",photo.photoThumbNail);
-        NSLog(@"%@",photo.fullPhoto);
+    for (NSDictionary* fqlResult in thirdFqlResults) {
+        NSDecimalNumber* ownerID = [fqlResult objectForKey:@"owner"];
+        NSString* pid = [fqlResult objectForKey:@"pid"];
+        
+        for (UserAnnotation* photo in photosWithLocations) {
+            if ([photo.photoId isEqualToString:pid]) {
+                [photo setOwnerId:ownerID];
+            }
+        }
     }
+
     
-    [[DataManager shared] addPhotosWithLocations:photosWithLocations];
+    [[DataManager shared] addPhotosWithLocationsToStorage:photosWithLocations];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self checkForCacheing];
+        [mapViewController refreshWithNewPoints:self.mapPoints];
+        
+    });
     [photosWithLocations release];
 }
 
@@ -1670,8 +1749,13 @@
                     return;
                 }
             }
-                                // TO-DO add asynchronous processing
-           [self processPhotosWithLocations:(NSDictionary*)result.body];
+            
+            if (processPhotosWithLocationsQueue == NULL) {
+                processPhotosWithLocationsQueue = dispatch_queue_create("com.quickblox.chattar.process.photos.queue", NULL);
+            }
+            dispatch_async(processPhotosWithLocationsQueue, ^{
+                [self processPhotosWithLocations:(NSDictionary*)result.body]; 
+            });
         }
         default:
             break;

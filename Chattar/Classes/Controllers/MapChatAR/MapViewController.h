@@ -12,7 +12,7 @@
 #import "OCMapView.h"
 #import "OCAnnotation.h"
 #import "ClusterMarkerView.h"
-
+#import "PhotoMarkerView.h"
 @interface MapViewController : UIViewController <MKMapViewDelegate, UIGestureRecognizerDelegate>{
     CGFloat count;
     CGFloat lastCount;

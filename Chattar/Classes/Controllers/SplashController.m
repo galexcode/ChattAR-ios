@@ -49,7 +49,7 @@
         [activityIndicator startAnimating];
 		
 		[NSTimer scheduledTimerWithTimeInterval:60*60*2-600 // Expiration date of access token is 2 hours. Repeat request for new token every 1 hour and 50 minutes.
-                                         target:self 
+                                         target:self
                                        selector:@selector(createSession) 
                                        userInfo:nil 
                                         repeats:YES];
@@ -65,13 +65,18 @@
 }
 
 -(void)viewDidAppear:(BOOL)animated{
+    [self checkCoreDataInit];
+}
+
+-(void)checkCoreDataInit{
     if (![[DataManager shared] persistentStoreCoordinator]) {
-        hud = [[MBProgressHUD alloc] initWithView:self.view];
-        hud.labelText = @"Please wait - your application is updating";
-        [hud show:YES];
-        [self.view addSubview:hud];
+        if (!hud) {
+            hud = [[MBProgressHUD alloc] initWithView:self.view];
+            hud.labelText = @"Please wait - your application is updating";
+            [hud show:YES];
+            [self.view addSubview:hud];
+        }
     }
-    
 }
 
 -(void)persistentStorageInitEnded:(NSNotification*)notification{
@@ -105,6 +110,7 @@
     activityIndicator = nil;
     loginButton = nil;
     
+    [[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:@"persistentStorageInitSuccess"];
     [self setBackgroundImage:nil];
     [super viewDidUnload];
 }
@@ -139,7 +145,6 @@
 }
 
 - (void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_backgroundImage release];
     [hud release];
     [super dealloc];
@@ -352,6 +357,7 @@
         NSArray *cookies = [cookiesStorage cookies];
         NSData *data = [NSKeyedArchiver archivedDataWithRootObject:cookies];
         [[NSUserDefaults standardUserDefaults] setObject:data forKey:FB_COOKIES];
+
     }
 }
 

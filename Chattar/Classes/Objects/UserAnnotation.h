@@ -31,6 +31,17 @@
     NSString* quotedUserName;
     NSDate* quotedMessageDate;
     NSString* quotedMessageText;
+    
+    // photo with location
+    NSString* thumbnailURL;
+    NSDecimalNumber* locationId;
+    NSDecimalNumber* locationLatitude;
+    NSDecimalNumber* locationLongitude;
+    NSString* fullImageURL;
+    NSString* locationName;
+    NSString* photoId;
+    NSDecimalNumber* photoTimeStamp;
+    NSDecimalNumber* ownerId;
 }
 
 @property (nonatomic, retain) NSString *userPhotoUrl;
@@ -55,5 +66,14 @@
 @property (nonatomic, retain) NSString* quotedUserName;
 @property (nonatomic, retain) NSDate* quotedMessageDate;
 @property (nonatomic, retain) NSString* quotedMessageText;
-
+// photo with location
+@property (nonatomic, retain) NSDecimalNumber* locationId;
+@property (nonatomic, retain) NSString* thumbnailURL;
+@property (nonatomic, retain) NSString* fullImageURL;
+@property (nonatomic, retain) NSString* locationName;
+@property (nonatomic, retain) NSDecimalNumber* locationLatitude;
+@property (nonatomic, retain) NSDecimalNumber* locationLongitude;
+@property (nonatomic, retain) NSString* photoId;
+@property (nonatomic, retain) NSDecimalNumber* photoTimeStamp;
+@property (nonatomic, retain) NSDecimalNumber* ownerId;
 @end

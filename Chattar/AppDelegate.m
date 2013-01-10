@@ -126,7 +126,6 @@
 }
 
 - (void)showSplashWithAnimation:(BOOL) animated showLoginButton:(BOOL)isShow{
-    
     // show Splash
     SplashController *splashViewController = [[SplashController alloc] initWithNibName:@"SplashController" bundle:nil];
     splashViewController.openedAtStartApp = !animated;
@@ -141,7 +140,6 @@
 }
 
 - (void)showSplashWithAnimation:(BOOL) animated{
-    
     // show Splash
     SplashController *splashViewController = [[SplashController alloc] initWithNibName:@"SplashController" bundle:nil]; 
     splashViewController.openedAtStartApp = !animated;

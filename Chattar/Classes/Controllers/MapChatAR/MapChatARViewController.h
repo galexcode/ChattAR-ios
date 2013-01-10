@@ -30,15 +30,19 @@ MKMapViewDelegate>{
     
     dispatch_queue_t processCheckinsQueue;
     
+    dispatch_queue_t processPhotosWithLocationsQueue;
+    
     BOOL showAllUsers;
 }
 
 @property (assign) NSMutableArray* allMapPoints;
 @property (assign) NSMutableArray* allChatPoints;
 @property (assign) NSMutableArray* allCheckins;
+@property (nonatomic,retain) NSMutableArray* allPhotosWithLocations;
 
 @property (assign) NSMutableArray *mapPoints;
 @property (assign) NSMutableArray *chatPoints;
+@property (nonatomic,retain) NSMutableArray* photoPoints;
 
 @property (assign) NSMutableArray *chatMessagesIDs;
 @property (assign) NSMutableArray *mapPointsIDs;
@@ -60,6 +64,7 @@ MKMapViewDelegate>{
 @property (nonatomic, assign) CustomSwitch *allFriendsSwitch;
 
 @property (assign) short initState; // 2 if all data(map/chat) was retrieved
+
 
 
 - (void)segmentValueDidChanged:(id)sender;

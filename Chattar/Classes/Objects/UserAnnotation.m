@@ -12,6 +12,10 @@
 @implementation UserAnnotation
 @synthesize userPhotoUrl, userName, userStatus, coordinate, fbUserId, geoDataID, createdAt, fbUser, quotedUserName, quotedMessageDate, quotedMessageText, quotedUserPhotoURL, distance, quotedUserFBId, quotedUserQBId, qbUserID, fbCheckinID, fbPlaceID;
 
+@synthesize fullImageURL,locationId,locationName,thumbnailURL,photoTimeStamp,photoId,ownerId;
+@synthesize locationLatitude = _locationLatitude;
+@synthesize locationLongitude = _locationLongitude;
+
 - (id)initWithCoder:(NSCoder *)aDecoder
 {
 	if (self = [super init])
@@ -38,6 +42,16 @@
         DESERIALIZE_OBJECT(quotedUserName, aDecoder);
         DESERIALIZE_OBJECT(quotedMessageDate, aDecoder);
         DESERIALIZE_OBJECT(quotedMessageText, aDecoder);
+        
+        DESERIALIZE_OBJECT(locationLatitude, aDecoder);
+        DESERIALIZE_OBJECT(locationLongitude, aDecoder);
+        DESERIALIZE_OBJECT(fullImageURL, aDecoder);
+        DESERIALIZE_OBJECT(thumbnailURL, aDecoder);
+        DESERIALIZE_OBJECT(locationName, aDecoder);
+        DESERIALIZE_OBJECT(locationId, aDecoder);
+        DESERIALIZE_OBJECT(photoId, aDecoder);
+        DESERIALIZE_OBJECT(photoTimeStamp, aDecoder);
+        DESERIALIZE_OBJECT(ownerId, aDecoder);
 	}
 	
 	return self;
@@ -66,6 +80,16 @@
     SERIALIZE_OBJECT(quotedUserName, aCoder);
     SERIALIZE_OBJECT(quotedMessageDate, aCoder);
     SERIALIZE_OBJECT(quotedMessageText, aCoder);
+    
+    SERIALIZE_OBJECT(locationLatitude, aCoder);
+    SERIALIZE_OBJECT(locationLongitude, aCoder);
+    SERIALIZE_OBJECT(fullImageURL, aCoder);
+    SERIALIZE_OBJECT(thumbnailURL, aCoder);
+    SERIALIZE_OBJECT(locationName, aCoder);
+    SERIALIZE_OBJECT(locationId, aCoder);
+    SERIALIZE_OBJECT(photoTimeStamp, aCoder);
+    SERIALIZE_OBJECT(photoId, aCoder);
+    SERIALIZE_OBJECT(ownerId, aCoder);
 }
 
 - (void)dealloc
@@ -85,6 +109,14 @@
     [fbUser release];
     [fbCheckinID release];
     [fbPlaceID release];
+    
+    [fullImageURL release];
+    [locationName release];
+    [thumbnailURL release];
+    [locationId release];
+    [photoId release];
+    [photoTimeStamp release];
+    [ownerId release];
     
     [super dealloc];
 }
@@ -142,6 +174,16 @@
     copy.quotedUserName     = [[self.quotedUserName copyWithZone:zone] autorelease];
     copy.quotedMessageDate  = [[self.quotedMessageDate copyWithZone:zone] autorelease];
     copy.quotedMessageText  = [[self.quotedMessageText copyWithZone:zone] autorelease];
+    
+    copy.locationId = [[self.locationId copyWithZone:zone] autorelease];
+    copy.fullImageURL = [[self.fullImageURL copyWithZone:zone] autorelease];
+    copy.thumbnailURL = [[self.thumbnailURL copyWithZone:zone] autorelease];
+    copy.locationName = [[self.locationName copyWithZone:zone] autorelease];
+    copy.locationLatitude = [[self.locationLatitude copyWithZone:zone] autorelease];
+    copy.locationLongitude = [[self.locationLongitude copyWithZone:zone] autorelease];
+    copy.photoId = [[self.photoId copyWithZone:zone] autorelease];
+    copy.photoTimeStamp = [[self.photoTimeStamp copyWithZone:zone] autorelease];
+    copy.ownerId = [[self.ownerId copyWithZone:zone] autorelease];
     
     return copy;
 }

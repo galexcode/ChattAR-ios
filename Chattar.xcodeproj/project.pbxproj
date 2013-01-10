@@ -129,6 +129,8 @@
 		ED8C506A16846A7200993E34 /* userPhotoBlackBg.png in Resources */ = {isa = PBXBuildFile; fileRef = ED8C506816846A7200993E34 /* userPhotoBlackBg.png */; };
 		ED8C506B16846A7200993E34 /* userPhotoBlackBg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = ED8C506916846A7200993E34 /* userPhotoBlackBg@2x.png */; };
 		ED8C52471689C47400993E34 /* clusterBg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = ED8C52461689C47400993E34 /* clusterBg@2x.png */; };
+		EDE1DD21169C1D8A00156E78 /* PhotoWithLocationModel.m in Sources */ = {isa = PBXBuildFile; fileRef = EDE1DD20169C1D8A00156E78 /* PhotoWithLocationModel.m */; };
+		EDE1DD24169DCFC900156E78 /* PhotoMarkerView.m in Sources */ = {isa = PBXBuildFile; fileRef = EDE1DD23169DCFC900156E78 /* PhotoMarkerView.m */; };
 		FA0BBEF015AD6062005F4D63 /* allSwitch.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0BBEEA15AD6062005F4D63 /* allSwitch.png */; };
 		FA0BBEF115AD6062005F4D63 /* allSwitch@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0BBEEB15AD6062005F4D63 /* allSwitch@2x.png */; };
 		FA0BBEF215AD6062005F4D63 /* circle.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0BBEEC15AD6062005F4D63 /* circle.png */; };
@@ -384,6 +386,10 @@
 		ED8C506916846A7200993E34 /* userPhotoBlackBg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "userPhotoBlackBg@2x.png"; sourceTree = "<group>"; };
 		ED8C52221684DA7C00993E34 /* Chattar-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Chattar-Prefix.pch"; sourceTree = "<group>"; };
 		ED8C52461689C47400993E34 /* clusterBg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "clusterBg@2x.png"; sourceTree = "<group>"; };
+		EDE1DD1F169C1D8900156E78 /* PhotoWithLocationModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoWithLocationModel.h; sourceTree = "<group>"; };
+		EDE1DD20169C1D8A00156E78 /* PhotoWithLocationModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoWithLocationModel.m; sourceTree = "<group>"; };
+		EDE1DD22169DCFC900156E78 /* PhotoMarkerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoMarkerView.h; sourceTree = "<group>"; };
+		EDE1DD23169DCFC900156E78 /* PhotoMarkerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoMarkerView.m; sourceTree = "<group>"; };
 		FA0BBEEA15AD6062005F4D63 /* allSwitch.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = allSwitch.png; sourceTree = "<group>"; };
 		FA0BBEEB15AD6062005F4D63 /* allSwitch@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "allSwitch@2x.png"; sourceTree = "<group>"; };
 		FA0BBEEC15AD6062005F4D63 /* circle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = circle.png; sourceTree = "<group>"; };
@@ -935,6 +941,8 @@
 				FA0BBF0915AD6113005F4D63 /* ViewTouch.m */,
 				ED75489F1671F10F001E3192 /* ClusterMarkerView.h */,
 				ED7548A01671F10F001E3192 /* ClusterMarkerView.m */,
+				EDE1DD22169DCFC900156E78 /* PhotoMarkerView.h */,
+				EDE1DD23169DCFC900156E78 /* PhotoMarkerView.m */,
 			);
 			name = Views;
 			path = Classes/Views;
@@ -1212,6 +1220,8 @@
 				FAC6B88F15D9006D00F3B10F /* QBChatMessageModel.m */,
 				FAC6B89015D9006D00F3B10F /* QBCheckinModel.h */,
 				FAC6B89115D9006D00F3B10F /* QBCheckinModel.m */,
+				EDE1DD1F169C1D8900156E78 /* PhotoWithLocationModel.h */,
+				EDE1DD20169C1D8A00156E78 /* PhotoWithLocationModel.m */,
 			);
 			name = Models;
 			path = Classes/Models;
@@ -1506,6 +1516,8 @@
 				ED7548A11671F10F001E3192 /* ClusterMarkerView.m in Sources */,
 				ED70278C168DB19E003F6829 /* PhotoWithLocationObject.m in Sources */,
 				ED5C5BF01696FCB10039909E /* PhotoWithLocationAnnotation.m in Sources */,
+				EDE1DD21169C1D8A00156E78 /* PhotoWithLocationModel.m in Sources */,
+				EDE1DD24169DCFC900156E78 /* PhotoMarkerView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -73,13 +73,6 @@
 
 
 #pragma mark -
-#pragma mark Photos With Locations
--(NSMutableArray*)photosWithLocations;
--(void)addPhotoWithLocation:(PhotoWithLocationObject*)photo;
--(void)addPhotosWithLocations:(NSArray*)photos;
--(void)removePhotoWithLocation:(PhotoWithLocationObject*)photo;
--(void)removePhotosWithLocations:(NSArray*)photos;
-#pragma mark -
 #pragma mark First switch All/Friends
 
 - (BOOL)isFirstStartApp;
@@ -109,5 +102,11 @@
 -(BOOL)addCheckinToStorage:(id)checkins;
 
 -(void) deleteAllObjects: (NSString *) entityDescription  context:(NSManagedObjectContext *)ctx;
+
+-(NSMutableArray*)photosWithLocationsFromStorage;
+-(void)addPhotosWithLocationsToStorage:(NSArray*)photos;
+-(BOOL)addPhotoWithLocationsToStorage:(id)photo;
+
+-(NSArray*)photosWithLocationsFromStorageFromUserWithId:(NSDecimalNumber*)userId;
 
 @end

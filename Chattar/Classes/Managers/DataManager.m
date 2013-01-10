@@ -12,6 +12,7 @@
 #import "QBCheckinModel.h"
 #import "QBChatMessageModel.h"
 #import "FBCheckinModel.h"
+#import "PhotoWithLocationModel.h"
 
 #define kFavoritiesFriends [NSString stringWithFormat:@"kFavoritiesFriends_%@", [DataManager shared].currentFBUserId]
 #define kFavoritiesFriendsIds [NSString stringWithFormat:@"kFavoritiesFriendsIds_%@", [DataManager shared].currentFBUserId]
@@ -25,7 +26,9 @@
 #define FBCheckinModelEntity @"FBCheckinModel"
 #define QBCheckinModelEntity @"QBCheckinModel"
 #define QBChatMessageModelEntity @"QBChatMessageModel"
+#define PhotoWithLocationEntity @"PhotoWithLocationModel"
 
+#define MAX_PHOTOS 5
 
 @implementation DataManager
 
@@ -381,8 +384,9 @@ static DataManager *instance = nil;
 		 * The schema for the persistent store is incompatible with current managed object model
 		 Check the error message to determine what the actual problem was.
 		 */
-		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-		abort();
+//		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+//		abort();
+        return nil;
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:@"persistentStorageInitSuccess" object:self];
     [options release];
@@ -689,6 +693,119 @@ static DataManager *instance = nil;
     return results;
 }
 
+#pragma mark -
+#pragma mark Core Data: Photos with locations
+
+-(NSArray*)photosWithLocationsFromStorage{
+    NSManagedObjectContext* ctx = [self threadSafeContext];
+    
+    NSFetchRequest* fetchRequest = [[NSFetchRequest alloc] init];
+    
+    NSEntityDescription* photoEntityDescription = [NSEntityDescription entityForName:PhotoWithLocationEntity inManagedObjectContext:ctx];
+    
+    [fetchRequest setEntity:photoEntityDescription];
+                                                        // photos will be sorted according to place name
+    NSSortDescriptor* sortingOrder = [NSSortDescriptor sortDescriptorWithKey:@"locationName" ascending:YES];
+    [fetchRequest setSortDescriptors:[NSArray arrayWithObject:sortingOrder]];
+    [fetchRequest setPredicate:nil];        // choose ALL photos
+    
+    NSError* fetchError = nil;
+    NSArray* fetchResults = [ctx executeFetchRequest:fetchRequest error:&fetchError];
+    
+    if (fetchError) {
+        NSLog(@"ERROR FETCHING PHOTOS %@",fetchError.domain);
+        return nil;
+    }
+    return fetchResults;
+}
+
+-(BOOL)addPhotoWithLocationsToStorage:(UserAnnotation*)photo{
+    NSManagedObjectContext* context = [self threadSafeContext];
+    return [self addPhotoWithLocationToStorage:photo withContext:context];
+}
+
+-(BOOL)addPhotoWithLocationToStorage:(UserAnnotation*)photo withContext:(NSManagedObjectContext*)context{
+    // construct query for checking is photo already added
+    NSFetchRequest* fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription* photoEntityDescription = [NSEntityDescription entityForName:PhotoWithLocationEntity inManagedObjectContext:context];
+    
+    [fetchRequest setEntity:photoEntityDescription];
+        
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"photoId LIKE (%@)",
+                                photo.photoId]];
+    
+    NSError* error = nil;
+    NSArray* fetchResult = [context executeFetchRequest:fetchRequest error:&error];
+    [fetchRequest release];
+    if (error) {
+        NSLog(@"ERROR ADDDING PHOTO WITH LOCATION %@",error);
+    }
+                        // if photo is not in DB
+    if([fetchResult count] == 0 || fetchResult == nil){
+         // insert new record into table
+        PhotoWithLocationModel* photoToSave = [[PhotoWithLocationModel alloc] initWithEntity:photoEntityDescription insertIntoManagedObjectContext:context];
+        [photoToSave setThumbnailURL:photo.thumbnailURL];
+        [photoToSave setFullImageURL:photo.fullImageURL];
+        [photoToSave setLocationId:photo.locationId];
+        [photoToSave setLocationLongitude:photo.locationLongitude];
+        [photoToSave setLocationLatitude:photo.locationLatitude];
+        [photoToSave setLocationName:photo.locationName];
+        [photoToSave setPhotoTimeStamp:photo.photoTimeStamp];
+        [photoToSave setPhotoId:photo.photoId];
+        [photoToSave setOwnerId:photo.ownerId];
+        NSError* error = nil;
+        [context save:&error];
+        
+        if (error) {
+            NSLog(@"ERROR ADDING PHOTO %@",error.domain);
+            return NO;
+        }
+        else return YES;
+    }
+    
+    return NO;
+}
+
+-(NSArray*)photosWithLocationsFromStorageFromUserWithId:(NSDecimalNumber*)userId{
+    NSManagedObjectContext* context = [self threadSafeContext];
+    NSFetchRequest* fetchRequest = [[NSFetchRequest alloc] init];
+    NSLog(@"%f",userId.doubleValue);
+    NSArray* m = [[DataManager shared] photosWithLocationsFromStorage];
+    for (PhotoWithLocationModel* a in m) {
+        NSLog(@"%f",a.ownerId.doubleValue);
+    }
+    
+    NSEntityDescription* photoEntityDescription = [NSEntityDescription entityForName:PhotoWithLocationEntity inManagedObjectContext:context];
+    
+    [fetchRequest setEntity:photoEntityDescription];
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"ownerId == %@",userId]];
+
+    NSError* error = nil;
+    NSArray* fetchResult = [context executeFetchRequest:fetchRequest error:&error];
+    [fetchRequest release];
+    if (error) {
+        NSLog(@"ERROR ADDDING PHOTO WITH LOCATION %@",error);
+    }
+    if (fetchResult == nil || fetchResult.count == 0) {
+        return nil;
+    }
+                    // sort array
+    NSSortDescriptor* sortOrder = [NSSortDescriptor sortDescriptorWithKey:@"photoTimeStamp" ascending:NO];
+    
+    fetchResult = [fetchResult sortedArrayUsingDescriptors:[NSArray arrayWithObject:sortOrder]];
+    NSLog(@"%@",fetchResult);
+
+                    // get 5 newest photos
+    if (fetchResult.count > 5) {
+        return [fetchResult subarrayWithRange:NSMakeRange(0, MAX_PHOTOS-1)];
+    }
+    return fetchResult;
+}
+-(void)addPhotosWithLocationsToStorage:(NSArray*)photos{
+    for (UserAnnotation* photo in photos) {
+        [self addPhotoWithLocationsToStorage:photo];
+    }
+}
 
 #pragma mark -
 #pragma mark Application's documents directory
@@ -698,35 +815,5 @@ static DataManager *instance = nil;
  */
 - (NSString *)applicationDocumentsDirectory {
 	return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-}
-
-
-#pragma mark -
-#pragma  mark Photos With Locations Methods
--(void)addPhotoWithLocation:(PhotoWithLocationObject*)photo{
-    if (!photosWithLocations) {
-        photosWithLocations = [[NSMutableArray alloc] init];
-    }
-    
-    [photosWithLocations addObject:photo];
-}
-
--(void)addPhotosWithLocations:(NSArray*)_photosWithLocations{
-    if (!photosWithLocations) {
-        photosWithLocations = [[NSMutableArray alloc] init];
-    }
-    [photosWithLocations addObjectsFromArray:_photosWithLocations];
-}
-
--(void)removePhotoWithLocation:(PhotoWithLocationObject *)photo{
-    [photosWithLocations removeObject:photo];
-}
-
--(void)removePhotosWithLocations:(NSArray *)photos{
-    [photosWithLocations removeObjectsInArray:photos];
-}
-
--(NSMutableArray*)photosWithLocations{
-    return photosWithLocations;
 }
 @end

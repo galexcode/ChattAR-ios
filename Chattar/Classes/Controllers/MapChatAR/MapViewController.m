@@ -225,32 +225,41 @@
     
     else if([annotation isKindOfClass:[UserAnnotation class]])
     {
-        MapMarkerView *marker = (MapMarkerView *)[_mapView dequeueReusableAnnotationViewWithIdentifier:@"pinView"];
-        if(marker == nil){
-            marker = [[[MapMarkerView alloc] initWithAnnotation:annotation 
-                                        reuseIdentifier:@"pinView"] autorelease];
-        }else{
-            [marker updateAnnotation:(UserAnnotation *)annotation];
+        UserAnnotation* ann = (UserAnnotation*)annotation;
+                    // if this is photo annotation
+        if (ann.locationName) {
+            PhotoMarkerView* photoMarker = [[PhotoMarkerView alloc] initWithAnnotation:ann reuseIdentifier:@"photoView"];
+            
+            return photoMarker;
         }
-        
-        // set touch action
-        marker.target = delegate;
-        marker.action = @selector(touchOnMarker:);
-
-        if (IS_IOS_6) {
-            [marker setTransform:CGAffineTransformMakeRotation(0.001)];
-            if(count){
-                [marker setTransform:CGAffineTransformMakeRotation(-count)];
+        else
+        {
+            MapMarkerView *marker = (MapMarkerView *)[_mapView dequeueReusableAnnotationViewWithIdentifier:@"pinView"];
+            if(marker == nil){
+                marker = [[[MapMarkerView alloc] initWithAnnotation:annotation 
+                                            reuseIdentifier:@"pinView"] autorelease];
+            }else{
+                [marker updateAnnotation:(UserAnnotation *)annotation];
             }
-        } else{
-            double delayInSeconds = 0;
-            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
-            dispatch_after(popTime, dispatch_get_main_queue(), ^{
-                [marker setTransform:CGAffineTransformMakeRotation(-count)];
-            });
+            
+            // set touch action
+            marker.target = delegate;
+            marker.action = @selector(touchOnMarker:);
+
+            if (IS_IOS_6) {
+                [marker setTransform:CGAffineTransformMakeRotation(0.001)];
+                if(count){
+                    [marker setTransform:CGAffineTransformMakeRotation(-count)];
+                }
+            } else{
+                double delayInSeconds = 0;
+                dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+                dispatch_after(popTime, dispatch_get_main_queue(), ^{
+                    [marker setTransform:CGAffineTransformMakeRotation(-count)];
+                });
+            }
+            return marker;
         }
-        
-        return marker;
     }
     
     return nil;
