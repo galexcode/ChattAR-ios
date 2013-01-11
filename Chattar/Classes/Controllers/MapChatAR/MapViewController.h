@@ -13,7 +13,8 @@
 #import "OCAnnotation.h"
 #import "ClusterMarkerView.h"
 #import "PhotoMarkerView.h"
-@interface MapViewController : UIViewController <MKMapViewDelegate, UIGestureRecognizerDelegate>{
+
+@interface MapViewController : UIViewController <MKMapViewDelegate, UIGestureRecognizerDelegate,PhotoMarkerProtocol>{
     CGFloat count;
     CGFloat lastCount;
     
@@ -37,7 +38,7 @@
 - (void)refreshWithNewPoints:(NSArray *)mapPoints;
 - (void)addPoints:(NSArray *)mapPoints;
 - (void)addPoint:(UserAnnotation *)mapPoint;
-
+-(void)makeFullScreenView:(UIView *)view;
 - (void)clear;
 
 @end

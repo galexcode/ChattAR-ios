@@ -14,14 +14,15 @@
 @protocol PhotoMarkerProtocol <NSObject>
 
 @required
--(void)touchOn:(UITapGestureRecognizer*)recognizer;
+-(void)makeFullScreenView:(UIView*)view;
 
 @end
 
-@interface PhotoMarkerView : MKAnnotationView{
+@interface PhotoMarkerView : MKAnnotationView<UIGestureRecognizerDelegate>{
     AsyncImageView* fullPhoto;
     AsyncImageView* thumbnailPhoto;
-    
-    id<PhotoMarkerProtocol> delegate;
 }
+
+@property (nonatomic,assign) id<PhotoMarkerProtocol> delegate;
+
 @end

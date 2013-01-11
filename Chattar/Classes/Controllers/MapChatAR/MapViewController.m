@@ -229,7 +229,7 @@
                     // if this is photo annotation
         if (ann.locationName) {
             PhotoMarkerView* photoMarker = [[PhotoMarkerView alloc] initWithAnnotation:ann reuseIdentifier:@"photoView"];
-            
+            [photoMarker setDelegate:self];
             return photoMarker;
         }
         else
@@ -339,6 +339,14 @@
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer{
     
     return YES;
+}
+
+#pragma mark - 
+#pragma mark Photo Delegate Methods
+-(void)makeFullScreenView:(UIView *)view{
+    
+    view.center = self.view.center;
+    [self.view addSubview:view];
 }
 
 @end
