@@ -63,7 +63,10 @@
 }
 
 -(void)updateAnnotation:(UserAnnotation *)_annotation{
+            // if it is not a photo
     [super updateAnnotation:_annotation];
+    
+    
     NSArray *friendsIds =  [[DataManager shared].myFriendsAsDictionary allKeys];
 
     if([friendsIds containsObject:[_annotation.fbUser objectForKey:kId]]

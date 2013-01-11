@@ -140,6 +140,7 @@
 - (void)updateAnnotation:(UserAnnotation *)_annotation{
     
     //[self updateContainer:_annotation];
+    
     [annotation release];
     annotation = [_annotation retain];
     
@@ -154,18 +155,41 @@
     {
         [userNameBG setImage:[UIImage imageNamed:@"radarMarkerName2@2x.png"] ];
     }
-    
-    if ([_annotation.userPhotoUrl isKindOfClass:[NSString class]]){
-        [userPhotoView loadImageFromURL:[NSURL URLWithString:_annotation.userPhotoUrl]];
-    }else{
-        NSDictionary* pic = (NSDictionary*)_annotation.userPhotoUrl;
-        NSString* url = [[pic objectForKey:kData] objectForKey:kUrl];
-        [userPhotoView loadImageFromURL:[NSURL URLWithString:url]];
+                // if it is not photo annotation view
+    if (!_annotation.photoId) {
+        
+        if ([_annotation.userPhotoUrl isKindOfClass:[NSString class]]){
+            [userPhotoView loadImageFromURL:[NSURL URLWithString:_annotation.userPhotoUrl]];
+        }else{
+            NSDictionary* pic = (NSDictionary*)_annotation.userPhotoUrl;
+            NSString* url = [[pic objectForKey:kData] objectForKey:kUrl];
+            [userPhotoView loadImageFromURL:[NSURL URLWithString:url]];
+        }
+        
+        [userName setText:_annotation.userName];
+        
+        [userStatus setText:[[DataManager shared] messageFromQuote:_annotation.userStatus]];
+        
     }
-    
-    [userName setText:_annotation.userName];
-    
-    [userStatus setText:[[DataManager shared] messageFromQuote:_annotation.userStatus]];
+    else{
+        [self.userStatus setText:_annotation.locationName];
+        for (NSDictionary* friendInfo in [[DataManager shared] myFriends]) {
+            NSDecimalNumber* friendId = [friendInfo objectForKey:kId];
+            if (fabs(friendId.doubleValue - _annotation.ownerId.doubleValue) < 0.00001) {
+                NSMutableString* friendFullName = [[NSMutableString alloc] init];
+                [friendFullName appendString:[friendInfo objectForKey:@"first_name"]];
+                [friendFullName appendString:@" "];
+                [friendFullName appendString:[friendInfo objectForKey:@"last_name"]];
+                
+                [self.userName setText:friendFullName];
+                [friendFullName release];
+                break;
+            }
+        }
+
+        [self.userPhotoView loadImageFromURL:[NSURL URLWithString:_annotation.thumbnailURL]];
+
+    }
 }
 
 // touch action

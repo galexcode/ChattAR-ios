@@ -8,6 +8,7 @@
 
 #import "MapMarkerView.h"
 #import "OCAnnotation.h"
+#import "PhotoMarkerView.h"
 @interface ClusterMarkerView : MapMarkerView{
     UILabel* numberOfAnnotationsInCluster;
     UIImageView* backGround;

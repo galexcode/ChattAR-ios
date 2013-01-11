@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "PhotoWithLocationObject.h"
 #define maxPopularFriends 40
 
 @interface DataManager : NSObject{

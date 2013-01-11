@@ -14,7 +14,7 @@
 #import "ClusterMarkerView.h"
 #import "PhotoMarkerView.h"
 
-@interface MapViewController : UIViewController <MKMapViewDelegate, UIGestureRecognizerDelegate,PhotoMarkerProtocol>{
+@interface MapViewController : UIViewController <MKMapViewDelegate, UIGestureRecognizerDelegate>{
     CGFloat count;
     CGFloat lastCount;
     

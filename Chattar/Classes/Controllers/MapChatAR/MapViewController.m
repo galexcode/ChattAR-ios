@@ -182,7 +182,8 @@
         [clusterView retain];
         
         UserAnnotation* closest = (UserAnnotation*)[OCAlgorithms calculateClusterCenter:clusterAnnotation];
-
+        
+        
        
         if (!clusterView) {
             
@@ -229,7 +230,8 @@
                     // if this is photo annotation
         if (ann.locationName) {
             PhotoMarkerView* photoMarker = [[PhotoMarkerView alloc] initWithAnnotation:ann reuseIdentifier:@"photoView"];
-            [photoMarker setDelegate:self];
+            photoMarker.target = self;
+            photoMarker.action = @selector(makeFullScreenView:);
             return photoMarker;
         }
         else
@@ -341,12 +343,27 @@
     return YES;
 }
 
-#pragma mark - 
-#pragma mark Photo Delegate Methods
--(void)makeFullScreenView:(UIView *)view{
+#pragma mark -
+#pragma mark Photo Annotation Displaying Methods
+-(void)makeFullScreenView:(UIView *)markerView{
+    PhotoMarkerView* marker = (PhotoMarkerView*)markerView;
     
-    view.center = self.view.center;
-    [self.view addSubview:view];
+    AsyncImageView* fullPhoto = [[AsyncImageView alloc] initWithFrame:CGRectMake(20, 20, 250, 300)];
+    [fullPhoto loadImageFromURL:[NSURL URLWithString:marker.annotation.fullImageURL]];
+    
+    UIButton* closeButton = [[UIButton alloc] initWithFrame:CGRectMake(fullPhoto.frame.size.width - 20, -10, 29, 29)];
+    [closeButton setImage:[UIImage imageNamed:@"FBDialog.bundle/images/close.png"] forState:UIControlStateNormal];
+    [closeButton addTarget:self action:@selector(closeFullPhoto) forControlEvents:UIControlEventTouchDown];
+    [fullPhoto addSubview:closeButton];
+    [closeButton release];
+    
+    fullPhoto.center = self.view.center;
+    fullPhoto.tag = 2008;
+    [self.view addSubview:fullPhoto];
+}
+
+-(void)closeFullPhoto{
+    [[self.view viewWithTag:2008] removeFromSuperview];
 }
 
 @end
