@@ -769,11 +769,6 @@ static DataManager *instance = nil;
 -(NSArray*)photosWithLocationsFromStorageFromUserWithId:(NSDecimalNumber*)userId{
     NSManagedObjectContext* context = [self threadSafeContext];
     NSFetchRequest* fetchRequest = [[NSFetchRequest alloc] init];
-    NSLog(@"%f",userId.doubleValue);
-    NSArray* m = [[DataManager shared] photosWithLocationsFromStorage];
-    for (PhotoWithLocationModel* a in m) {
-        NSLog(@"%f",a.ownerId.doubleValue);
-    }
     
     NSEntityDescription* photoEntityDescription = [NSEntityDescription entityForName:PhotoWithLocationEntity inManagedObjectContext:context];
     
@@ -786,6 +781,7 @@ static DataManager *instance = nil;
     if (error) {
         NSLog(@"ERROR ADDDING PHOTO WITH LOCATION %@",error);
     }
+    
     if (fetchResult == nil || fetchResult.count == 0) {
         return nil;
     }
@@ -793,7 +789,6 @@ static DataManager *instance = nil;
     NSSortDescriptor* sortOrder = [NSSortDescriptor sortDescriptorWithKey:@"photoTimeStamp" ascending:NO];
     
     fetchResult = [fetchResult sortedArrayUsingDescriptors:[NSArray arrayWithObject:sortOrder]];
-    NSLog(@"%@",fetchResult);
 
                     // get 5 newest photos
     if (fetchResult.count > 5) {

@@ -254,23 +254,29 @@ static FBService *instance = nil;
     NSMutableString* batchRequestBody = [[NSMutableString alloc] initWithString:@""];
     NSArray *popularFriendsIDs = [NSArray arrayWithArray:[[DataManager shared].myPopularFriends allObjects]];
     
-    NSMutableString* friendsIDsString = [[NSMutableString alloc] init];
-    for (int i = 0; i < popularFriendsIDs.count; i++) {
-        [friendsIDsString appendFormat:@"%@,",[popularFriendsIDs objectAtIndex:i]];
+    if (popularFriendsIDs.count != 0) {
+        NSMutableString* friendsIDsString = [[NSMutableString alloc] init];
+        for (int i = 0; i < popularFriendsIDs.count; i++) {
+            [friendsIDsString appendFormat:@"%@,",[popularFriendsIDs objectAtIndex:i]];
+        }
+        
+        [friendsIDsString deleteCharactersInRange:NSMakeRange([friendsIDsString length]-1, 1) ];
+        // create queries
+        NSString* firstQuery = [NSString stringWithFormat:@"SELECT src,src_small,place_id,created,pid FROM photo WHERE (pid IN (SELECT pid FROM photo_tag WHERE subject IN (%@)) OR pid IN (SELECT pid FROM photo WHERE aid IN (SELECT aid FROM album WHERE owner IN (%@) AND type!='profile'))) AND place_id>0",friendsIDsString,friendsIDsString];
+        
+        NSString* secondQuery = @"SELECT name,latitude,longitude,page_id FROM place WHERE page_id IN (SELECT place_id FROM #query1)";
+        
+        NSString* thirdQuery = @"SELECT owner,pid FROM photo WHERE pid IN (SELECT pid FROM #query1)";
+        
+        [batchRequestBody appendFormat:@"{\"query1\": \"%@\",\"query2\":\"%@\",\"query3\":\"%@\"}",firstQuery,secondQuery,thirdQuery];
+        
+        NSLog(@"%@",batchRequestBody);
+        
+        NSMutableDictionary* params = [NSMutableDictionary dictionaryWithObject:batchRequestBody forKey:@"q"];
+        [batchRequestBody release];
+        [self performSelector:@selector(requestPhotosWithLocations:) withObject:[NSArray arrayWithObjects:params,delegate, nil] ];
     }
-    [friendsIDsString deleteCharactersInRange:NSMakeRange([friendsIDsString length]-1, 1) ];
-                                                                                            // create queries 
-    NSString* firstQuery = [NSString stringWithFormat:@"SELECT src,src_small,place_id,created,pid FROM photo WHERE (pid IN (SELECT pid FROM photo_tag WHERE subject IN (%@)) OR pid IN (SELECT pid FROM photo WHERE aid IN (SELECT aid FROM album WHERE owner IN (%@) AND type!='profile'))) AND place_id>0",friendsIDsString,friendsIDsString];
-
-    NSString* secondQuery = @"SELECT name,latitude,longitude,page_id FROM place WHERE page_id IN (SELECT place_id FROM #query1)";
     
-    NSString* thirdQuery = @"SELECT owner,pid FROM photo WHERE pid IN (SELECT pid FROM #query1)";
-    
-    [batchRequestBody appendFormat:@"{\"query1\": \"%@\",\"query2\":\"%@\",\"query3\":\"%@\"}",firstQuery,secondQuery,thirdQuery];
-    
-    NSMutableDictionary* params = [NSMutableDictionary dictionaryWithObject:batchRequestBody forKey:@"q"];
-    [batchRequestBody release];
-    [self performSelector:@selector(requestPhotosWithLocations:) withObject:[NSArray arrayWithObjects:params,delegate, nil] ];
 }
 
 

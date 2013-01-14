@@ -568,9 +568,10 @@
         }
         
         NSArray *feeds = [result.body objectForKey:kData];
-        
+        NSLog(@"%@",result.body);
         
         NSArray *friendsIds = [[[DataManager shared].myFriendsAsDictionary allKeys] copy];
+        NSLog(@"%@",friendsIds);
         
         for(NSDictionary *feed in feeds){
             NSArray *likes = [[feed objectForKey:kLikes] objectForKey:kData];

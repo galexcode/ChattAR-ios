@@ -392,7 +392,7 @@
     //
     // 1. add All from QB
     NSMutableArray *friendsIdsWhoAlreadyAdded = [NSMutableArray array];
-    for(UserAnnotation *mapAnnotation in self.allMapPoints){
+    for(UserAnnotation *mapAnnotation in self.allMapPoints){    
         [self.mapPoints addObject:mapAnnotation];
         [friendsIdsWhoAlreadyAdded addObject:mapAnnotation.fbUserId];
     }
@@ -618,31 +618,21 @@
 }
 
 -(void)retrievePhotosWithLocations{
-    
     [self checkForCacheing];
     [[FBService shared] performSelector:@selector(friendsPhotosWithLocationWithDelegate:) withObject:self];
-    
-    for (UserAnnotation* ann in allPhotosWithLocations) {
-        NSLog(@"%@",ann.locationName);
-        NSLog(@"%f",ann.locationLatitude.doubleValue);
-        NSLog(@"%f",ann.locationLongitude.doubleValue);
-        NSLog(@"%@",ann.locationId);
-        NSLog(@"%@",ann.fullImageURL);
-        NSLog(@"%@",ann.thumbnailURL);        
-    }
-    
 }
 
 -(void)checkForCacheing{
     NSArray* popularFriendsIds = [[[DataManager shared] myPopularFriends] allObjects];
     NSMutableArray* cachedPhotos = [[NSMutableArray alloc] init];
-    
-    for (NSString* popularFriendId in popularFriendsIds) {
-        NSDecimalNumber* friendID = [NSDecimalNumber decimalNumberWithString:popularFriendId];
-        NSArray* friendPhotos = [[DataManager shared] photosWithLocationsFromStorageFromUserWithId:friendID];
-        [cachedPhotos addObjectsFromArray:friendPhotos];
+
+    if (popularFriendsIds.count != 0) {
+        for (NSString* popularFriendId in popularFriendsIds) {
+            NSDecimalNumber* friendID = [NSDecimalNumber decimalNumberWithString:popularFriendId];
+            NSArray* friendPhotos = [[DataManager shared] photosWithLocationsFromStorageFromUserWithId:friendID];
+            [cachedPhotos addObjectsFromArray:friendPhotos];
+        }
     }
-    
     NSLog(@"%@",cachedPhotos);
     
     
