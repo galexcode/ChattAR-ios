@@ -182,14 +182,19 @@
         [clusterView retain];
         
         UserAnnotation* closest = (UserAnnotation*)[OCAlgorithms calculateClusterCenter:clusterAnnotation];
-        
-        
        
         if (!clusterView) {
             
             // find annotation which is closest to cluster center
             clusterView = [[ClusterMarkerView alloc] initWithAnnotation:closest reuseIdentifier:@"ClusterView"];
             [clusterView setCanShowCallout:YES];
+
+            // if it is photo
+            if (closest.photoId) {
+                [clusterView findAndSetFriendName:closest];
+                [clusterView.userPhotoView loadImageFromURL:[NSURL URLWithString:closest.thumbnailURL]];
+                [clusterView.userStatus setText:closest.locationName];
+            }
             
                         
             UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapToZoom:)];
@@ -228,10 +233,9 @@
     {
         UserAnnotation* ann = (UserAnnotation*)annotation;
                     // if this is photo annotation
-        if (ann.locationName) {
+        if (ann.photoId) {
             PhotoMarkerView* photoMarker = [[PhotoMarkerView alloc] initWithAnnotation:ann reuseIdentifier:@"photoView"];
-            photoMarker.target = self;
-            photoMarker.action = @selector(makeFullScreenView:);
+            [photoMarker setDelegate:self];
             return photoMarker;
         }
         else
@@ -335,6 +339,8 @@
     
 }
 
+
+
 #pragma mark -
 #pragma mark UIGestureRecognizerDelegate
 
@@ -345,25 +351,26 @@
 
 #pragma mark -
 #pragma mark Photo Annotation Displaying Methods
--(void)makeFullScreenView:(UIView *)markerView{
-    PhotoMarkerView* marker = (PhotoMarkerView*)markerView;
-    
-    AsyncImageView* fullPhoto = [[AsyncImageView alloc] initWithFrame:CGRectMake(20, 20, 250, 300)];
-    [fullPhoto loadImageFromURL:[NSURL URLWithString:marker.annotation.fullImageURL]];
-    
-    UIButton* closeButton = [[UIButton alloc] initWithFrame:CGRectMake(fullPhoto.frame.size.width - 20, -10, 29, 29)];
+-(void)showPhoto:(AsyncImageView*)photo{
+    [photo loadImageFromURL:photo.linkedUrl];
+    photo.center = self.view.center;
+    [photo setTag:2008];
+
+    UIButton* closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [closeButton setFrame:CGRectMake(photo.frame.size.width-13, -6, 29, 29)];
+    [closeButton addTarget:self action:@selector(closeView) forControlEvents:UIControlEventTouchUpInside];
     [closeButton setImage:[UIImage imageNamed:@"FBDialog.bundle/images/close.png"] forState:UIControlStateNormal];
-    [closeButton addTarget:self action:@selector(closeFullPhoto) forControlEvents:UIControlEventTouchDown];
-    [fullPhoto addSubview:closeButton];
-    [closeButton release];
+    [photo bringSubviewToFront:closeButton];
+
+    [self.view setUserInteractionEnabled:YES];
+    [self.view bringSubviewToFront:photo];
+    [photo addSubview:closeButton];
+    [photo bringSubviewToFront:closeButton];
     
-    fullPhoto.center = self.view.center;
-    fullPhoto.tag = 2008;
-    [self.view addSubview:fullPhoto];
+    [self.view addSubview:photo];
 }
 
--(void)closeFullPhoto{
+-(void)closeView{
     [[self.view viewWithTag:2008] removeFromSuperview];
 }
-
 @end

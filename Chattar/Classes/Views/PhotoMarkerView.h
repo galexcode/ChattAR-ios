@@ -11,10 +11,18 @@
 #import "UserAnnotation.h"
 #import "MapMarkerView.h"
 
-@interface PhotoMarkerView : MapMarkerView<UIGestureRecognizerDelegate>{
+@protocol PhotoMarkerProtocol <NSObject>
+
+-(void)showPhoto:(AsyncImageView*)photo;
+
+@end
+
+@interface PhotoMarkerView : MKAnnotationView<UIGestureRecognizerDelegate>{
     AsyncImageView* fullPhoto;
     AsyncImageView* thumbnailPhoto;
 }
+
+@property (nonatomic, assign)id<PhotoMarkerProtocol> delegate;
 
 
 @end

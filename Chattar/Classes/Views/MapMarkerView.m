@@ -191,6 +191,22 @@
 
     }
 }
+-(void)findAndSetFriendName:(UserAnnotation*)ann{
+    for (NSDictionary* friendInfo in [[DataManager shared] myFriends]) {
+        NSDecimalNumber* friendId = [friendInfo objectForKey:kId];
+        if (fabs(friendId.doubleValue - ann.ownerId.doubleValue) < 0.00001) {
+            NSMutableString* friendFullName = [[NSMutableString alloc] init];
+            [friendFullName appendString:[friendInfo objectForKey:@"first_name"]];
+            [friendFullName appendString:@" "];
+            [friendFullName appendString:[friendInfo objectForKey:@"last_name"]];
+            
+            [self.userName setText:friendFullName];
+            [friendFullName release];
+            break;
+        }
+    }
+    
+}
 
 // touch action
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
@@ -207,6 +223,8 @@
 		}
 	}
 }
+
+
 
 - (void)dealloc
 {
