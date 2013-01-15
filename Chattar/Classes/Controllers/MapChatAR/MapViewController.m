@@ -146,8 +146,6 @@
 }
 
 - (void)addPoints:(NSArray *)mapPoints{
-    NSLog(@"%f",self.mapView.clusterSize);
-
     // add new
     for (UserAnnotation* ann in mapPoints) {
         [self.mapView addAnnotation:ann];
@@ -332,9 +330,7 @@
                          }
          ];
     }
-        
-    // determ type of region changing - zooming or moving
-       
+               
     [self.mapView doClustering];
     
 }
@@ -357,7 +353,7 @@
     [photo setTag:2008];
 
     UIButton* closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [closeButton setFrame:CGRectMake(photo.frame.size.width-13, -6, 29, 29)];
+    [closeButton setFrame:CGRectMake(photo.frame.size.width-18, -6, 29, 29)];
     [closeButton addTarget:self action:@selector(closeView) forControlEvents:UIControlEventTouchUpInside];
     [closeButton setImage:[UIImage imageNamed:@"FBDialog.bundle/images/close.png"] forState:UIControlStateNormal];
     [photo bringSubviewToFront:closeButton];

@@ -619,6 +619,7 @@
 
 -(void)retrievePhotosWithLocations{
     [self checkForCacheing];
+    
     [[FBService shared] performSelector:@selector(friendsPhotosWithLocationWithDelegate:) withObject:self];
 }
 
@@ -643,7 +644,6 @@
     if (cachedPhotos.count > 0) {
         
         for (PhotoWithLocationModel* photo in cachedPhotos) {
-            NSLog(@"%@",photo);
             UserAnnotation* photoAnnotation = [[UserAnnotation alloc] init];
             [photoAnnotation setFullImageURL:photo.fullImageURL];
             [photoAnnotation setThumbnailURL:photo.thumbnailURL];
@@ -656,6 +656,7 @@
             [allPhotosWithLocations addObject:photoAnnotation];
             [photoAnnotation release];
         }
+        
         [self showWorld];
     }
     [cachedPhotos release];
@@ -787,66 +788,76 @@
     
     NSArray *currentMapAnnotations = [mapViewController.mapView.annotations copy];
    
-    // Check for Map
-    BOOL isExistPoint = NO;
-    for (UserAnnotation *annotation in currentMapAnnotations)
-	{
-        NSDate *newCreateDateTime = point.createdAt;
-        NSDate *currentCreateDateTime = annotation.createdAt;
-        // already exist, change status
-        if([point.fbUserId isEqualToString:annotation.fbUserId])
-		{
-            if([newCreateDateTime compare:currentCreateDateTime] == NSOrderedDescending){
-                if ([point.userStatus length] < 6 || ([point.userStatus length] >= 6 && ![[point.userStatus substringToIndex:6] isEqualToString:fbidIdentifier])){
-                        MapMarkerView *marker = (MapMarkerView *)[mapViewController.mapView viewForAnnotation:annotation];
-                    [marker updateStatus:point.userStatus];// update status
-                    [marker updateCoordinate:point.coordinate];
-                }
+            // this is PHOTO
+    if (point.photoId) {
+        for (UserAnnotation* annotation in currentMapAnnotations) {
+            if (![annotation.photoId isEqualToString:point.photoId]) {
+                [self.mapPoints addObject:point];
+                break;
             }
-
-            isExistPoint = YES;
-            
-            break;
         }
     }
-    
-    [currentMapAnnotations release];
-    
-    
-    // Check for AR
-    if(isExistPoint){
-        
-        NSArray *currentARMarkers = [arViewController.coordinateViews copy];
-        
-        for (ARMarkerView *marker in currentARMarkers)
-		{
+    else{
+        // Check for Map
+        BOOL isExistPoint = NO;
+        for (UserAnnotation *annotation in currentMapAnnotations)
+        {
             NSDate *newCreateDateTime = point.createdAt;
-            NSDate *currentCreateDateTime = marker.userAnnotation.createdAt;
+            NSDate *currentCreateDateTime = annotation.createdAt;
             // already exist, change status
-            if([point.fbUserId isEqualToString:marker.userAnnotation.fbUserId])
-			{
+            if([point.fbUserId isEqualToString:annotation.fbUserId])
+            {
                 if([newCreateDateTime compare:currentCreateDateTime] == NSOrderedDescending){
                     if ([point.userStatus length] < 6 || ([point.userStatus length] >= 6 && ![[point.userStatus substringToIndex:6] isEqualToString:fbidIdentifier])){
-                        ARMarkerView *marker = (ARMarkerView *)[arViewController viewForExistAnnotation:point];
+                        MapMarkerView *marker = (MapMarkerView *)[mapViewController.mapView viewForAnnotation:annotation];
                         [marker updateStatus:point.userStatus];// update status
-                        [marker updateCoordinate:point.coordinate]; // update location
+                        [marker updateCoordinate:point.coordinate];
                     }
                 }
                 
                 isExistPoint = YES;
-                               
+                
                 break;
             }
         }
         
-        [currentARMarkers release];
-    }
-    
-    
-    // new -> add to Map, AR
-    if(!isExistPoint){
+        [currentMapAnnotations release];
+        
+        
+        // Check for AR
+        if(isExistPoint){
+            
+            NSArray *currentARMarkers = [arViewController.coordinateViews copy];
+            
+            for (ARMarkerView *marker in currentARMarkers)
+            {
+                NSDate *newCreateDateTime = point.createdAt;
+                NSDate *currentCreateDateTime = marker.userAnnotation.createdAt;
+                // already exist, change status
+                if([point.fbUserId isEqualToString:marker.userAnnotation.fbUserId])
+                {
+                    if([newCreateDateTime compare:currentCreateDateTime] == NSOrderedDescending){
+                        if ([point.userStatus length] < 6 || ([point.userStatus length] >= 6 && ![[point.userStatus substringToIndex:6] isEqualToString:fbidIdentifier])){
+                            ARMarkerView *marker = (ARMarkerView *)[arViewController viewForExistAnnotation:point];
+                            [marker updateStatus:point.userStatus];// update status
+                            [marker updateCoordinate:point.coordinate]; // update location
+                        }
+                    }
+                    
+                    isExistPoint = YES;
+                    
+                    break;
+                }
+            }
+            
+            [currentARMarkers release];
+        }
+        
+        
+        // new -> add to Map, AR
+        if(!isExistPoint){
             BOOL addedToCurrentMapState = NO;
-
+            
             [self.allMapPoints addObject:point];
             
             if(point.geoDataID != -1){
@@ -860,16 +871,18 @@
             //
             if(addedToCurrentMapState){
                 
-                    [mapViewController addPoint:point];
-                    [arViewController addPoint:point];
-      
+                [mapViewController addPoint:point];
+                [arViewController addPoint:point];
+                
             }
-    }
-    
-    // Save to cache
-    //
-    if(!isFBCheckin){
-        [[DataManager shared] addMapARPointToStorage:point];
+        }
+        
+        // Save to cache
+        //
+        if(!isFBCheckin){
+            [[DataManager shared] addMapARPointToStorage:point];
+        }
+
     }
 }
 
@@ -1389,7 +1402,6 @@
     // refresh chat
     dispatch_async(dispatch_get_main_queue(), ^{
         [chatViewController refresh];
-        
         [arViewController updateMarkersPositionsForCenterLocation:arViewController.centerLocation];
     });
 }
@@ -1461,13 +1473,20 @@
         }
     }
 
+//    [self checkForCacheing];
+    for (UserAnnotation* ann in photosWithLocations) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self addNewPointToMapAR:ann isFBCheckin:NO];
+        });
+    }
     
-    [[DataManager shared] addPhotosWithLocationsToStorage:photosWithLocations];
+
+    
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self checkForCacheing];
-        [mapViewController refreshWithNewPoints:self.mapPoints];
-        
+        [[DataManager shared] addPhotosWithLocationsToStorage:photosWithLocations];
     });
+    
+    
     [photosWithLocations release];
 }
 
