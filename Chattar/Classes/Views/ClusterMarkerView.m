@@ -63,7 +63,7 @@
 }
 
 -(void)updateAnnotation:(UserAnnotation *)_annotation{
-            // if it is not a photo
+    
     [super updateAnnotation:_annotation];
     
     

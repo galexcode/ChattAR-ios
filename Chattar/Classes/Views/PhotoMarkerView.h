@@ -23,6 +23,6 @@
 }
 
 @property (nonatomic, assign)id<PhotoMarkerProtocol> delegate;
-
+-(void)updateAnnotation:(UserAnnotation*)annotation;
 
 @end

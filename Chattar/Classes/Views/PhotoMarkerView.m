@@ -40,6 +40,18 @@
     return self;
 }
 
+-(void)updateAnnotation:(UserAnnotation*)annotation{
+    UserAnnotation* currentAnnotation = (UserAnnotation*)self.annotation;
+    if (![annotation.photoId isEqualToString:currentAnnotation.photoId]) {
+        NSString* newUserName = [currentAnnotation findAndFriendNameForPhoto:annotation];
+        [currentAnnotation setUserName:newUserName];
+        [currentAnnotation setUserStatus:annotation.locationName];
+        [currentAnnotation setThumbnailURL:annotation.thumbnailURL];
+        [currentAnnotation setFullImageURL:annotation.fullImageURL];
+    }
+}
+
+
 -(void)closeView{
     [fullPhoto removeFromSuperview];
 }
@@ -56,8 +68,6 @@
     [super dealloc];
 }
 
--(void)updateAnnotation:(UserAnnotation *)_annotation{
-}
 
 
 #pragma mark -

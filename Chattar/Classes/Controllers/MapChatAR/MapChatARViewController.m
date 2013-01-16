@@ -619,7 +619,7 @@
 
 -(void)retrievePhotosWithLocations{
     [self checkForCacheing];
-    
+
     [[FBService shared] performSelector:@selector(friendsPhotosWithLocationWithDelegate:) withObject:self];
 }
 
@@ -627,10 +627,9 @@
     NSArray* popularFriendsIds = [[[DataManager shared] myPopularFriends] allObjects];
     NSMutableArray* cachedPhotos = [[NSMutableArray alloc] init];
 
-    if (popularFriendsIds.count != 0) {
-        for (NSString* popularFriendId in popularFriendsIds) {
-            NSDecimalNumber* friendID = [NSDecimalNumber decimalNumberWithString:popularFriendId];
-            NSArray* friendPhotos = [[DataManager shared] photosWithLocationsFromStorageFromUserWithId:friendID];
+    if (popularFriendsIds.count != 0) {        
+        for (NSString* friendId in popularFriendsIds) {
+            NSArray* friendPhotos = [[DataManager shared] photosWithLocationsFromStorageFromUserWithId:[NSDecimalNumber decimalNumberWithString:friendId]];
             [cachedPhotos addObjectsFromArray:friendPhotos];
         }
     }
@@ -793,7 +792,6 @@
         for (UserAnnotation* annotation in currentMapAnnotations) {
             if (![annotation.photoId isEqualToString:point.photoId]) {
                 [self.mapPoints addObject:point];
-                break;
             }
         }
     }
@@ -1408,7 +1406,10 @@
 
 -(void)processPhotosWithLocations:(NSDictionary*)responseData{
     NSLog(@"%@",responseData);
-
+//    NSLog(@"%@",[[DataManager shared] myPopularFriends]);
+//    NSLog(@"%@",[[DataManager shared] myFriends]);
+    
+    
     NSArray* fqlResults = [responseData objectForKey:kData];
     
     NSArray* firstFqlResults = [(NSDictionary*)[fqlResults objectAtIndex:0] objectForKey:@"fql_result_set"];
@@ -1442,9 +1443,8 @@
         
         [photosWithLocations addObject:photoObject];
         [photoObject release];
-        
-        
     }
+    
     NSLog(@"%@",photosWithLocations);
     
     for (NSDictionary* fqlResult in secondFqlResults) {
@@ -1473,18 +1473,11 @@
         }
     }
 
-//    [self checkForCacheing];
-    for (UserAnnotation* ann in photosWithLocations) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self addNewPointToMapAR:ann isFBCheckin:NO];
-        });
-    }
-    
-
-    
     dispatch_async(dispatch_get_main_queue(), ^{
-        [[DataManager shared] addPhotosWithLocationsToStorage:photosWithLocations];
+        [self showWorld];
     });
+
+    [[DataManager shared] addPhotosWithLocationsToStorage:photosWithLocations];
     
     
     [photosWithLocations release];

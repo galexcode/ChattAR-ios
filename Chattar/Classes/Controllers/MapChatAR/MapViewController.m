@@ -189,7 +189,8 @@
 
             // if it is photo
             if (closest.photoId) {
-                [clusterView findAndSetFriendName:closest];
+                NSString* photoOwner = [closest findAndFriendNameForPhoto:closest];
+                [clusterView.userName setText:photoOwner];
                 [clusterView.userPhotoView loadImageFromURL:[NSURL URLWithString:closest.thumbnailURL]];
                 [clusterView.userStatus setText:closest.locationName];
             }
@@ -199,8 +200,6 @@
             [clusterView addGestureRecognizer:tap];
             
             [tap release];
-            NSLog(@"%f",atan2(self.mapView.transform.b, self.mapView.transform.a));
-
         }
         
         if (IS_IOS_6) {
@@ -231,8 +230,16 @@
     {
         UserAnnotation* ann = (UserAnnotation*)annotation;
                     // if this is photo annotation
+        
+        
         if (ann.photoId) {
-            PhotoMarkerView* photoMarker = [[PhotoMarkerView alloc] initWithAnnotation:ann reuseIdentifier:@"photoView"];
+            PhotoMarkerView* photoMarker = (PhotoMarkerView*)[_mapView dequeueReusableAnnotationViewWithIdentifier:@"photoView"];
+            if (!photoMarker) {
+                photoMarker = [[[PhotoMarkerView alloc] initWithAnnotation:ann reuseIdentifier:@"photoView"] autorelease];
+            }
+            else{
+                [photoMarker updateAnnotation:ann];
+            }
             [photoMarker setDelegate:self];
             return photoMarker;
         }

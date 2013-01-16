@@ -16,7 +16,7 @@
 
 #define MAX_ZOOM_LEVEL 0.5
 #define MAX_ZOOM_LEVEL_IOS6 0.396886
-#define EPSILON 0.000001
+#define EPSILON 0.0000001
 
 /// MapView which should be used instead of MKMapView
 /** OCMapView works like the standard MKMapView but creates clusters form its containing Annotations.*/

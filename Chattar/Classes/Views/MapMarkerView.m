@@ -144,18 +144,7 @@
     [annotation release];
     annotation = [_annotation retain];
     
-    NSArray *friendsIds =  [[DataManager shared].myFriendsAsDictionary allKeys];
-    
-    if([friendsIds containsObject:[annotation.fbUser objectForKey:kId]]
-       || [[DataManager shared].currentFBUserId isEqualToString:[annotation.fbUser objectForKey:kId]]){
-        
-        [userNameBG setImage:[UIImage imageNamed:@"radarMarkerName@2x.png"]];
-    }
-    else
-    {
-        [userNameBG setImage:[UIImage imageNamed:@"radarMarkerName2@2x.png"] ];
-    }
-                // if it is not photo annotation view
+    // if it is not photo annotation view
     if (!_annotation.photoId) {
         
         if ([_annotation.userPhotoUrl isKindOfClass:[NSString class]]){
@@ -173,39 +162,25 @@
     }
     else{
         [self.userStatus setText:_annotation.locationName];
-        for (NSDictionary* friendInfo in [[DataManager shared] myFriends]) {
-            NSDecimalNumber* friendId = [friendInfo objectForKey:kId];
-            if (fabs(friendId.doubleValue - _annotation.ownerId.doubleValue) < 0.00001) {
-                NSMutableString* friendFullName = [[NSMutableString alloc] init];
-                [friendFullName appendString:[friendInfo objectForKey:@"first_name"]];
-                [friendFullName appendString:@" "];
-                [friendFullName appendString:[friendInfo objectForKey:@"last_name"]];
-                
-                [self.userName setText:friendFullName];
-                [friendFullName release];
-                break;
-            }
-        }
-
+        
+        NSString* photoOwner = [_annotation findAndFriendNameForPhoto:_annotation];
+        [self.userName setText:photoOwner];
+        
         [self.userPhotoView loadImageFromURL:[NSURL URLWithString:_annotation.thumbnailURL]];
+        
+    }
 
-    }
-}
--(void)findAndSetFriendName:(UserAnnotation*)ann{
-    for (NSDictionary* friendInfo in [[DataManager shared] myFriends]) {
-        NSDecimalNumber* friendId = [friendInfo objectForKey:kId];
-        if (fabs(friendId.doubleValue - ann.ownerId.doubleValue) < 0.00001) {
-            NSMutableString* friendFullName = [[NSMutableString alloc] init];
-            [friendFullName appendString:[friendInfo objectForKey:@"first_name"]];
-            [friendFullName appendString:@" "];
-            [friendFullName appendString:[friendInfo objectForKey:@"last_name"]];
-            
-            [self.userName setText:friendFullName];
-            [friendFullName release];
-            break;
-        }
-    }
+    NSArray *friendsIds =  [[DataManager shared].myFriendsAsDictionary allKeys];
     
+    if([friendsIds containsObject:[annotation.fbUser objectForKey:kId]]
+       || [[DataManager shared].currentFBUserId isEqualToString:[annotation.fbUser objectForKey:kId]]){
+        
+        [userNameBG setImage:[UIImage imageNamed:@"radarMarkerName@2x.png"]];
+    }
+    else
+    {
+        [userNameBG setImage:[UIImage imageNamed:@"radarMarkerName2@2x.png"] ];
+    }
 }
 
 // touch action

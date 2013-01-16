@@ -190,4 +190,22 @@
     return copy;
 }
 
+#pragma mark -
+#pragma mark Finding owner of photo
+-(NSString*)findAndFriendNameForPhoto:(UserAnnotation*)ann{
+    for (NSDictionary* friendInfo in [[DataManager shared] myFriends]) {
+        NSDecimalNumber* friendId = [friendInfo objectForKey:kId];
+        if (fabs(friendId.doubleValue - ann.ownerId.doubleValue) < 0.00001) {
+            NSMutableString* friendFullName = [[NSMutableString alloc] init];
+            [friendFullName appendString:[friendInfo objectForKey:@"first_name"]];
+            [friendFullName appendString:@" "];
+            [friendFullName appendString:[friendInfo objectForKey:@"last_name"]];
+            NSLog(@"%@",friendFullName);
+            return friendFullName;
+        }
+    }
+    return nil;
+}
+
+
 @end

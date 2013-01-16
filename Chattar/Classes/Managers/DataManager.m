@@ -798,7 +798,7 @@ static DataManager *instance = nil;
 }
 -(void)addPhotosWithLocationsToStorage:(NSArray*)photos{
     for (UserAnnotation* photo in photos) {
-        [self addPhotoWithLocationsToStorage:photo];
+        NSLog(@"%d",[self addPhotoWithLocationsToStorage:photo]);
     }
 }
 

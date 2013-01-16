@@ -43,6 +43,7 @@
     NSDecimalNumber* photoTimeStamp;
     NSDecimalNumber* ownerId;
 }
+-(NSString*)findAndFriendNameForPhoto:(UserAnnotation*)ann;
 
 @property (nonatomic, retain) NSString *userPhotoUrl;
 @property (nonatomic, retain) NSString *userName;

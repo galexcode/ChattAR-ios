@@ -201,7 +201,7 @@
         
         for (id<MKAnnotation> ann in annotationsToRemove) {
             for (OCAnnotation* cluster in clusteredAnnotations) {
-                if ([self isAnnotation:cluster equalToAnotherAnnotation:ann]) {
+                if ([self isAnnotation:cluster equalToAnotherAnnotation:ann] ) {
                     [tmp addObject:ann];
                 }
             }
