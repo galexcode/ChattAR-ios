@@ -7,7 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-
+#import "ChatViewController.h"
+#import "MapViewController.h"
 
 @protocol DataDelegate <NSObject>
 

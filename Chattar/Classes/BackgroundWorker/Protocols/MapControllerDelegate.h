@@ -7,15 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
-
+#import "MapViewController.h"
+#import "UserAnnotation.h"
 @protocol MapControllerDelegate <NSObject>
 
 @optional
 -(void) didReceiveCachedMapPoints:(NSArray*)cachedMapPoints;
 -(void) didReceiveCachedMapPointsIDs:(NSArray*)cachedMapIDs;
 -(void) willAddNewPoint:(UserAnnotation*)point isFBCheckin:(BOOL)isFBCheckin;
--(void) willAddFBCheckin:(UserAnnotation*)checkin;
--(void) willShowMap;
 -(void) willUpdatePointStatus:(UserAnnotation*)newPoint;
 @end
 

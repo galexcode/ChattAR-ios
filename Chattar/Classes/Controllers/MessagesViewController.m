@@ -518,7 +518,7 @@
         [[FBService shared] friendsGetWithDelegate:self];
         
     // get friends
-    }else if (result.queryType ==FBQueriesTypesFriendsGet){
+    }else if (result.queryType == FBQueriesTypesFriendsGet){
         
         if(![result.body isKindOfClass:NSDictionary.class]){
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Facebook"
@@ -533,7 +533,6 @@
             
             return;
         }
-        
         
 		// save friends
 		[DataManager shared].myFriends = [result.body objectForKey:kData];
@@ -552,7 +551,7 @@
         [[FBService shared] userWallWithDelegate:self];
         
     // Wall
-	}else if(result.queryType ==FBQueriesTypesWall){
+	}else if(result.queryType == FBQueriesTypesWall){
         if(![result.body isKindOfClass:NSDictionary.class]){
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Facebook"
                                                             message:@"Something went wrong, please restart application"

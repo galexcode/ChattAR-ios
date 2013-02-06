@@ -643,6 +643,7 @@ static FBService *instance = nil;
         NSError **error = nil;
         
         NSURLRequest *request = [params objectAtIndex:0];
+        NSLog(@"%@",[params objectAtIndex:1]);
         FBQueriesTypes queryType = (FBQueriesTypes)[[params objectAtIndex:1] intValue];
         NSObject <FBServiceResultDelegate>* delegate = [params objectAtIndex:2];
         id context = nil;
@@ -650,7 +651,7 @@ static FBService *instance = nil;
             context = [params objectAtIndex:3];
         }
         
-        
+        NSLog(@"%@",request.URL);
         // perform request
         NSData *resultData = [NSURLConnection sendSynchronousRequest:request returningResponse:response error:error];
         
@@ -679,14 +680,6 @@ static FBService *instance = nil;
         
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     }
-}
-#pragma mark -
-#pragma mark Helpers
--(NSString*)createPhotoWithLocationBatchRequestWithAlbumIds:(NSArray*)albumIds{
-    NSMutableString* batchRequest = [[NSMutableString alloc] initWithString:@"["];
-    
-    [batchRequest appendString:@"]"];
-    return [batchRequest autorelease];
 }
 
 

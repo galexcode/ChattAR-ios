@@ -7,13 +7,13 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "ChatViewController.h"
+#import "MapViewController.h"
 
 @protocol QBDataDelegate <NSObject>
 @optional
--(void)didReceiveQBGeodatas:(NSArray*)qbGeodatas;
 
 -(void)didReceiveCachedChatPoints:(NSArray*)cachedChatPoints;
 -(void)didReceiveCachedChatMessagesIDs:(NSArray*)cachedChatMessagesIDs;
--(void)didReceiveQBChatMessages:(NSArray*)qbChatMessages;
 
 @end

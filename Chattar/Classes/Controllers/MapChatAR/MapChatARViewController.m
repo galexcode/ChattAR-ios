@@ -192,8 +192,6 @@
     
     mapViewController.mapView.delegate = self;
     mapViewController.mapView.clusterSize = kDEFAULT_CLUSTER_SIZE;
-    
-
 }
 
 - (void)viewWillAppear:(BOOL)animated{
@@ -1406,8 +1404,6 @@
 
 -(void)processPhotosWithLocations:(NSDictionary*)responseData{
     NSLog(@"%@",responseData);
-//    NSLog(@"%@",[[DataManager shared] myPopularFriends]);
-//    NSLog(@"%@",[[DataManager shared] myFriends]);
     
     
     NSArray* fqlResults = [responseData objectForKey:kData];

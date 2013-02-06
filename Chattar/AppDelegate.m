@@ -103,10 +103,20 @@
     UINavigationController *contactsNavigationController = [[UINavigationController alloc] initWithRootViewController:contactsViewController];
 	[contactsViewController.navigationController setValue:[[[FBNavigationBar alloc]init] autorelease] forKeyPath:@"navigationBar"];
     [contactsViewController release];
+    
+    // Chat
+    ChatViewController* chatViewController = [[ChatViewController alloc] initWithNibName:@"ChatViewController" bundle:nil];
+    UINavigationController* chatNavigationController = [[UINavigationController alloc] initWithRootViewController:chatViewController];
+    [chatViewController release];
+    
+    // Map
+    MapViewController* mapViewController = [[MapViewController alloc] initWithNibName:@"MapViewController" bundle:nil];
+    UINavigationController* mapNavigationController = [[UINavigationController alloc] initWithRootViewController:mapViewController];
+    [mapViewController release];
 
 	// Tab Bar
-	_tabBarController = [[UITabBarController alloc] init];
-	_tabBarController.viewControllers = [NSArray arrayWithObjects: messagesNavigationController, mapChatARNavigationController, contactsNavigationController, settingsNavigationController, nil];
+	_tabBarController = [[CustomTabBarController alloc] init];
+	_tabBarController.viewControllers = [NSArray arrayWithObjects: chatNavigationController,mapNavigationController, /*messagesNavigationController,*/contactsNavigationController, settingsNavigationController, nil];
 	
 	// release controllers
 	[settingsNavigationController release];

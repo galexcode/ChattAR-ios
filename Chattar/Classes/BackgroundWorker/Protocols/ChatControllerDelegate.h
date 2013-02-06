@@ -7,11 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "ChatViewController.h"
+#import "UserAnnotation.h"
 
 @protocol ChatControllerDelegate <NSObject>
 
 @optional
 -(void)willUpdate;
--(void)willAddNewMessageToChat:(UserAnnotation*)annotation addToTop:(BOOL)toTop isFBCheckin:(BOOL)isFBCheckin;
 -(void)willAddNewMessageToChat:(UserAnnotation*)annotation addToTop:(BOOL)toTop withReloadTable:(BOOL)reloadTable isFBCheckin:(BOOL)isFBCheckin;
 @end

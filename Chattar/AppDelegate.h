@@ -7,11 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CustomTabBarController.h"
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate, UIAlertViewDelegate>{
 }
 @property (retain, nonatomic) UIWindow *window;
-@property (retain, nonatomic) UITabBarController *tabBarController;
+@property (retain, nonatomic) CustomTabBarController *tabBarController;
 
 - (void)showSplashWithAnimation:(BOOL) animated;
 - (void)showSplashWithAnimation:(BOOL) animated showLoginButton:(BOOL)isShow;
