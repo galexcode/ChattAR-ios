@@ -878,7 +878,7 @@ static BackgroundWorker* instance = nil;
                         }
                         
                         // add new Annotation to map/chat/ar
-//                        [self createAndAddNewAnnotationToMapChatARForFBUser:fbUser withGeoData:geoData addToTop:YES withReloadTable:YES];
+                        [self createAndAddNewAnnotationToMapChatARForFBUser:fbUser withGeoData:geoData addToTop:YES withReloadTable:YES];
                     }
                     
                     // Undefined format
@@ -955,7 +955,7 @@ static BackgroundWorker* instance = nil;
 }
 
 #pragma mark -
-#pragma Adding Methods
+#pragma mark Adding Methods
 // Add Quote data to annotation
 - (void)addQuoteDataToAnnotation:(UserAnnotation *)annotation geoData:(QBLGeoData *)geoData{
     // get quoted geodata
@@ -991,10 +991,70 @@ static BackgroundWorker* instance = nil;
     annotation.quotedMessageText = message;
 }
 
-
-
-
-
+- (void)createAndAddNewAnnotationToMapChatARForFBUser:(NSDictionary *)fbUser withGeoData:(QBLGeoData *)geoData addToTop:(BOOL)toTop withReloadTable:(BOOL)reloadTable{
+    
+    // create new user annotation
+    UserAnnotation *newAnnotation = [[UserAnnotation alloc] init];
+    newAnnotation.geoDataID = geoData.ID;
+    newAnnotation.coordinate = geoData.location.coordinate;
+	
+	if ([geoData.status length] >= 6){
+		if ([[geoData.status substringToIndex:6] isEqualToString:fbidIdentifier]){
+            // add Quote
+            [self addQuoteDataToAnnotation:newAnnotation geoData:geoData];
+            
+		}else {
+			newAnnotation.userStatus = geoData.status;
+		}
+        
+	}else {
+		newAnnotation.userStatus = geoData.status;
+	}
+	
+    newAnnotation.userName = [fbUser objectForKey:kName];
+    newAnnotation.userPhotoUrl = [fbUser objectForKey:kPicture];
+    newAnnotation.fbUserId = [fbUser objectForKey:kId];
+    newAnnotation.fbUser = fbUser;
+    newAnnotation.qbUserID = geoData.user.ID;
+    if(newAnnotation.qbUserID == 0){
+        newAnnotation.qbUserID = geoData.userID;
+    }
+	newAnnotation.createdAt = geoData.createdAt;
+    
+    CLLocationManager* locationManager = [[CLLocationManager alloc] init];
+    [locationManager startMonitoringSignificantLocationChanges];
+    
+    newAnnotation.distance  = [geoData.location distanceFromLocation:locationManager.location];
+    
+    if(newAnnotation.coordinate.latitude == 0.0f && newAnnotation.coordinate.longitude == 0.0f)
+    {
+        newAnnotation.distance = 0;
+    }
+        
+    if ([chatDelegate respondsToSelector:@selector(willAddNewMessageToChat:addToTop:withReloadTable:isFBCheckin:)]) {
+        [chatDelegate willAddNewMessageToChat:newAnnotation addToTop:toTop withReloadTable:reloadTable isFBCheckin:NO];
+    }
+    
+    if(newAnnotation.coordinate.latitude == 0.0f && newAnnotation.coordinate.longitude == 0.0f){
+        dispatch_async( dispatch_get_main_queue(), ^{
+            if ([mapDelegate respondsToSelector:@selector(willUpdatePointStatus:)]) {
+                [mapDelegate willUpdatePointStatus:newAnnotation];
+            }
+        });
+    }else{
+        // Add to Map
+        dispatch_async( dispatch_get_main_queue(), ^{
+            if ([mapDelegate respondsToSelector:@selector(willAddNewPoint:isFBCheckin:)]) {
+                [mapDelegate willAddNewPoint:[[newAnnotation copy] autorelease] isFBCheckin:NO];
+            }
+        });
+        
+        // update AR
+//        [arViewController updateMarkersPositionsForCenterLocation:arViewController.centerLocation];
+    }
+    
+	[newAnnotation release];
+}
 
 
 @end

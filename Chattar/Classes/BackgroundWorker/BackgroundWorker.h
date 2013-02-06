@@ -16,31 +16,21 @@
 #import "PhotoWithLocationModel.h"
 #import "JSON.h"
 
-@protocol FBCheckinsDelegate <NSObject>
+@protocol FBDataDelegate <NSObject>
 @optional
 -(void)didReceiveFBCheckins:(NSArray*)fbCheckins;
-
-@end
-
-@protocol  QBGeodatasDelegate<NSObject>
-@optional
--(void)didReceiveQBGeodatas:(NSArray*)qbGeodatas ;
-
-@end
-
-@protocol PhotosWithLocationsDelegate <NSObject>
-@optional
 -(void)didReceiveNewPhotosWithlocations:(NSArray*)photosWithLocations;
 -(void)didReceiveCachedPhotosWithLocations:(NSArray*)photosWithLocations;
+
 @end
 
-@protocol QBChatMessagesDelegate <NSObject>
+@protocol QBDataDelegate <NSObject>
 @optional
+-(void)didReceiveQBGeodatas:(NSArray*)qbGeodatas;
 
 -(void)didReceiveCachedChatPoints:(NSArray*)cachedChatPoints;
 -(void)didReceiveCachedChatMessagesIDs:(NSArray*)cachedChatMessagesIDs;
 -(void)didReceiveQBChatMessages:(NSArray*)qbChatMessages;
--(void)willUpdate;
 
 @end
 
@@ -52,11 +42,13 @@
 -(void) willAddNewPoint:(UserAnnotation*)point isFBCheckin:(BOOL)isFBCheckin;
 -(void) willAddFBCheckin:(UserAnnotation*)checkin;
 -(void) willShowMap;
+-(void) willUpdatePointStatus:(UserAnnotation*)newPoint;
 @end
 
 @protocol ChatControllerDelegate <NSObject>
 
 @optional
+-(void)willUpdate;
 -(void)willAddNewMessageToChat:(UserAnnotation*)annotation addToTop:(BOOL)toTop isFBCheckin:(BOOL)isFBCheckin;
 -(void)willAddNewMessageToChat:(UserAnnotation*)annotation addToTop:(BOOL)toTop withReloadTable:(BOOL)reloadTable isFBCheckin:(BOOL)isFBCheckin;
 @end
@@ -80,8 +72,8 @@
     dispatch_queue_t processPhotosWithLocationsQueue;
 }
 
-@property (nonatomic, assign) id<PhotosWithLocationsDelegate,FBCheckinsDelegate,MapControllerDelegate,DataDelegate> mapDelegate;
-@property (nonatomic, assign) id<QBGeodatasDelegate,QBChatMessagesDelegate,DataDelegate,ChatControllerDelegate> chatDelegate;
+@property (nonatomic, assign) id<FBDataDelegate, QBDataDelegate, MapControllerDelegate,  DataDelegate> mapDelegate;
+@property (nonatomic, assign) id<FBDataDelegate, QBDataDelegate, ChatControllerDelegate, DataDelegate> chatDelegate;
 
 +(BackgroundWorker*)instance;
 @end
