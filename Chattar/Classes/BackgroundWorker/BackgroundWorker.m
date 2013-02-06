@@ -8,10 +8,6 @@
 
 #import "BackgroundWorker.h"
 
-@implementation BackgroundWorker
-@synthesize mapDelegate;
-@synthesize chatDelegate;
-
 #define mapSearch @"mapSearch"
 #define chatSearch @"chatSearch"
 #define mapFBUsers @"mapFBUsers"
@@ -19,24 +15,109 @@
 
 #define kGetGeoDataCount 100
 
+@implementation BackgroundWorker
+@synthesize mapDelegate;
+@synthesize chatDelegate;
+@synthesize tabBarDelegate;
+@synthesize FBfriends;
+@synthesize chatInitState;
+@synthesize mapInitState;
+
 static BackgroundWorker* instance = nil;
 
 + (BackgroundWorker *)instance {
 	@synchronized (self) {
 		if (instance == nil){
             instance = [[self alloc] init];
+            
         }
 	}
 	return instance;
 }
 
+-(id)init{
+    if (self = [super init]) {
+        self.chatInitState = 1;
+        self.mapInitState = 0;
+    }
+    return self;
+}
+
+-(void)dealloc{
+    [FBfriends release];
+    [super dealloc];
+}
+
 #pragma mark -
 #pragma mark Data Requests
 
-- (void)retrieveQBGeodatas
+-(void)requestFBInfo{
+    [[FBService shared] inboxMessagesWithDelegate:self];
+}
+
+-(void)requestFriends{
+    // get friends
+    [[FBService shared] friendsGetWithDelegate:self];
+}
+
+-(void)requestPopularFriends{
+    // need home feeds for determing popular friends IDs
+    [[FBService shared] userWallWithDelegate:self];
+    
+}
+
+- (void)retrieveNewQBData
 {
+    if(updateTimer){
+        [updateTimer invalidate];
+        [updateTimer release];
+    }
+                    // request new data every 15 seconds
+    updateTimer = [[NSTimer scheduledTimerWithTimeInterval:15 target:self selector:@selector(checkForNewPoints:) userInfo:nil repeats:YES] retain];
+}
+
+-(void)retrieveCachedMapDataAndRequestNewData{
+    NSMutableArray* mapPoints = [[NSMutableArray alloc] init];
+    NSMutableArray* mapPointsIds = [[NSMutableArray alloc] init];
+    
+    // get map/ar points from cash
+    NSArray *cashedMapARPoints = [[DataManager shared] mapARPointsFromStorage];
+    if([cashedMapARPoints count] > 0){
+        for(QBCheckinModel *mapARCashedPoint in cashedMapARPoints){
+            if(lastPointDate == nil){
+                lastPointDate = ((UserAnnotation *)mapARCashedPoint.body).createdAt;
+            }
+            [mapPoints addObject:mapARCashedPoint.body];
+            [mapPointsIds addObject:[NSString stringWithFormat:@"%d", ((UserAnnotation *)mapARCashedPoint.body).geoDataID]];
+        }
+    }
+    
+    if ([mapDelegate respondsToSelector:@selector(didReceiveCachedMapPoints:)]) {
+        [mapDelegate didReceiveCachedMapPoints:mapPoints];
+    }
+    [mapPoints release];
+    
+    if ([mapDelegate respondsToSelector:@selector(didReceiveCachedMapPointsIDs:)]) {
+        [mapDelegate didReceiveCachedMapPointsIDs:mapPointsIds];
+    }
+    [mapPointsIds release];
+    
+    // get points for map
+	QBLGeoDataGetRequest *searchMapARPointsRequest = [[QBLGeoDataGetRequest alloc] init];
+	searchMapARPointsRequest.lastOnly = YES; // Only last location
+	searchMapARPointsRequest.perPage = kGetGeoDataCount; // Pins limit for each page
+	searchMapARPointsRequest.sortBy = GeoDataSortByKindCreatedAt;
+    if(lastPointDate){
+        searchMapARPointsRequest.minCreatedAt = lastPointDate;
+    }
+	[QBLocation geoDataWithRequest:searchMapARPointsRequest delegate:self context:mapSearch];
+	[searchMapARPointsRequest release];
+    
+    [self retrieveNewQBData];
+}
+
+-(void)retrieveCachedChatDataAndRequestNewData{
     // get chat messages from cash
-    NSDate *lastMessageDate = nil;
     NSArray *cashedChatMessages = [[DataManager shared] chatMessagesFromStorage];
     
     NSMutableArray* chatPoints = [[NSMutableArray alloc] init];
@@ -62,52 +143,7 @@ static BackgroundWorker* instance = nil;
     }
     [chatMessagesIDs release];
     
-    
-    NSMutableArray* mapPoints = [[NSMutableArray alloc] init];
-    NSMutableArray* mapPointsIds = [[NSMutableArray alloc] init];
-    
-    // get map/ar points from cash
-    NSDate *lastPointDate = nil;
-    NSArray *cashedMapARPoints = [[DataManager shared] mapARPointsFromStorage];
-    if([cashedMapARPoints count] > 0){
-        for(QBCheckinModel *mapARCashedPoint in cashedMapARPoints){
-            if(lastPointDate == nil){
-                lastPointDate = ((UserAnnotation *)mapARCashedPoint.body).createdAt;
-            }
-            [mapPoints addObject:mapARCashedPoint.body];
-            [mapPointsIds addObject:[NSString stringWithFormat:@"%d", ((UserAnnotation *)mapARCashedPoint.body).geoDataID]];
-        }
-    }
-    
-    if ([mapDelegate respondsToSelector:@selector(didReceiveCachedMapPoints:)]) {
-        [mapDelegate didReceiveCachedMapPoints:mapPoints];
-    }
-    [mapPoints release];
-    
-    if ([mapDelegate respondsToSelector:@selector(didReceiveCachedMapPointsIDs:)]) {
-        [mapDelegate didReceiveCachedMapPointsIDs:mapPointsIds];
-    }
-    [mapPointsIds release];
-    
-    if(updateTimer){
-        [updateTimer invalidate];
-        [updateTimer release];
-    }
-                    // request new data every 15 seconds
-    updateTimer = [[NSTimer scheduledTimerWithTimeInterval:15 target:self selector:@selector(checkForNewPoints:) userInfo:nil repeats:YES] retain];
-    
-    // get points for map
-	QBLGeoDataGetRequest *searchMapARPointsRequest = [[QBLGeoDataGetRequest alloc] init];
-	searchMapARPointsRequest.lastOnly = YES; // Only last location
-	searchMapARPointsRequest.perPage = kGetGeoDataCount; // Pins limit for each page
-	searchMapARPointsRequest.sortBy = GeoDataSortByKindCreatedAt;
-    if(lastPointDate){
-        searchMapARPointsRequest.minCreatedAt = lastPointDate;
-    }
-	[QBLocation geoDataWithRequest:searchMapARPointsRequest delegate:self context:mapSearch];
-	[searchMapARPointsRequest release];
-	
-	// get points for chat
+    // get points for chat
 	QBLGeoDataGetRequest *searchChatMessagesRequest = [[QBLGeoDataGetRequest alloc] init];
 	searchChatMessagesRequest.perPage = kGetGeoDataCount; // Pins limit for each page
 	searchChatMessagesRequest.status = YES;
@@ -119,6 +155,8 @@ static BackgroundWorker* instance = nil;
     
 	[QBLocation geoDataWithRequest:searchChatMessagesRequest delegate:self context:chatSearch];
 	[searchChatMessagesRequest release];
+    
+    [self retrieveNewQBData];
 }
 
 - (void)retrieveFBCheckins{
@@ -134,6 +172,10 @@ static BackgroundWorker* instance = nil;
         
         if ([mapDelegate respondsToSelector:@selector(didReceiveFBCheckins:)]) {
             [mapDelegate didReceiveFBCheckins:cachedCheckins];
+        }
+        
+        if ([chatDelegate respondsToSelector:@selector(didReceiveFBCheckins:)]) {
+            [chatDelegate didReceiveFBCheckins:cachedCheckins];
         }
         [cachedCheckins release];
         
@@ -325,15 +367,15 @@ static BackgroundWorker* instance = nil;
                 // show Message on Chat
                 UserAnnotation *chatAnnotation = [checkinAnnotation copy];
                 
-                if ([chatDelegate respondsToSelector:@selector(willAddNewMessageToChat:addToTop:isFBCheckin:)]) {
-                    [chatDelegate willAddNewMessageToChat:chatAnnotation addToTop:NO isFBCheckin:YES];
+                if ([chatDelegate respondsToSelector:@selector(willAddNewMessageToChat:addToTop:withReloadTable:isFBCheckin:)]) {
+                    [chatDelegate willAddNewMessageToChat:chatAnnotation addToTop:NO withReloadTable:NO isFBCheckin:YES];
                 }
                 
                 previousPlaceID = [place objectForKey:kId];
                 previousFBUserID = fbUserID;
                 
                 if ([mapDelegate respondsToSelector:@selector(willAddFBCheckin:)]) {
-                    [mapDelegate willAddFBCheckin:chatAnnotation];
+                    [mapDelegate willAddNewPoint:chatAnnotation isFBCheckin:NO];
                 }
                 [checkinAnnotation release];
                 [chatAnnotation release];
@@ -401,7 +443,7 @@ static BackgroundWorker* instance = nil;
         NSString* locationName = [fqlResult objectForKey:@"name"];
         
         for (UserAnnotation* photo in photosWithLocations) {
-            if (fabs(photo.locationId.doubleValue - pageID.doubleValue) < EPSILON ) {
+            if (fabs(photo.locationId.doubleValue - pageID.doubleValue) < 0.000001 ) {
                 [photo setLocationName:locationName];
                 [photo setLocationLatitude:latitude];
                 [photo setLocationLongitude:longitude];
@@ -419,13 +461,7 @@ static BackgroundWorker* instance = nil;
             }
         }
     }
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ([mapDelegate respondsToSelector:@selector(willShowMap)]) {
-            [mapDelegate willShowMap];
-        }
-    });
-    
+        
     [[DataManager shared] addPhotosWithLocationsToStorage:photosWithLocations];
     
     
@@ -507,11 +543,16 @@ static BackgroundWorker* instance = nil;
     
     
     // all data was retrieved
-    ++initState;
+    NSLog(@"%d",self.chatInitState);
+    ++self.chatInitState;
+    NSLog(@"%d",self.chatInitState);
+
     NSLog(@"CHAT INIT OK");
-    if(initState == 2){
+    if(self.chatInitState == 2){
         dispatch_async( dispatch_get_main_queue(), ^{
-            [self endOfRetrieveInitialData];
+            if ([chatDelegate respondsToSelector:@selector(chatEndRetrievingData)]) {
+                [chatDelegate chatEndRetrievingData];
+            }
         });
     }
 }
@@ -586,16 +627,20 @@ static BackgroundWorker* instance = nil;
     
     //
     // add to Storage
-    [[DataManager shared] addMapARPointsToStorage:mapPointsMutable];
+    if ([mapDelegate respondsToSelector:@selector(willSaveMapARPoints:)]) {
+        [mapDelegate willSaveMapARPoints:mapPointsMutable];
+    }
     
     [mapPointsMutable release];
     
     // all data was retrieved
-    ++initState;
+    ++self.mapInitState;
     NSLog(@"MAP INIT OK");
-    if(initState == 2){
+    if(self.mapInitState == 2){
         dispatch_async( dispatch_get_main_queue(), ^{
-            [self endOfRetrieveInitialData];
+            if ([mapDelegate respondsToSelector:@selector(mapEndRetrievingData)]) {
+                [mapDelegate mapEndRetrievingData];
+            }
         });
     }
 }
@@ -748,19 +793,6 @@ static BackgroundWorker* instance = nil;
 }
 
 
-
-- (void)endOfRetrieveInitialData{
-
-    if ([mapDelegate respondsToSelector:@selector(endRetrievingData)]) {
-        [mapDelegate endRetrievingData];
-    }
-    
-    if ([chatDelegate respondsToSelector:@selector(endRetrievingData)]) {
-        [chatDelegate endRetrievingData];
-    }
-}
-
-
 #pragma mark -
 #pragma mark FBServiceResultDelegate
 
@@ -793,10 +825,13 @@ static BackgroundWorker* instance = nil;
                     NSDictionary *resultError = [result.body objectForKey:kError];
                     if(resultError != nil){
                         // all data was retrieved
-                        ++initState;
+                        ++self.mapInitState;
                         NSLog(@"MAP INIT FB ERROR");
-                        if(initState == 2){
-                            [self endOfRetrieveInitialData];
+                        if(self.mapInitState == 2){
+                            
+                            if ([mapDelegate respondsToSelector:@selector(mapEndRetrievingData)]) {
+                                [mapDelegate mapEndRetrievingData];
+                            }
                         }
                         return;
                     }
@@ -814,10 +849,13 @@ static BackgroundWorker* instance = nil;
                     
                     // Undefined format
                 }else{
-                    ++initState;
+                    ++self.mapInitState;
                     NSLog(@"MAP INIT FB Undefined format");
-                    if(initState == 2){
-                        [self endOfRetrieveInitialData];
+                    if(self.mapInitState == 2){
+                        if ([mapDelegate respondsToSelector:@selector(mapEndRetrievingData)]) {
+                            [mapDelegate mapEndRetrievingData];
+                        }
+                        
                     }
                 }
                 
@@ -828,10 +866,12 @@ static BackgroundWorker* instance = nil;
                     NSDictionary *resultError = [result.body objectForKey:kError];
                     if(resultError != nil){
                         // all data was retrieved
-                        ++initState;
+                        ++self.chatInitState;
                         NSLog(@"CHAT INIT FB ERROR");
-                        if(initState == 2){
-                            [self endOfRetrieveInitialData];
+                        if(self.chatInitState == 2){
+                            if ([chatDelegate respondsToSelector:@selector(chatEndRetrievingData)]) {
+                                [chatDelegate chatEndRetrievingData];
+                            }
                         }
                         return;
                     }
@@ -849,10 +889,12 @@ static BackgroundWorker* instance = nil;
                     
                     // Undefined format
                 }else{
-                    ++initState;
+                    ++self.chatInitState;
                     NSLog(@"CHAT INIT FB Undefined format");
-                    if(initState == 2){
-                        [self endOfRetrieveInitialData];
+                    if(self.chatInitState == 2){
+                        if ([chatDelegate respondsToSelector:@selector(chatEndRetrievingData)]) {
+                            [chatDelegate chatEndRetrievingData];
+                        }
                     }
                 }
                 
@@ -896,7 +938,7 @@ static BackgroundWorker* instance = nil;
 
 -(void)completedWithFBResult:(FBServiceResult *)result
 {
-    NSLog(@"%d",result.queryType);
+    NSLog(@"RESULT TYPE %d",result.queryType);
     switch (result.queryType)
     {
             // Get Friends checkins
@@ -949,6 +991,189 @@ static BackgroundWorker* instance = nil;
                 [self processPhotosWithLocations:(NSDictionary*)result.body];
             });
         }
+            break;
+            
+        case FBQueriesTypesGetInboxMessages:{
+                // get inbox messages
+            if(![result.body isKindOfClass:NSDictionary.class]){
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Facebook"
+                                                                message:@"Something went wrong, please restart application"
+                                                               delegate:nil
+                                                      cancelButtonTitle:NSLocalizedString(@"Ok", nil)
+                                                      otherButtonTitles:nil];
+                [alert show];
+                [alert release];
+                return;
+            }
+            
+            NSArray *resultData = [result.body objectForKey:kData];
+            NSDictionary *resultError = [result.body objectForKey:kError];
+            if(resultError && !resultData){
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Facebook: %@", [resultError objectForKey:@"type"]]
+                                                                message:[resultError objectForKey:@"message"]
+                                                               delegate:nil
+                                                      cancelButtonTitle:NSLocalizedString(@"Ok", nil)
+                                                      otherButtonTitles:nil];
+                [alert show];
+                [alert release];
+                
+                return;
+            }
+            
+            NSMutableDictionary* conversations = [[[NSMutableDictionary alloc] init] autorelease];
+            // each inbox message
+            for(NSDictionary *inboxConversation in resultData)
+            {
+                if([inboxConversation objectForKey:kComments] == nil){
+                    continue;
+                }
+                
+                // crop own id and name
+                NSMutableArray *to = [[[[inboxConversation objectForKey:kTo] objectForKey:kData] mutableCopy] autorelease];
+                
+                // skip multiple conversations
+                if ([to count] > 2){
+                    continue;
+                }
+                
+                // remove self from 'To'
+                for(int i = 0; i<[to count]; i++){
+                    if([[[to objectAtIndex:i] objectForKey:kId] isEqualToString:[DataManager shared].currentFBUserId]){
+                        [to removeObject:[to objectAtIndex:i]];
+                    }
+                }
+                if([to count] == 0){
+                    continue;
+                }
+                
+                // create and add conversation
+                Conversation *conersation = [[Conversation alloc] init];
+                conersation.to = [to objectAtIndex:0];
+                
+                
+                // add to popular
+                [[DataManager shared] addPopularFriendID:[conersation.to objectForKey:kId]];
+                
+                
+                // add comments
+                if([inboxConversation objectForKey:kComments]){
+                    conersation.messages = [[[[inboxConversation objectForKey:kComments] objectForKey:kData] mutableCopy] autorelease];
+                }else{
+                    NSMutableArray *emptryArray = [[NSMutableArray alloc] init];
+                    conersation.messages = emptryArray;
+                    [emptryArray release];
+                }
+                                
+                [conversations setValue:conersation forKey:[conersation.to objectForKey:kId]];
+                [conersation release];
+            }
+            
+            if ([tabBarDelegate respondsToSelector:@selector(didReceiveInboxMessages:)]) {
+                [tabBarDelegate didReceiveInboxMessages:conversations];
+            }
+        }
+            break;
+        case FBQueriesTypesFriendsGet:{
+            if(![result.body isKindOfClass:NSDictionary.class]){
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Facebook"
+                                                                message:@"Something went wrong, please restart application"
+                                                               delegate:nil
+                                                      cancelButtonTitle:NSLocalizedString(@"Ok", nil)
+                                                      otherButtonTitles:nil];
+                [alert show];
+                [alert release];
+                        
+                return;
+            }
+                        
+            if (!FBfriends) {
+                FBfriends = [[NSMutableArray alloc] init];
+            }
+            
+            [FBfriends addObjectsFromArray:[result.body objectForKey:kData]];
+            
+            // add online/offline & favs keys
+            for (int i = 0; i < FBfriends.count; i++) {
+                [[FBfriends objectAtIndex:i] setObject:kOffline forKey:kOnOffStatus];
+                [[FBfriends objectAtIndex:i] setObject:[NSNumber numberWithBool:NO] forKey:kFavorites];
+            }
+            
+            if ([tabBarDelegate respondsToSelector:@selector(didReceiveAllFriends:)]) {
+                [tabBarDelegate didReceiveAllFriends:FBfriends];
+            }
+            
+        }
+            break;
+        case FBQueriesTypesWall:{
+            if(![result.body isKindOfClass:NSDictionary.class]){
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Facebook"
+                                                                message:@"Something went wrong, please restart application"
+                                                               delegate:nil
+                                                      cancelButtonTitle:NSLocalizedString(@"Ok", nil)
+                                                      otherButtonTitles:nil];
+                [alert show];
+                [alert release];
+                
+                return;
+            }
+            
+            NSArray *feeds = [result.body objectForKey:kData];
+            NSLog(@"%@",result.body);
+            
+            NSMutableDictionary* friendsAsDictionary = [[NSMutableDictionary alloc] init];
+            for (NSDictionary* user in FBfriends){
+                [friendsAsDictionary setObject:user forKey:[user objectForKey:kId]];
+            }
+
+            
+            NSMutableSet* popularFriends = [[NSMutableSet alloc] init];
+            
+            NSArray *friendsIds = [[friendsAsDictionary allKeys] copy];
+            [friendsAsDictionary release];
+            NSLog(@"%@",friendsIds);
+            
+            
+            for(NSDictionary *feed in feeds){
+                NSArray *likes = [[feed objectForKey:kLikes] objectForKey:kData];
+                NSDictionary *comments = [[feed objectForKey:kComments] objectForKey:kData];
+                
+                if(likes == nil && comments == nil){
+                    continue;
+                }
+                
+                if([popularFriends.allObjects count] > maxPopularFriends){
+                    break;
+                }
+                
+                // add likes
+                if(likes != nil){
+                    for(NSDictionary *like in likes){
+                        NSString *userID = [like objectForKey:kId];
+                        if([friendsIds containsObject:userID]){
+                            // add popular friend's ID
+                            [popularFriends addObject:userID];
+                        }
+                    }
+                }
+                
+                // add comments
+                if(comments != nil){
+                    for(NSDictionary *comment in comments){
+                        NSString *userID = [[comment objectForKey:kFrom] objectForKey:kId];
+                        if([friendsIds containsObject:userID]){
+                            // add popular friend's ID
+                            [popularFriends addObject:userID];
+                        }
+                    }
+                }
+            }
+            
+            if ([tabBarDelegate respondsToSelector:@selector(didReceivePopularFriends:)]) {
+                [tabBarDelegate didReceivePopularFriends:popularFriends];
+            }
+            [popularFriends release];
+        }
+            break;
         default:
             break;
     }
