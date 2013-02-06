@@ -14,10 +14,12 @@
 #import "MessagesViewController.h"
 #import "CustomSwitch.h"
 
+#import "BackgroundWorker.h"
+
 #define tableIsUpdating 1011
 
 
-@interface ChatViewController : UIViewController <UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource, QBActionStatusDelegate, UIScrollViewDelegate, FBServiceResultDelegate, UIWebViewDelegate>{
+@interface ChatViewController : UIViewController <UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate, QBActionStatusDelegate, UIScrollViewDelegate, FBServiceResultDelegate, UIWebViewDelegate,FBDataDelegate, QBDataDelegate, ChatControllerDelegate, DataDelegate>{
     UIImage *messageBGImage;
     UIImage *messageBGImage2;
     UIImage *distanceImage;
@@ -29,6 +31,7 @@
 	BOOL isLoadingMoreMessages;
     
     dispatch_queue_t getMoreMessagesWorkQueue;
+    
 }
 
 @property (nonatomic, assign) id delegate;
@@ -38,6 +41,16 @@
 
 @property (nonatomic, retain) NSString* quoteMark;
 @property (nonatomic, retain) AsyncImageView* quotePhotoTop;
+
+@property (nonatomic, retain) NSMutableArray* chatPoints;
+@property (nonatomic, retain) NSMutableArray* allChatPoints;
+@property (nonatomic, retain) NSMutableArray* chatMessagesIds;
+
+@property (nonatomic, retain) UIActionSheet *userActionSheet;
+@property (retain) UserAnnotation *selectedUserAnnotation;
+@property (nonatomic, assign) CustomSwitch *allFriendsSwitch;
+@property (retain, nonatomic) IBOutlet UIActivityIndicatorView *loadingIndicator;
+
 
 - (IBAction)sendMessageDidPress:(id)sender;
 
