@@ -14,7 +14,11 @@
 #import "ClusterMarkerView.h"
 #import "PhotoMarkerView.h"
 
-@interface MapViewController : UIViewController <MKMapViewDelegate, UIGestureRecognizerDelegate,PhotoMarkerProtocol>{
+#import "BackgroundWorker.h"
+
+@protocol FBDataDelegate;
+@interface MapViewController : UIViewController <MKMapViewDelegate, UIGestureRecognizerDelegate,PhotoMarkerProtocol,
+                                                 FBDataDelegate, QBDataDelegate, MapControllerDelegate,  DataDelegate>{
     CGFloat count;
     CGFloat lastCount;
     
@@ -34,6 +38,10 @@
                                         // add custom map view with clusterization
 @property (nonatomic, assign) OCMapView *mapView;
 @property (nonatomic, retain) UIImageView *compass;
+@property (assign) NSMutableArray *mapPoints;
+@property (assign) NSMutableArray *mapPointsIDs;
+@property (nonatomic, assign) CustomSwitch *allFriendsSwitch;
+
 
 - (void)refreshWithNewPoints:(NSArray *)mapPoints;
 - (void)addPoints:(NSArray *)mapPoints;

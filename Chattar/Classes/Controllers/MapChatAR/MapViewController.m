@@ -19,6 +19,23 @@
 @synthesize mapView;
 @synthesize delegate;
 @synthesize compass;
+@synthesize mapPoints = _mapPoints;
+@synthesize mapPointsIDs;
+@synthesize allFriendsSwitch;
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        // Custom initialization
+		self.title = NSLocalizedString(@"Map", nil);
+		self.tabBarItem.image = [UIImage imageNamed:@"Around_toolbar_icon.png"];
+        
+        // logout
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(logoutDone) name:kNotificationLogout object:nil];
+        
+    }
+    return self;
+}
 
 - (void)viewDidLoad
 {
@@ -165,6 +182,31 @@
     [mapView setUserInteractionEnabled:NO];
     [mapView removeAnnotations:mapView.annotations];
 	mapView.userInteractionEnabled = YES;
+}
+
+-(void)updateStatus:(UserAnnotation*)point{
+    NSArray *currentMapAnnotations = [self.mapView.annotations copy];
+    
+    // Check for Map
+    BOOL isExistPoint = NO;
+    for (UserAnnotation *annotation in currentMapAnnotations)
+	{
+        // already exist, change status
+        if([point.fbUserId isEqualToString:annotation.fbUserId])
+		{
+            if ([point.userStatus length] < 6 || ([point.userStatus length] >= 6 && ![[point.userStatus substringToIndex:6] isEqualToString:fbidIdentifier])){
+                MapMarkerView *marker = (MapMarkerView *)[self.mapView viewForAnnotation:annotation];
+                [marker updateStatus:point.userStatus];// update status
+            }
+            
+            isExistPoint = YES;
+            
+            break;
+        }
+    }
+    
+    [currentMapAnnotations release];
+
 }
 
 #pragma mark -
@@ -376,4 +418,97 @@
 -(void)closeView{
     [[self.view viewWithTag:2008] removeFromSuperview];
 }
+
+
+#pragma mark -
+#pragma mark FBDataDelegate
+-(void)didReceiveFBCheckins:(NSArray*)fbCheckins{
+    
+}
+
+#pragma mark -
+#pragma mark DataDelegate
+-(void)mapEndRetrievingData{
+    
+}
+
+-(void)didReceiveError{
+    
+}
+
+#pragma mark -
+#pragma mark MapControllerDelegate
+-(void) didReceiveCachedMapPoints:(NSArray*)cachedMapPoints{
+    [_mapPoints addObjectsFromArray:cachedMapPoints];
+}
+-(void) didReceiveCachedMapPointsIDs:(NSArray*)cachedMapIDs{
+    [mapPointsIDs addObjectsFromArray:cachedMapIDs];
+}
+-(void) willAddNewPoint:(UserAnnotation*)point isFBCheckin:(BOOL)isFBCheckin{
+    NSArray *friendsIds = [[DataManager shared].myFriendsAsDictionary allKeys];
+    
+    NSArray *currentMapAnnotations = [self.mapView.annotations copy];
+
+    
+    BOOL isExistPoint = NO;
+    for (UserAnnotation *annotation in currentMapAnnotations)
+    {
+        NSDate *newCreateDateTime = point.createdAt;
+        NSDate *currentCreateDateTime = annotation.createdAt;
+        // already exist, change status
+        if([point.fbUserId isEqualToString:annotation.fbUserId])
+        {
+            if([newCreateDateTime compare:currentCreateDateTime] == NSOrderedDescending){
+                if ([point.userStatus length] < 6 || ([point.userStatus length] >= 6 && ![[point.userStatus substringToIndex:6] isEqualToString:fbidIdentifier])){
+                    MapMarkerView *marker = (MapMarkerView *)[self.mapView viewForAnnotation:annotation];
+                    [marker updateStatus:point.userStatus];// update status
+                    [marker updateCoordinate:point.coordinate];
+                }
+            }
+            
+            isExistPoint = YES;
+            
+            break;
+        }
+    }
+    
+    [currentMapAnnotations release];
+    
+    if(!isExistPoint){
+        BOOL addedToCurrentMapState = NO;
+        
+        [self.mapPoints addObject:point];
+        
+        if(point.geoDataID != -1){
+            [self.mapPointsIDs addObject:[NSString stringWithFormat:@"%d", point.geoDataID]];
+        }
+        
+        if([self isAllShowed] || [friendsIds containsObject:point.fbUserId]){
+            [self.mapPoints addObject:point];
+            addedToCurrentMapState = YES;
+        }
+        //
+        if(addedToCurrentMapState){
+            [self addPoint:point];
+        }
+    }
+}
+
+- (BOOL)isAllShowed{
+    if(allFriendsSwitch.value >= worldValue){
+        return YES;
+    }
+    
+    return NO;
+}
+
+-(void) willUpdatePointStatus:(UserAnnotation*)newPoint{
+    [self updateStatus:newPoint];
+}
+
+
+-(void) willSaveMapARPoints:(NSArray*)newMapPoints{
+    [[DataManager shared] addMapARPointsToStorage:newMapPoints];
+}
+
 @end
