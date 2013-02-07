@@ -22,6 +22,8 @@
 @synthesize mapPoints = _mapPoints;
 @synthesize mapPointsIDs;
 @synthesize allFriendsSwitch;
+@synthesize allCheckins;
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -32,9 +34,13 @@
         
         // logout
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(logoutDone) name:kNotificationLogout object:nil];
-        
     }
     return self;
+}
+
+-(void)dealloc{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [super dealloc];
 }
 
 - (void)viewDidLoad
@@ -112,8 +118,47 @@
     
     previousRect = mapView.visibleMapRect;
     
+    allFriendsSwitch = [CustomSwitch customSwitch];
+    [allFriendsSwitch setAutoresizingMask:(UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin)];
+    
+    if(IS_HEIGHT_GTE_568){
+        [allFriendsSwitch setCenter:CGPointMake(280, 448)];
+    }else{
+        [allFriendsSwitch setCenter:CGPointMake(280, 360)];
+    }
+    
+    [allFriendsSwitch setValue:worldValue];
+    [allFriendsSwitch scaleSwitch:0.9];
+    [allFriendsSwitch addTarget:self action:@selector(allFriendsSwitchValueDidChanged:) forControlEvents:UIControlEventValueChanged];
+	[allFriendsSwitch setBackgroundColor:[UIColor clearColor]];
+	[self.view addSubview:allFriendsSwitch];
+    
+//    _loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+//    _loadingIndicator.center = self.view.center;
+//    _loadingIndicator.tag = 1101;
+//    [self.view addSubview:_loadingIndicator];
+//    [_loadingIndicator startAnimating];
+
     
 }
+
+- (void)viewDidUnload
+{
+    self.mapView = nil;
+    
+    [super viewDidUnload];
+    // Release any retained subviews of the main view.
+    // e.g. self.myOutlet = nil;
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+
+
+#pragma mark -
+#pragma mark Rotation methods
 
 - (void)spin:(UIRotationGestureRecognizer *)gestureRecognizer {
     if(canRotate){
@@ -139,19 +184,6 @@
         }];
 }
 
-- (void)viewDidUnload
-{
-    self.mapView = nil;
-    
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
 
 - (void)refreshWithNewPoints:(NSArray *)mapPoints{
     // remove old
@@ -162,6 +194,8 @@
     [mapView doClustering];
 }
 
+#pragma mark -
+#pragma mark Internal data methods
 - (void)addPoints:(NSArray *)mapPoints{
     // add new
     for (UserAnnotation* ann in mapPoints) {
@@ -422,28 +456,50 @@
 
 #pragma mark -
 #pragma mark FBDataDelegate
--(void)didReceiveFBCheckins:(NSArray*)fbCheckins{
-    
+-(void)willAddCheckin:(UserAnnotation*)checkin{
+    [self.allCheckins addObject:checkin];
+}
+
+-(void)didReceiveCachedCheckins:(NSArray *)cachedCheckins{
+    [self.allCheckins addObjectsFromArray:cachedCheckins];
 }
 
 #pragma mark -
 #pragma mark DataDelegate
 -(void)mapEndRetrievingData{
+//    [activityIndicator removeFromSuperview];
+    [self.allFriendsSwitch setEnabled:YES];
+
+}
+
+-(void)didReceiveError:(NSString*)errorMessage{
     
 }
 
--(void)didReceiveError{
+-(CLLocation*)sendLocationToBgWorker{
+    CLLocationManager* locationManager = [[[CLLocationManager alloc] init] autorelease];
+    [locationManager startMonitoringSignificantLocationChanges];
     
+    return locationManager.location;
 }
+
 
 #pragma mark -
 #pragma mark MapControllerDelegate
 -(void) didReceiveCachedMapPoints:(NSArray*)cachedMapPoints{
+    if (!_mapPoints) {
+        _mapPoints = [[NSMutableArray alloc] init];
+    }
     [_mapPoints addObjectsFromArray:cachedMapPoints];
 }
+
 -(void) didReceiveCachedMapPointsIDs:(NSArray*)cachedMapIDs{
+    if (!mapPointsIDs) {
+        mapPointsIDs = [[NSMutableArray alloc] init];
+    }
     [mapPointsIDs addObjectsFromArray:cachedMapIDs];
 }
+
 -(void) willAddNewPoint:(UserAnnotation*)point isFBCheckin:(BOOL)isFBCheckin{
     NSArray *friendsIds = [[DataManager shared].myFriendsAsDictionary allKeys];
     

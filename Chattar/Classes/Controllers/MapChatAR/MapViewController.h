@@ -41,7 +41,7 @@
 @property (assign) NSMutableArray *mapPoints;
 @property (assign) NSMutableArray *mapPointsIDs;
 @property (nonatomic, assign) CustomSwitch *allFriendsSwitch;
-
+@property (nonatomic, retain) NSMutableArray* allCheckins;
 
 - (void)refreshWithNewPoints:(NSArray *)mapPoints;
 - (void)addPoints:(NSArray *)mapPoints;
