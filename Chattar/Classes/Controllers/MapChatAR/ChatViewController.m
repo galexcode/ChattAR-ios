@@ -26,7 +26,6 @@
 @synthesize quoteMark, quotePhotoTop;
 @synthesize delegate;
 
-@synthesize chatPoints,allChatPoints,chatMessagesIds;
 @synthesize userActionSheet;
 @synthesize selectedUserAnnotation;
 @synthesize allFriendsSwitch;
@@ -41,7 +40,16 @@
 
                     // logout
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(logoutDone) name:kNotificationLogout object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(generalDataDidFinishedLoading:) name:@"GeneralDataFinishLoading" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doUpdate) name:kWillUpdate object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doScrollToTop) name:kWillScrollToTop object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doClearMessageField) name:kWillClearMessageField object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doRemoveLastChatPoint) name:kWillRemoveLastChatPoint object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAddNewPointToChat:) name:kWillClearMessageField object:nil ];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChatEndRetrievingData) name:kChatEndRetrievingData object:nil ];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveError:) name:kDidReceiveError object:nil ];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doNotReceiveNewChatPoints) name:kDidNotReceiveNewChatPoints object:nil ];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveErrorLoadingNewChatPoints) name:kdidReceiveErrorLoadingNewChatPoints object:nil ];
+        
     }
     return self;
 }
@@ -89,9 +97,6 @@
     _loadingIndicator.tag = 1101;
     [self.view addSubview:_loadingIndicator];
     [_loadingIndicator startAnimating];
-
-                // set our controller as delegate to get processed data from BgWorker
-    [[BackgroundWorker instance] setChatDelegate:self];
 }
 
 - (void)removeQuote
@@ -135,24 +140,18 @@
 }
 
 - (void)dealloc {
-    dispatch_release(getMoreMessagesWorkQueue);
     [_loadingIndicator release];
     [super dealloc];
 }
 
 #pragma mark -
-#pragma mark Data Requests
--(void)generalDataDidFinishedLoading:(NSNotification*)notification{
-    [self sendDataRequests];
-}
-
-
--(void)sendDataRequests{
-    [[BackgroundWorker instance] retrieveCachedChatDataAndRequestNewData];
-}
-
-#pragma mark -
 #pragma mark Interface based methods
+
+-(void)didSuccessfulMessageSending{
+    [sendMessageActivityIndicator stopAnimating];
+    messageField.rightView = nil;
+    quotePhotoTop = nil;
+}
 
 - (IBAction)sendMessageDidPress:(id)sender{
     
@@ -201,16 +200,15 @@
 		geoData.status = messageField.text;
 	}
 
-    // post geodata
-	[QBLocation createGeoData:geoData delegate:self];
-    
+    [[BackgroundWorker instance] postGeoData:geoData];
 
 	// send push notification if this is quote
 	if (quoteMark){
         
         // search QB User by fb ID
         NSString *fbUserID = [[geoData.status substringFromIndex:6] substringToIndex:[self.quoteMark rangeOfString:nameIdentifier].location-6];
-        [QBUsers userWithFacebookID:fbUserID delegate:self context:messageField.text];
+        
+        [[BackgroundWorker instance] requestFriendWithFacebookID:fbUserID andMessageText:messageField.text];        
 	}
     
     if(quotePhotoTop){
@@ -225,6 +223,82 @@
 
 	self.quoteMark = nil;
 }
+
+- (void)allFriendsSwitchValueDidChanged:(id)sender{
+    
+    // switch All/Friends
+    float origValue = [(CustomSwitch *)sender value];
+    int stateValue;
+    if(origValue >= worldValue){
+        stateValue = 1;
+    }else if(origValue <= friendsValue){
+        stateValue = 0;
+    }
+    
+    switch (stateValue) {
+            // show Friends
+        case 0:{
+            if(!showAllUsers){
+                [self showFriends];
+                showAllUsers = YES;
+            }
+        }
+            break;
+            
+            // show World
+        case 1:{
+            if(showAllUsers){
+                [self showWorld];
+                showAllUsers = NO;
+            }
+        }
+            break;
+    }
+}
+
+-(void)showWorld{
+    [[DataManager shared].chatPoints removeAllObjects];
+    //
+    // 2. add Friends from FB
+    [[DataManager shared].chatPoints addObjectsFromArray:[DataManager shared].allChatPoints];
+    
+    
+    // add all checkins
+    for(UserAnnotation *checkinAnnotatin in [DataManager shared].allCheckins){
+        if(![[DataManager shared].chatPoints containsObject:checkinAnnotatin]){
+            [[DataManager shared].chatPoints addObject:checkinAnnotatin];
+        }
+    }
+    
+    [self refresh];
+}
+
+-(void)showFriends{
+    NSMutableArray *friendsIds = [[[DataManager shared].myFriendsAsDictionary allKeys] mutableCopy];
+    [friendsIds addObject:[DataManager shared].currentFBUserId];// add me
+    
+    // Chat points
+    //
+    [[DataManager shared].chatPoints removeAllObjects];
+    //
+    // add only friends QB points
+    for(UserAnnotation *mapAnnotation in [DataManager shared].allChatPoints){
+        if([friendsIds containsObject:[mapAnnotation.fbUser objectForKey:kId]]){
+            [[DataManager shared].chatPoints addObject:mapAnnotation];
+        }
+    }
+    [friendsIds release];
+    //
+    // add all checkins
+    for(UserAnnotation *checkinAnnotatin in [DataManager shared].allCheckins){
+        if(![[DataManager shared].chatPoints containsObject:checkinAnnotatin]){
+            [[DataManager shared].chatPoints addObject:checkinAnnotatin];
+        }
+    }
+    
+    [self refresh];
+}
+
 
 - (void)addQuote
 {
@@ -270,11 +344,12 @@
 
     // add new
     // sort chat messaged due to created date
+    
 	NSSortDescriptor *sortDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"createdAt" ascending: NO] autorelease];
-	NSArray* sortedArray = [[self chatPoints] sortedArrayUsingDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+	NSArray* sortedArray = [[DataManager shared].chatPoints sortedArrayUsingDescriptors:[NSArray arrayWithObject:sortDescriptor]];
 
-	[[self chatPoints] removeAllObjects];
-	[[self chatPoints] addObjectsFromArray:sortedArray];
+	[[DataManager shared].chatPoints removeAllObjects];
+	[[DataManager shared].chatPoints addObjectsFromArray:sortedArray];
 	
 	messagesTableView.delegate = self;
     messagesTableView.dataSource = self;
@@ -287,15 +362,8 @@
 - (void)getMoreMessages
 {
 	++page;
-	
-	// get points for chat
-	QBLGeoDataGetRequest *searchChatMessagesRequest = [[QBLGeoDataGetRequest alloc] init];
-	searchChatMessagesRequest.perPage = 30; // Pins limit for each page
-	searchChatMessagesRequest.page = page;
-	searchChatMessagesRequest.status = YES;
-	searchChatMessagesRequest.sortBy = GeoDataSortByKindCreatedAt;
-	[QBLocation geoDataWithRequest:searchChatMessagesRequest delegate:self context:getMoreChatMessages];
-	[searchChatMessagesRequest release];
+    
+    [[BackgroundWorker instance] retrieveMoreChatMessages:page];
 }
 
 
@@ -326,7 +394,7 @@
     NSString *userName = nil;
     if([marker isKindOfClass:UITableViewCell.class]){ 
         userName = ((UILabel *)[marker viewWithTag:1105]).text;
-        self.selectedUserAnnotation = [self.chatPoints objectAtIndex:marker.tag];
+        self.selectedUserAnnotation = [[DataManager shared].chatPoints objectAtIndex:marker.tag];
     }
 	
 	NSString* title;
@@ -459,7 +527,7 @@
 #pragma mark UITableViewDelegate
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    UserAnnotation *currentAnnotation = [[self chatPoints] objectAtIndex:[indexPath row]];
+    UserAnnotation *currentAnnotation = [[DataManager shared].chatPoints objectAtIndex:[indexPath row]];
     
     // regular chat cell
 	if ([currentAnnotation isKindOfClass:[UserAnnotation class]]){
@@ -491,14 +559,14 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return [[self chatPoints] count];
+    return [DataManager shared].chatPoints.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     
     NSArray *friendsIds = [[DataManager shared].myFriendsAsDictionary allKeys];
                                   
-    UserAnnotation *currentAnnotation = [[self chatPoints] objectAtIndex:[indexPath row]];
+    UserAnnotation *currentAnnotation = [[DataManager shared].chatPoints objectAtIndex:[indexPath row]];
     
     if ([currentAnnotation isKindOfClass:[UITableViewCell class]]){
 		return (UITableViewCell*)currentAnnotation;
@@ -880,93 +948,6 @@
     [self performSelector:@selector(touchOnMarker:) withObject:cell];
 }
 
-
-#pragma mark -
-#pragma mark QB QBActionStatusDelegate
-
--(void)completedWithResult:(Result *)result context:(void *)contextInfo
-{
-    // search QB user by FB ID result
-    if([result isKindOfClass:QBUUserResult.class]){
-        if(result.success){
-        
-            QBUUser *qbUser = ((QBUUserResult *)result).user;
-            
-            // Create push message
-            
-            NSMutableDictionary *payload = [NSMutableDictionary dictionary];
-            NSMutableDictionary *aps = [NSMutableDictionary dictionary];
-            [aps setObject:@"default" forKey:QBMPushMessageSoundKey];
-            [aps setObject:[NSString stringWithFormat:@"%@: %@", [[DataManager shared].currentFBUser objectForKey:kName], (NSString *)contextInfo] forKey:QBMPushMessageAlertKey];
-            [payload setObject:aps forKey:QBMPushMessageApsKey];
-            //
-            QBMPushMessage *message = [[QBMPushMessage alloc] initWithPayload:payload];
-            
-            // Send push
-            [QBMessages TSendPush:message
-                          toUsers:[NSString stringWithFormat:@"%d",  qbUser.ID]
-         isDevelopmentEnvironment:[ProvisionManager isDevelopmentProvision]
-                         delegate:self];
-            
-            [message release];
-        }
-    
-    //
-    }else if (result.success){
-        
-        // get more messages result
-		if([((NSString *)contextInfo) isEqualToString:getMoreChatMessages])
-		{
-            
-            QBLGeoDataPagedResult *geoDataSearchResult = (QBLGeoDataPagedResult *)result;
-            
-            // empty
-            if([geoDataSearchResult.geodata count] == 0){
-                [self.chatPoints removeLastObject];
-                [messagesTableView reloadData];
-                isLoadingMoreMessages = NO;
-                
-                return;
-            }
-            
-            // process responce
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                    
-                // get fb users info
-                NSMutableArray *fbChatUsersIds = [[NSMutableArray alloc] init];
-                for (QBLGeoData *geodata in geoDataSearchResult.geodata){
-                    [fbChatUsersIds addObject:geodata.user.facebookID];
-                }
-                //
-                NSMutableString* ids = [[NSMutableString alloc] init];
-                for (NSString* userID in fbChatUsersIds)
-                {
-                    [ids appendFormat:@"%@,", userID];
-                }
-                    
-                if ([ids length] != 0)
-                {
-                    NSString* q = [ids substringToIndex:[ids length]-1];
-                    [[FBService shared] usersProfilesWithIds:q delegate:self context:geoDataSearchResult.geodata];
-                }
-                [ids release];
-                //
-                [fbChatUsersIds release];
-            });
-        }
-	}else{
-
-        NSString *message = [result.errors stringValue];
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Errors", nil)
-                                                        message:message
-                                                       delegate:self
-                                              cancelButtonTitle:NSLocalizedString(@"Ok", nil)
-                                              otherButtonTitles:nil];
-        [alert show];
-        [alert release];
-    }
-}
-
 #pragma mark -
 #pragma mark UIScrollViewDelegate
 
@@ -987,7 +968,7 @@
 		[loading setActivityIndicatorViewStyle:UIActivityIndicatorViewStyleGray];
 		[loading startAnimating];
 		[cell.contentView addSubview:loading];
-		[[self chatPoints] addObject:cell];
+		[[DataManager shared].chatPoints addObject:cell];
         [cell release];
 		[loading release];
 		//
@@ -999,86 +980,83 @@
 }
 
 #pragma mark -
-#pragma mark FBDataDelegate
--(void)didReceiveFBCheckins:(NSArray*)fbCheckins{
-    
-}
+#pragma mark Notifications Reaction
 
-#pragma mark -
-#pragma mark QBDataDelegate
-
--(void)didReceiveCachedChatPoints:(NSArray*)cachedChatPoints{
-    [self.chatPoints addObjectsFromArray:cachedChatPoints];
-}
-
--(void)didReceiveCachedChatMessagesIDs:(NSArray*)cachedChatMessagesIDs{
-    [self.chatMessagesIds addObjectsFromArray:cachedChatMessagesIDs];
-}
-
-#pragma mark -
-#pragma mark DataDelegate
-
--(void)didReceiveError{
-    NSLog(@"ERROR IN CHAT CONTROLLER!");
-    [self.allFriendsSwitch setEnabled:YES];
-    [self.messageField setEnabled:YES];
-}
-
--(void)chatEndRetrievingData{
+-(void)doChatEndRetrievingData{
     messageField.enabled = YES;
     [_loadingIndicator removeFromSuperview];
     
+    NSLog(@"%@",[DataManager shared].allChatPoints);
+    NSLog(@"%@",[DataManager shared].chatMessagesIDs);
+    NSLog(@"%@",[DataManager shared].chatPoints);
+    NSLog(@"%@",[DataManager shared].allCheckins);
+    
+
     [messagesTableView reloadData];
 }
-
-#pragma mark -
-#pragma mark ChatControllerDelegate
-
--(void)willUpdate{
+-(void)doUpdate{
     [self refresh];
 }
 
--(void)willAddNewMessageToChat:(UserAnnotation*)message addToTop:(BOOL)toTop withReloadTable:(BOOL)reloadTable isFBCheckin:(BOOL)isFBCheckin{
-    self.messagesTableView.tag = tableIsUpdating;
-    
-    if(message.geoDataID != -1){
-        [self.chatMessagesIds addObject:[NSString stringWithFormat:@"%d", message.geoDataID]];
+-(void)doScrollToTop{
+    // scroll to top
+    if([DataManager shared].chatPoints.count > 0){
+        [messagesTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
     }
-    
+}
+
+-(void)doClearMessageField{
+    // clear text
+    messageField.text = @"";
+    [messageField resignFirstResponder];
+}
+
+-(void)doAddNewPointToChat:(NSNotification*) notification{
+    UserAnnotation* message = [notification.userInfo objectForKey:@"newMessage"];
+    BOOL toTop = [[notification.userInfo objectForKey:@"addToTop"] boolValue];
+    BOOL reloadTable = [[notification.userInfo objectForKey:@"reloadTable"] boolValue];
+    BOOL isFBCheckin = [[notification.userInfo objectForKey:@"isFBCheckin"] boolValue];
+    self.messagesTableView.tag = tableIsUpdating;
+
+    if(message.geoDataID != -1){
+       [[DataManager shared].chatMessagesIDs addObject:[NSString stringWithFormat:@"%d", message.geoDataID]];
+    }
+
     NSArray *friendsIds = [[DataManager shared].myFriendsAsDictionary allKeys];
-    
+
     // Add to Chat
     __block BOOL addedToCurrentChatState = NO;
-    
+
     dispatch_async( dispatch_get_main_queue(), ^{
-        
+
         // New messages
         if (toTop){
-            [self.allChatPoints insertObject:message atIndex:0];
+            [[DataManager shared].allChatPoints insertObject:message atIndex:0];
             if([self isAllShowed] || [friendsIds containsObject:message.fbUserId] ||
                [message.fbUserId isEqualToString:[DataManager shared].currentFBUserId]){
-                [self.chatPoints insertObject:message atIndex:0];
+                [[DataManager shared].chatPoints insertObject:message atIndex:0];
                 addedToCurrentChatState = YES;
             }
-            
+
             // old messages
         }else {
-            [self.allChatPoints insertObject:message atIndex:[self.allChatPoints count] > 0 ? ([self.allChatPoints count]-1) : 0];
+            [[DataManager shared].allChatPoints insertObject:message atIndex:[[DataManager shared].allChatPoints count] > 0 ?
+                                                                            ([[DataManager shared].allChatPoints count]-1) : 0];
             if([self isAllShowed] || [friendsIds containsObject:message.fbUserId] ||
                [message.fbUserId isEqualToString:[DataManager shared].currentFBUserId]){
-                [self.chatPoints insertObject:message atIndex:[self.chatPoints count] > 0 ? ([self.chatPoints count]-1) : 0];
+                [[DataManager shared].chatPoints insertObject:message atIndex:[[DataManager shared].chatPoints count] > 0 ? ([[DataManager shared].chatPoints count]-1) : 0];
                 addedToCurrentChatState = YES;
             }
         }
         //
         if(addedToCurrentChatState && reloadTable){
             // on main thread
-            
+
             [self.messagesTableView reloadData];
-            
+
         }
     });
-    
+
     // Save to cache
     //
     if(!isFBCheckin){
@@ -1086,6 +1064,32 @@
     }
     
     self.messagesTableView.tag = 0;
+
+}
+
+-(void)doRemoveLastChatPoint{
+    [[DataManager shared].chatPoints removeLastObject];
+}
+
+-(void)doReceiveError:(NSNotification*)notification{
+    NSString* errorMessage = [notification.userInfo objectForKey:@"errorMessage"];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Errors", nil)
+                                                    message:errorMessage
+                                                   delegate:self
+                                          cancelButtonTitle:NSLocalizedString(@"Ok", nil)
+                                          otherButtonTitles:nil];
+    [alert show];
+    [alert release];
+}
+
+-(void)doNotReceiveNewChatPoints{
+    [[DataManager shared].chatPoints removeLastObject];
+    [messagesTableView reloadData];
+    isLoadingMoreMessages = NO;
+}
+
+-(void)doReceiveErrorLoadingNewChatPoints{
+    [messagesTableView reloadData];
 }
 
 #pragma mark -
@@ -1097,7 +1101,8 @@
     
     return NO;
 }
-
+#pragma mark -
+#pragma mark ActionSheet Delegate
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex{
     int buttonsNum = actionSheet.numberOfButtons;
     
@@ -1109,10 +1114,10 @@
 //                if(activityIndicator){
 //                    [self.view bringSubviewToFront:activityIndicator];
 //                }
-
-                // move all/friends switch to front
+//
+//                // move all/friends switch to front
 //                [self.view bringSubviewToFront:allFriendsSwitch];
-            
+//            
             // quote action
             [self addQuote];
             [self.messageField becomeFirstResponder];

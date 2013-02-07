@@ -30,8 +30,7 @@
 
 	BOOL isLoadingMoreMessages;
     
-    dispatch_queue_t getMoreMessagesWorkQueue;
-    
+    BOOL showAllUsers;
 }
 
 @property (nonatomic, assign) id delegate;
@@ -42,15 +41,10 @@
 @property (nonatomic, retain) NSString* quoteMark;
 @property (nonatomic, retain) AsyncImageView* quotePhotoTop;
 
-@property (nonatomic, retain) NSMutableArray* chatPoints;
-@property (nonatomic, retain) NSMutableArray* allChatPoints;
-@property (nonatomic, retain) NSMutableArray* chatMessagesIds;
-
 @property (nonatomic, retain) UIActionSheet *userActionSheet;
 @property (retain) UserAnnotation *selectedUserAnnotation;
 @property (nonatomic, assign) CustomSwitch *allFriendsSwitch;
 @property (retain, nonatomic) IBOutlet UIActivityIndicatorView *loadingIndicator;
-
 
 - (IBAction)sendMessageDidPress:(id)sender;
 
