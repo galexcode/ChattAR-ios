@@ -43,6 +43,15 @@ static DataManager *instance = nil;
 @synthesize myFriends, myFriendsAsDictionary, myPopularFriends;
 @synthesize historyConversation, historyConversationAsArray;
 
+@synthesize allChatPoints;
+@synthesize allCheckins;
+@synthesize allmapPoints;
+
+@synthesize chatPoints;
+@synthesize mapPoints;
+
+@synthesize mapPointsIDs;
+
 + (DataManager *)shared {
 	@synchronized (self) {
 		if (instance == nil){ 

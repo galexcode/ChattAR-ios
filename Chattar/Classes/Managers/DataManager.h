@@ -40,6 +40,16 @@
 @property (nonatomic, retain, readonly) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, retain, readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 
+// Controllers Data
+@property (nonatomic, retain) NSMutableArray* chatPoints;
+@property (nonatomic, retain) NSMutableArray* allChatPoints;
+@property (nonatomic, retain) NSMutableArray* chatMessagesIDs;
+
+@property (nonatomic, retain) NSMutableArray* allCheckins;
+
+@property (nonatomic, retain) NSMutableArray* mapPointsIDs;
+@property (nonatomic, retain) NSMutableArray* allmapPoints;
+@property (nonatomic, retain) NSMutableArray* mapPoints;
 
 + (DataManager *) shared;
 
