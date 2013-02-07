@@ -19,6 +19,28 @@
 #define kNewChatMessageCome @"kNewChatMessageCome"
 #define kReceivedOnlineStatus @"kReceivedOnlineStatus"
 
+#define kCachedMapPoints @"kCachedMapPoints"
+#define kCachedMapPointsIDs @"kCachedMapPoints"
+#define kCachedChatPoints @"kCachedChatPoints"
+#define kCachedChatPointsIDs @"kCachedChatPointsIDs"
+#define kCachedCheckins @"kCachedCheckins"
+
+#define kDidNotReceiveNewChatPoints @"kDidNotReceiveNewChatPoints"
+#define kDidReceiveError @"kDidReceiveError"
+#define kDidSuccessfulMessageSending @"kDidSuccessfulMessageSending"
+#define kChatEndRetrievingData @"kChatRetrievingData"
+#define kMapEndRetrievingData @"kMapEndRetrievingData"
+#define kWillRemoveLastChatPoint @"kWillRemoveLastChatPoint"
+#define kdidReceiveErrorLoadingNewChatPoints @"kdidReceiveErrorLoadingNewChatPoints"
+#define kWillUpdate @"kWillUpdate"
+
+#define kWillAddPointIsFBCheckin @"kWillAddPointIsFBCheckin"
+#define kWillUpdatePointStatus @"kWillUpdatePointStatus"
+#define kWillAddNewMessageToChat @"kWillAddNewMessageToChat"
+
+#define kWillAddCheckin @"kWillAddCheckin"
+#define kWillClearMessageField @"kWillClearMessageField"
+#define kWillScrollToTop @"kWillScrollToTop"
 // Strings
 #define appName @"ChattAR"
 
