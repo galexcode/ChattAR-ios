@@ -18,9 +18,9 @@
 #import "NumberToLetterConverter.h"
 #import "Extender.h"
 #import "UserAnnotation.h"
-
-
-    #import "ProvisionManager.h"
+#import "AugmentedRealityController.h"
+#import "ARManager.h"
+#import "ProvisionManager.h"
 
 @implementation AppDelegate
 
@@ -80,11 +80,11 @@
 	
 	_window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	
-    // Radar
-	MapChatARViewController *mapChatARViewController = [[MapChatARViewController alloc] initWithNibName:@"MapChatARViewController" bundle:nil];
-	UINavigationController* mapChatARNavigationController = [[UINavigationController alloc] initWithRootViewController:mapChatARViewController];
-	[mapChatARViewController.navigationController setValue:[[[FBNavigationBar alloc]init] autorelease] forKeyPath:@"navigationBar"];
-    [mapChatARViewController release];
+//    // Radar
+//	MapChatARViewController *mapChatARViewController = [[MapChatARViewController alloc] initWithNibName:@"MapChatARViewController" bundle:nil];
+//	UINavigationController* mapChatARNavigationController = [[UINavigationController alloc] initWithRootViewController:mapChatARViewController];
+//	[mapChatARViewController.navigationController setValue:[[[FBNavigationBar alloc]init] autorelease] forKeyPath:@"navigationBar"];
+//    [mapChatARViewController release];
 
     // Settings
 	SettingsController *settingsViewController = [[SettingsController alloc] initWithNibName:@"SettingsController" bundle:nil];
@@ -113,14 +113,25 @@
     MapViewController* mapViewController = [[MapViewController alloc] initWithNibName:@"MapViewController" bundle:nil];
     UINavigationController* mapNavigationController = [[UINavigationController alloc] initWithRootViewController:mapViewController];
     [mapViewController release];
-
+    
 	// Tab Bar
 	_tabBarController = [[CustomTabBarController alloc] init];
-	_tabBarController.viewControllers = [NSArray arrayWithObjects: chatNavigationController,mapNavigationController, /*messagesNavigationController,*/contactsNavigationController, settingsNavigationController, nil];
+    NSArray* viewControllers;
+    if ([ARManager deviceSupportsAR]) {
+        // Radar
+        AugmentedRealityController* arController = [[AugmentedRealityController alloc] initWithNibName:@"ARViewController" bundle:nil];
+        UINavigationController* arNavigationController = [[UINavigationController alloc] initWithRootViewController:arController];
+        [arController release];
+
+        viewControllers = [NSArray arrayWithObjects: chatNavigationController,mapNavigationController,arNavigationController,contactsNavigationController, settingsNavigationController, nil];
+        [arNavigationController release];
+    }
+    else
+        viewControllers = [NSArray arrayWithObjects: chatNavigationController,mapNavigationController,contactsNavigationController, settingsNavigationController, nil];
+	_tabBarController.viewControllers = viewControllers;
 	
 	// release controllers
 	[settingsNavigationController release];
-    [mapChatARNavigationController release];
     [messagesNavigationController release];
 	[contactsNavigationController release];
 	

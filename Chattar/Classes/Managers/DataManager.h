@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "UserAnnotation.h"
 #define maxPopularFriends 40
 
 @interface DataManager : NSObject{
@@ -50,6 +51,8 @@
 @property (nonatomic, retain) NSMutableArray* mapPointsIDs;
 @property (nonatomic, retain) NSMutableArray* allmapPoints;
 @property (nonatomic, retain) NSMutableArray* mapPoints;
+@property (nonatomic, retain) NSMutableArray *coordinateViews;
+@property (nonatomic, retain) NSMutableArray* coordinates;
 
 + (DataManager *) shared;
 
@@ -63,7 +66,11 @@
 - (void)makeFriendsDictionary;
 - (void)addPopularFriendID:(NSString *)friendID;
 
-
+#pragma mark -
+#pragma mark Controllers data methods
+-(UIView*)viewForExistingPoint:(UserAnnotation*)point;
+-(void)addPointToARCoordinateViews:(UserAnnotation*)point;
+-(void)updateARCoordinateViewWithPoint:(UserAnnotation*)point;
 #pragma mark -
 #pragma mark FB
 

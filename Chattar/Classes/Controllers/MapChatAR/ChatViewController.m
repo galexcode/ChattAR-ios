@@ -44,11 +44,13 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doScrollToTop) name:kWillScrollToTop object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doClearMessageField) name:kWillClearMessageField object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doRemoveLastChatPoint) name:kWillRemoveLastChatPoint object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAddNewPointToChat:) name:kWillClearMessageField object:nil ];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAddNewPointToChat:) name:kWillAddNewMessageToChat object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChatEndRetrievingData) name:kChatEndRetrievingData object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveError:) name:kDidReceiveError object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doNotReceiveNewChatPoints) name:kDidNotReceiveNewChatPoints object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveErrorLoadingNewChatPoints) name:kdidReceiveErrorLoadingNewChatPoints object:nil ];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doSuccessfulMessageSending) name:kDidSuccessfulMessageSending object:nil ];
+
         
     }
     return self;
@@ -146,12 +148,6 @@
 
 #pragma mark -
 #pragma mark Interface based methods
-
--(void)didSuccessfulMessageSending{
-    [sendMessageActivityIndicator stopAnimating];
-    messageField.rightView = nil;
-    quotePhotoTop = nil;
-}
 
 - (IBAction)sendMessageDidPress:(id)sender{
     
@@ -981,6 +977,11 @@
 
 #pragma mark -
 #pragma mark Notifications Reaction
+-(void)doSuccessfulMessageSending{
+    [sendMessageActivityIndicator stopAnimating];
+    messageField.rightView = nil;
+    quotePhotoTop = nil;
+}
 
 -(void)doChatEndRetrievingData{
     messageField.enabled = YES;
@@ -1026,6 +1027,10 @@
 
     // Add to Chat
     __block BOOL addedToCurrentChatState = NO;
+    
+    if (![DataManager shared].chatPoints) {
+        [DataManager shared].chatPoints = [[NSMutableArray alloc] init];
+    }
 
     dispatch_async( dispatch_get_main_queue(), ^{
 
@@ -1092,6 +1097,24 @@
     [messagesTableView reloadData];
 }
 
+- (void)logoutDone{
+    showAllUsers  = NO;
+    
+    [self.allFriendsSwitch setValue:1.0f];
+    
+    
+    [self.messageField setText:nil];
+    
+    [[DataManager shared].allChatPoints removeAllObjects];
+	[[DataManager shared].allCheckins removeAllObjects];
+    [[DataManager shared].chatPoints removeAllObjects];
+    
+    [[DataManager shared].chatMessagesIDs removeAllObjects];
+
+    [self.messagesTableView reloadData];
+}
+
+
 #pragma mark -
 #pragma mark Helpers
 - (BOOL)isAllShowed{
@@ -1108,16 +1131,6 @@
     
     switch (buttonIndex) {
         case 0:{
-            
-            // Reply in public chat/Reply with quote
-                // move wheel to front
-//                if(activityIndicator){
-//                    [self.view bringSubviewToFront:activityIndicator];
-//                }
-//
-//                // move all/friends switch to front
-//                [self.view bringSubviewToFront:allFriendsSwitch];
-//            
             // quote action
             [self addQuote];
             [self.messageField becomeFirstResponder];

@@ -41,9 +41,16 @@
 #define kWillAddCheckin @"kWillAddCheckin"
 #define kWillClearMessageField @"kWillClearMessageField"
 #define kWillScrollToTop @"kWillScrollToTop"
+#define kwillUpdateMarkersForCenterLocation @"kwillUpdateMarkersForCenterLocation"
+#define kAREndOfRetrieveInitialData @"kAREndOfRetrieveInitialData"
 // Strings
 #define appName @"ChattAR"
 
 // Flurry
 #define FLURRY_API_KEY @"KMD7NSM4DF344W9JVCGN"
 #define FLURRY_EVENT_USER_DID_LOGIN @"User did login"
+
+// Tab bar indexes enum
+enum TabbarIndexes {
+    chatIndex = 0, mapIndex,radarIndex,dialogsIndex
+};

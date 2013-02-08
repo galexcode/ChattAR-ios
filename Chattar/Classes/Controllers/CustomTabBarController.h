@@ -8,5 +8,6 @@
 
 #import <UIKit/UIKit.h>
 #import "BackgroundWorker.h"
-@interface CustomTabBarController : UITabBarController<FBDataDelegate,QBDataDelegate,DataDelegate,ChatControllerDelegate,MapControllerDelegate>
+@interface CustomTabBarController : UITabBarController<FBDataDelegate,QBDataDelegate,DataDelegate,ChatControllerDelegate,
+                                    MapControllerDelegate,ARControllerDelegate>
 @end

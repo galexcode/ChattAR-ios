@@ -48,11 +48,13 @@
     [[BackgroundWorker instance] setTabBarDelegate:self];
     [[BackgroundWorker instance] requestFBHistory];
     [[BackgroundWorker instance] requestFriends];
+    
 }
 
 -(void)requestControllerData{
     [[BackgroundWorker instance] retrieveCachedChatDataAndRequestNewData];
     [[BackgroundWorker instance] retrieveCachedMapDataAndRequestNewData];
+    [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
 }
 
 #pragma mark - 
@@ -65,6 +67,8 @@
     else{
         [[DataManager shared].myPopularFriends addObjectsFromArray:popFriends.allObjects];
     }
+    
+    [BackgroundWorker instance].numberOfCheckinsRetrieved = ceil([[[DataManager shared].myPopularFriends allObjects] count]/fmaxRequestsInBatch);
     
     [self requestControllerData];
 }
@@ -102,27 +106,34 @@
 #pragma mark DataDelegate methods
 
 -(void) didReceiveCachedMapPoints:(NSArray*)cachedMapPoints{
-    if (![DataManager shared].mapPoints) {
-        [DataManager shared].mapPoints = cachedMapPoints.mutableCopy;
+    if (![DataManager shared].allmapPoints) {
+        [DataManager shared].allmapPoints = cachedMapPoints.mutableCopy;
     }
     else
-        [[DataManager shared].mapPoints addObjectsFromArray:cachedMapPoints];
+        [[DataManager shared].allmapPoints addObjectsFromArray:cachedMapPoints];
     
+    if (![DataManager shared].mapPoints) {
+        [DataManager shared].mapPoints = [[NSMutableArray alloc] init];
+    }
 }
 
 -(void) didReceiveCachedMapPointsIDs:(NSArray*)cachedMapIDs{
-    if (![DataManager shared].mapPoints) {
-        [DataManager shared].mapPoints = cachedMapIDs.mutableCopy;
+    if (![DataManager shared].mapPointsIDs) {
+        [DataManager shared].mapPointsIDs = cachedMapIDs.mutableCopy;
     }
-    [[DataManager shared].mapPoints addObjectsFromArray:cachedMapIDs];
+    [[DataManager shared].mapPointsIDs addObjectsFromArray:cachedMapIDs];
 }
 
 -(void)didReceiveCachedChatPoints:(NSArray*)cachedChatPoints{
-    if (![[DataManager shared] chatPoints]) {
-        [DataManager shared].chatPoints = cachedChatPoints.mutableCopy;
+    if (![[DataManager shared] allChatPoints]) {
+        [DataManager shared].allChatPoints = cachedChatPoints.mutableCopy;
     }
     else
-        [[DataManager shared].chatPoints addObjectsFromArray:cachedChatPoints];
+        [[DataManager shared].allChatPoints addObjectsFromArray:cachedChatPoints];
+    
+    if (![DataManager shared].chatPoints) {
+        [DataManager shared].chatPoints = [[NSMutableArray alloc] init];
+    }
 }
 
 -(void)didReceiveCachedChatMessagesIDs:(NSArray*)cachedChatMessagesIDs{
@@ -138,7 +149,8 @@
         [DataManager shared].allCheckins = cachedCheckins.mutableCopy;
     }
     
-    [[DataManager shared].allCheckins addObjectsFromArray:cachedCheckins];
+    else [[DataManager shared].allCheckins addObjectsFromArray:cachedCheckins];
+    
 }
 
 -(void)didNotReceiveNewChatPoints{
@@ -215,6 +227,20 @@
 
 -(void)willSaveMapARPoints:(NSArray *)newMapPoints{
     [[DataManager shared] addMapARPointsToStorage:newMapPoints];
+}
+
+#pragma mark -
+#pragma mark ARControllerDelegate Methods
+-(void)willUpdateMarkersForCenterLocation{
+    [[NSNotificationCenter defaultCenter] postNotificationName:kwillUpdateMarkersForCenterLocation object:nil];
+}
+
+-(void)willAddMarker{
+    
+}
+
+-(void)AREndOfRetrieveInitialData{
+    [[NSNotificationCenter defaultCenter] postNotificationName:kAREndOfRetrieveInitialData object:nil];
 }
 
 

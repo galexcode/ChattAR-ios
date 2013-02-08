@@ -13,6 +13,8 @@
 #import "QBChatMessageModel.h"
 #import "FBCheckinModel.h"
 #import "PhotoWithLocationModel.h"
+#import "ARMarkerView.h"
+#import "ARGeoCoordinate.h"
 
 #define kFavoritiesFriends [NSString stringWithFormat:@"kFavoritiesFriends_%@", [DataManager shared].currentFBUserId]
 #define kFavoritiesFriendsIds [NSString stringWithFormat:@"kFavoritiesFriendsIds_%@", [DataManager shared].currentFBUserId]
@@ -49,6 +51,7 @@ static DataManager *instance = nil;
 
 @synthesize chatPoints;
 @synthesize mapPoints;
+@synthesize coordinates;
 
 @synthesize mapPointsIDs;
 
@@ -819,5 +822,51 @@ static DataManager *instance = nil;
  */
 - (NSString *)applicationDocumentsDirectory {
 	return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+}
+
+#pragma mark - 
+#pragma mark Controllers data methods
+-(UIView*)viewForExistingPoint:(UserAnnotation*)point{
+    for(ARMarkerView *marker in [DataManager shared].coordinateViews){
+        if([marker.userAnnotation.fbUserId isEqualToString:point.fbUserId]){
+            return marker;
+        }
+    }
+    return nil;
+}
+
+-(void)updateARCoordinateViewWithPoint:(UserAnnotation*)point{
+    for (ARMarkerView *marker in [DataManager shared].coordinateViews)
+    {
+        // already exist, change status
+        if([point.fbUserId isEqualToString:marker.userAnnotation.fbUserId])
+        {
+            if ([point.userStatus length] < 6 || ([point.userStatus length] >= 6 && ![[point.userStatus substringToIndex:6] isEqualToString:fbidIdentifier])){
+                ARMarkerView *marker = (ARMarkerView *)[[DataManager shared] viewForExistingPoint:point];
+                [marker updateStatus:point.userStatus];// update status
+            }
+            break;
+        }
+    }
+}
+
+-(void)addPointToARCoordinateViews:(UserAnnotation *)point{
+    for (ARMarkerView *marker in [DataManager shared].coordinateViews)
+    {
+        NSDate *newCreateDateTime = point.createdAt;
+        NSDate *currentCreateDateTime = marker.userAnnotation.createdAt;
+        // already exist, change status
+        if([point.fbUserId isEqualToString:marker.userAnnotation.fbUserId])
+        {
+            if([newCreateDateTime compare:currentCreateDateTime] == NSOrderedDescending){
+                if ([point.userStatus length] < 6 || ([point.userStatus length] >= 6 && ![[point.userStatus substringToIndex:6] isEqualToString:fbidIdentifier])){
+                    ARMarkerView *marker = (ARMarkerView *)[[DataManager shared] viewForExistingPoint:point];
+                    [marker updateStatus:point.userStatus];// update status
+                    [marker updateCoordinate:point.coordinate]; // update location
+                }
+            }
+            break;
+        }
+    }
 }
 @end

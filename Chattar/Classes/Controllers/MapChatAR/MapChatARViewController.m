@@ -335,19 +335,6 @@
     [arViewController dissmisAR];
 }
 
-- (void)showMap{
-	
-    if([mapViewController.view superview] == nil){
-        [self.view addSubview:mapViewController.view];
-    }
-    [chatViewController.view removeFromSuperview];
-    [arViewController.view removeFromSuperview];
-    
-    // stop AR
-    [arViewController dissmisAR];
-}
-
-
 #pragma mark -
 #pragma mark All/Friends
 
@@ -758,10 +745,8 @@
     
     // Check for AR
     if(isExistPoint){
-        
-        NSArray *currentARMarkers = [arViewController.coordinateViews copy];
-        
-        for (ARMarkerView *marker in currentARMarkers)
+                
+        for (ARMarkerView *marker in [DataManager shared].coordinateViews)
 		{
             // already exist, change status
             if([point.fbUserId isEqualToString:marker.userAnnotation.fbUserId])
@@ -775,7 +760,6 @@
             }
         }
         
-        [currentARMarkers release];
     }
 }
 
@@ -823,9 +807,8 @@
         // Check for AR
         if(isExistPoint){
             
-            NSArray *currentARMarkers = [arViewController.coordinateViews copy];
             
-            for (ARMarkerView *marker in currentARMarkers)
+            for (ARMarkerView *marker in [DataManager shared].coordinateViews)
             {
                 NSDate *newCreateDateTime = point.createdAt;
                 NSDate *currentCreateDateTime = marker.userAnnotation.createdAt;
@@ -846,7 +829,6 @@
                 }
             }
             
-            [currentARMarkers release];
         }
         
         
@@ -1609,7 +1591,6 @@
                 
                     // conversation
                     NSArray *data = [NSArray arrayWithObjects:[result.body allValues], points, nil];
-                    //dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                     if(processCheckinsQueue == NULL){
                         processCheckinsQueue = dispatch_queue_create("com.quickblox.chattar.process.checkins.queue", NULL);
                     }
@@ -1644,7 +1625,6 @@
 
                     // conversation
                     NSArray *data = [NSArray arrayWithObjects:[result.body allValues], points, nil]; 
-                    //dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                     if(processCheckinsQueue == NULL){
                         processCheckinsQueue = dispatch_queue_create("com.quickblox.chattar.process.checkins.queue", NULL);
                     }
@@ -1802,7 +1782,7 @@
 				NSMutableString* ids = [[NSMutableString alloc] init];
 				for (NSString* userID in fbMapUsersIds)
 				{
-					[ids appendFormat:[NSString stringWithFormat:@"%@,", userID]];
+					[ids appendString:[NSString stringWithFormat:@"%@,", userID]];
 				}
 				
                 NSLog(@"ids=%@", ids);
@@ -1844,7 +1824,7 @@
                 NSMutableString* ids = [[NSMutableString alloc] init];
 				for (NSString* userID in fbChatUsersIds)
 				{
-					[ids appendFormat:[NSString stringWithFormat:@"%@,", userID]];
+					[ids appendString:[NSString stringWithFormat:@"%@,", userID]];
 				}
                 
                 
