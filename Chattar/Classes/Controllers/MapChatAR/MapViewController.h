@@ -18,7 +18,7 @@
 
 @protocol FBDataDelegate;
 @interface MapViewController : UIViewController <MKMapViewDelegate, UIGestureRecognizerDelegate,PhotoMarkerProtocol,
-                                                 FBDataDelegate, QBDataDelegate, MapControllerDelegate,  DataDelegate>{
+                                                 FBDataDelegate, QBDataDelegate, MapControllerDelegate,  DataDelegate,UIActionSheetDelegate>{
     CGFloat count;
     CGFloat lastCount;
     
@@ -32,9 +32,11 @@
     
     NSMutableArray* annotationsForClustering;
     MKMapRect previousRect;
+    BOOL showAllUsers;
 }
 
 @property (nonatomic, assign) id delegate;
+@property (retain, nonatomic) IBOutlet UIActivityIndicatorView *loadingIndicator;
                                         // add custom map view with clusterization
 @property (nonatomic, assign) OCMapView *mapView;
 @property (nonatomic, retain) UIImageView *compass;
@@ -42,6 +44,8 @@
 @property (assign) NSMutableArray *mapPointsIDs;
 @property (nonatomic, assign) CustomSwitch *allFriendsSwitch;
 @property (nonatomic, retain) NSMutableArray* allCheckins;
+@property (nonatomic, retain) UIActionSheet *userActionSheet;
+@property (retain) UserAnnotation *selectedUserAnnotation;
 
 - (void)refreshWithNewPoints:(NSArray *)mapPoints;
 - (void)addPoints:(NSArray *)mapPoints;

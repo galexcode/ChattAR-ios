@@ -193,6 +193,7 @@
 		ED4C900316C0F3F1000751D4 /* BackgroundWorker.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C900216C0F3F1000751D4 /* BackgroundWorker.m */; };
 		ED4C901716C1229F000751D4 /* CustomTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C901616C1229B000751D4 /* CustomTabBarController.m */; };
 		ED70277E168B3D4B003F6829 /* Quickblox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAD8E4E8164BB65700CBCB79 /* Quickblox.framework */; };
+		EDDDD39616C50F9000942F6F /* ARViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = EDDDD39516C50F8F00942F6F /* ARViewController.xib */; };
 		FA8E4EF11580887B00476EF7 /* Facebook.m in Sources */ = {isa = PBXBuildFile; fileRef = FA8E4E991580887B00476EF7 /* Facebook.m */; };
 		FA8E4EF31580887B00476EF7 /* FBDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = FA8E4E9D1580887B00476EF7 /* FBDialog.m */; };
 		FA8E4EF41580887B00476EF7 /* FBFrictionlessRequestSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = FA8E4E9F1580887B00476EF7 /* FBFrictionlessRequestSettings.m */; };
@@ -488,6 +489,7 @@
 		ED4C900216C0F3F1000751D4 /* BackgroundWorker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BackgroundWorker.m; sourceTree = "<group>"; };
 		ED4C901516C12298000751D4 /* CustomTabBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomTabBarController.h; sourceTree = "<group>"; };
 		ED4C901616C1229B000751D4 /* CustomTabBarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomTabBarController.m; sourceTree = "<group>"; };
+		EDDDD39516C50F8F00942F6F /* ARViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ARViewController.xib; path = MapChatAR/ARViewController.xib; sourceTree = "<group>"; };
 		FA8E4E981580887B00476EF7 /* Facebook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Facebook.h; sourceTree = "<group>"; };
 		FA8E4E991580887B00476EF7 /* Facebook.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Facebook.m; sourceTree = "<group>"; };
 		FA8E4E9A1580887B00476EF7 /* FBConnect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FBConnect.h; sourceTree = "<group>"; };
@@ -1059,6 +1061,7 @@
 				ED4C8F5D16BFEB5D000751D4 /* SettingsController.xib */,
 				ED4C8F5E16BFEB5D000751D4 /* SplashController.xib */,
 				ED4C8F5F16BFEB5D000751D4 /* WebViewController.xib */,
+				EDDDD39516C50F8F00942F6F /* ARViewController.xib */,
 			);
 			path = xibs;
 			sourceTree = "<group>";
@@ -1419,6 +1422,7 @@
 				ED4C8FF516BFEB5D000751D4 /* SettingsController.xib in Resources */,
 				ED4C8FF616BFEB5D000751D4 /* SplashController.xib in Resources */,
 				ED4C8FF716BFEB5D000751D4 /* WebViewController.xib in Resources */,
+				EDDDD39616C50F9000942F6F /* ARViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

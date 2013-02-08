@@ -9,6 +9,8 @@
 #import "MapViewController.h"
 #import "MapChatARViewController.h"
 #import "UserAnnotation.h"
+#import "AppDelegate.h"
+#import "ARMarkerView.h"
 
 @interface MapViewController ()
 
@@ -23,6 +25,7 @@
 @synthesize mapPointsIDs;
 @synthesize allFriendsSwitch;
 @synthesize allCheckins;
+@synthesize userActionSheet;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -34,12 +37,19 @@
         
         // logout
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(logoutDone) name:kNotificationLogout object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doMapEndRetrievingData) name:kMapEndRetrievingData object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAddNewPoint:) name:kWillAddPointIsFBCheckin object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doUpdatePointStatus:) name:kWillUpdatePointStatus object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveError:) name:kDidReceiveError object:nil];
+
     }
     return self;
 }
 
 -(void)dealloc{
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [_loadingIndicator release];
     [super dealloc];
 }
 
@@ -137,7 +147,6 @@
 //    _loadingIndicator.center = self.view.center;
 //    _loadingIndicator.tag = 1101;
 //    [self.view addSubview:_loadingIndicator];
-//    [_loadingIndicator startAnimating];
 
     
 }
@@ -146,6 +155,7 @@
 {
     self.mapView = nil;
     
+    [self setLoadingIndicator:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
@@ -157,8 +167,10 @@
 }
 
 
+
+
 #pragma mark -
-#pragma mark Rotation methods
+#pragma mark Interface based methods
 
 - (void)spin:(UIRotationGestureRecognizer *)gestureRecognizer {
     if(canRotate){
@@ -185,28 +197,140 @@
 }
 
 
-- (void)refreshWithNewPoints:(NSArray *)mapPoints{
+- (void)refreshWithNewPoints:(NSArray *)newMapPoints{
     // remove old
 	[mapView removeAnnotations:mapView.annotations];
 	
     // add new
-	[self addPoints:mapPoints];
+	[self addPoints:newMapPoints];
     [mapView doClustering];
 }
 
+- (void)allFriendsSwitchValueDidChanged:(id)sender{
+    float origValue = [(CustomSwitch *)sender value];
+    int stateValue;
+    if(origValue >= worldValue){
+        stateValue = 1;
+    }else if(origValue <= friendsValue){
+        stateValue = 0;
+    }
+    
+    switch (stateValue) {
+            // show Friends
+        case 0:{
+            if(!showAllUsers){
+                [self showFriends];
+                showAllUsers = YES;
+            }
+        }
+            break;
+            
+            // show World
+        case 1:{
+            if(showAllUsers){
+                [self showWorld];
+                showAllUsers = NO;
+            }
+        }
+            break;
+    }
+}
+
+- (void) showWorld{
+    
+    // Map/AR points
+    //
+    [[DataManager shared].mapPoints removeAllObjects];
+    //
+    // 1. add All from QB
+    NSMutableArray *friendsIdsWhoAlreadyAdded = [NSMutableArray array];
+    for(UserAnnotation *mapAnnotation in [DataManager shared].allmapPoints){
+        [[DataManager shared].mapPoints addObject:mapAnnotation];
+        [friendsIdsWhoAlreadyAdded addObject:mapAnnotation.fbUserId];
+    }
+    //
+    // add checkin
+    NSArray *allCheckinsCopy = [self.allCheckins copy];
+    for (UserAnnotation* checkin in allCheckinsCopy){
+        if (![friendsIdsWhoAlreadyAdded containsObject:checkin.fbUserId]){
+            [[DataManager shared].mapPoints addObject:checkin];
+            [friendsIdsWhoAlreadyAdded addObject:checkin.fbUserId];
+        }else{
+            // compare datetimes - add newest
+            NSDate *newCreateDateTime = checkin.createdAt;
+            
+            int index = [friendsIdsWhoAlreadyAdded indexOfObject:checkin.fbUserId];
+            NSDate *currentCreateDateTime = ((UserAnnotation *)[[DataManager shared].mapPoints objectAtIndex:index]).createdAt;
+            
+            if([newCreateDateTime compare:currentCreateDateTime] == NSOrderedDescending){ //The receiver(newCreateDateTime) is later in time than anotherDate, NSOrderedDescending
+                [[DataManager shared].mapPoints replaceObjectAtIndex:index withObject:checkin];
+                [friendsIdsWhoAlreadyAdded replaceObjectAtIndex:index withObject:checkin.fbUserId];
+            }
+        }
+    }
+    [allCheckinsCopy release];
+        
+    // notify controllers
+    [self refreshWithNewPoints:[DataManager shared].mapPoints];
+}
+
+- (void) showFriends{
+    NSMutableArray *friendsIds = [[[DataManager shared].myFriendsAsDictionary allKeys] mutableCopy];
+    [friendsIds addObject:[DataManager shared].currentFBUserId];// add me
+    
+    [[DataManager shared].mapPoints removeAllObjects];
+    
+    //
+    // add only friends QB points
+    NSMutableArray *friendsIdsWhoAlreadyAdded = [NSMutableArray array];
+    for(UserAnnotation *mapAnnotation in [DataManager shared].allmapPoints){
+        if([friendsIds containsObject:[mapAnnotation.fbUser objectForKey:kId]]){
+            [[DataManager shared].mapPoints addObject:mapAnnotation];
+            
+            [friendsIdsWhoAlreadyAdded addObject:[mapAnnotation.fbUser objectForKey:kId]];
+        }
+    }
+    //
+    // add checkin
+    NSArray *allCheckinsCopy = [[DataManager shared].allCheckins copy];
+    for (UserAnnotation* checkin in allCheckinsCopy){
+        if (![friendsIdsWhoAlreadyAdded containsObject:checkin.fbUserId]){
+            [[DataManager shared].mapPoints addObject:checkin];
+            [friendsIdsWhoAlreadyAdded addObject:checkin.fbUserId];
+        }else{
+            // compare datetimes - add newest
+            NSDate *newCreateDateTime = checkin.createdAt;
+            
+            int index = [friendsIdsWhoAlreadyAdded indexOfObject:checkin.fbUserId];
+            NSDate *currentCreateDateTime = ((UserAnnotation *)[[DataManager shared].mapPoints objectAtIndex:index]).createdAt;
+            
+            if([newCreateDateTime compare:currentCreateDateTime] == NSOrderedDescending){ //The receiver(newCreateDateTime) is later in time than anotherDate, NSOrderedDescending
+                [[DataManager shared].mapPoints replaceObjectAtIndex:index withObject:checkin];
+                [friendsIdsWhoAlreadyAdded replaceObjectAtIndex:index withObject:checkin.fbUserId];
+            }
+        }
+    }
+    [allCheckinsCopy release];
+    
+    
+    [self refreshWithNewPoints:[DataManager shared].mapPoints];
+}
+
+
+
 #pragma mark -
 #pragma mark Internal data methods
-- (void)addPoints:(NSArray *)mapPoints{
+- (void)addPoints:(NSArray *)newMapPoints{
     // add new
-    for (UserAnnotation* ann in mapPoints) {
+    for (UserAnnotation* ann in newMapPoints) {
         [self.mapView addAnnotation:ann];
     }
     
-    [annotationsForClustering addObjectsFromArray:mapPoints];
+    [annotationsForClustering addObjectsFromArray:newMapPoints];
 }
 
-- (void)addPoint:(UserAnnotation *)mapPoint{
-    [self.mapView addAnnotation:mapPoint];
+- (void)addPoint:(UserAnnotation *)newMapPoint{
+    [self.mapView addAnnotation:newMapPoint];
 }
 
 - (void)clear{
@@ -238,9 +362,11 @@
             break;
         }
     }
-    
     [currentMapAnnotations release];
-
+    
+    if (isExistPoint) {
+        [[DataManager shared] updateARCoordinateViewWithPoint:point];
+    }
 }
 
 #pragma mark -
@@ -453,101 +579,105 @@
     [[self.view viewWithTag:2008] removeFromSuperview];
 }
 
-
 #pragma mark -
-#pragma mark FBDataDelegate
--(void)willAddCheckin:(UserAnnotation*)checkin{
-    [self.allCheckins addObject:checkin];
+#pragma mark Notifications Reaction
+- (void)logoutDone{
+    showAllUsers  = NO;
+    
+    [self.allFriendsSwitch setValue:1.0f];
+    
+    
+	[[DataManager shared].allmapPoints removeAllObjects];
+    
+    [[DataManager shared].mapPoints removeAllObjects];
+    
+    [[DataManager shared].mapPointsIDs removeAllObjects];
+    
+    [self clear];
 }
 
--(void)didReceiveCachedCheckins:(NSArray *)cachedCheckins{
-    [self.allCheckins addObjectsFromArray:cachedCheckins];
-}
 
-#pragma mark -
-#pragma mark DataDelegate
--(void)mapEndRetrievingData{
+-(void)doMapEndRetrievingData{
 //    [activityIndicator removeFromSuperview];
     [self.allFriendsSwitch setEnabled:YES];
-
-}
-
--(void)didReceiveError:(NSString*)errorMessage{
+    NSLog(@"%d",[DataManager shared].mapPoints.count);
+    NSLog(@"%@",[DataManager shared].mapPointsIDs);
+    NSLog(@"%@",[DataManager shared].allmapPoints);
+    NSLog(@"%@",[DataManager shared].allCheckins);
     
+    [self refreshWithNewPoints:[DataManager shared].mapPoints];
 }
 
--(CLLocation*)sendLocationToBgWorker{
-    CLLocationManager* locationManager = [[[CLLocationManager alloc] init] autorelease];
-    [locationManager startMonitoringSignificantLocationChanges];
+-(void)doAddNewPoint:(NSNotification*)notification{
+    UserAnnotation* newPoint = (UserAnnotation*)[notification.userInfo objectForKey:@"newPoint"];
+    BOOL isFBCheckin = [[notification.userInfo objectForKey:@"isFBCheckin"] boolValue];
     
-    return locationManager.location;
-}
-
-
-#pragma mark -
-#pragma mark MapControllerDelegate
--(void) didReceiveCachedMapPoints:(NSArray*)cachedMapPoints{
-    if (!_mapPoints) {
-        _mapPoints = [[NSMutableArray alloc] init];
-    }
-    [_mapPoints addObjectsFromArray:cachedMapPoints];
-}
-
--(void) didReceiveCachedMapPointsIDs:(NSArray*)cachedMapIDs{
-    if (!mapPointsIDs) {
-        mapPointsIDs = [[NSMutableArray alloc] init];
-    }
-    [mapPointsIDs addObjectsFromArray:cachedMapIDs];
-}
-
--(void) willAddNewPoint:(UserAnnotation*)point isFBCheckin:(BOOL)isFBCheckin{
     NSArray *friendsIds = [[DataManager shared].myFriendsAsDictionary allKeys];
-    
+
     NSArray *currentMapAnnotations = [self.mapView.annotations copy];
 
-    
     BOOL isExistPoint = NO;
     for (UserAnnotation *annotation in currentMapAnnotations)
     {
-        NSDate *newCreateDateTime = point.createdAt;
+        NSDate *newCreateDateTime = newPoint.createdAt;
         NSDate *currentCreateDateTime = annotation.createdAt;
         // already exist, change status
-        if([point.fbUserId isEqualToString:annotation.fbUserId])
+        if([newPoint.fbUserId isEqualToString:annotation.fbUserId])
         {
             if([newCreateDateTime compare:currentCreateDateTime] == NSOrderedDescending){
-                if ([point.userStatus length] < 6 || ([point.userStatus length] >= 6 && ![[point.userStatus substringToIndex:6] isEqualToString:fbidIdentifier])){
+                if ([newPoint.userStatus length] < 6 || ([newPoint.userStatus length] >= 6 && ![[newPoint.userStatus substringToIndex:6] isEqualToString:fbidIdentifier])){
                     MapMarkerView *marker = (MapMarkerView *)[self.mapView viewForAnnotation:annotation];
-                    [marker updateStatus:point.userStatus];// update status
-                    [marker updateCoordinate:point.coordinate];
+                    [marker updateStatus:newPoint.userStatus];// update status
+                    [marker updateCoordinate:newPoint.coordinate];
                 }
             }
-            
+
             isExistPoint = YES;
-            
+
             break;
         }
     }
-    
+
     [currentMapAnnotations release];
     
+    if (isExistPoint) {
+        [[DataManager shared] updateARCoordinateViewWithPoint:newPoint];
+        isExistPoint = YES;
+    }
+
     if(!isExistPoint){
         BOOL addedToCurrentMapState = NO;
+
         
-        [self.mapPoints addObject:point];
-        
-        if(point.geoDataID != -1){
-            [self.mapPointsIDs addObject:[NSString stringWithFormat:@"%d", point.geoDataID]];
+        [[DataManager shared].mapPoints addObject:newPoint];
+
+        if(newPoint.geoDataID != -1){
+            [[DataManager shared].mapPointsIDs addObject:[NSString stringWithFormat:@"%d", newPoint.geoDataID]];
         }
-        
-        if([self isAllShowed] || [friendsIds containsObject:point.fbUserId]){
-            [self.mapPoints addObject:point];
+
+        if([self isAllShowed] || [friendsIds containsObject:newPoint.fbUserId]){
+            [[DataManager shared].mapPoints addObject:newPoint];
             addedToCurrentMapState = YES;
         }
-        //
+
         if(addedToCurrentMapState){
-            [self addPoint:point];
+            [self addPoint:newPoint];
+            
+            UITabBarController *tabBarController = ((AppDelegate *)self.delegate).tabBarController;
+            AugmentedRealityController* arController = (AugmentedRealityController*)[tabBarController.viewControllers objectAtIndex:radarIndex];
+            [arController addPoint:newPoint];
         }
     }
+
+    if(!isFBCheckin){
+        [[DataManager shared] addMapARPointToStorage:newPoint];
+        
+    }
+}
+
+-(void)doUpdatePointStatus:(NSNotification*)notification{
+    UserAnnotation* newPoint = (UserAnnotation*)[notification.userInfo objectForKey:@"newPointStatus"];
+    [self updateStatus:newPoint];
 }
 
 - (BOOL)isAllShowed{
@@ -558,13 +688,226 @@
     return NO;
 }
 
--(void) willUpdatePointStatus:(UserAnnotation*)newPoint{
-    [self updateStatus:newPoint];
+-(void)doReceiveError:(NSNotification*)notification{
+    NSString* errorMessage = [notification.userInfo objectForKey:@"errorMessage"];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Errors", nil)
+                                                    message:errorMessage
+                                                   delegate:self
+                                          cancelButtonTitle:NSLocalizedString(@"Ok", nil)
+                                          otherButtonTitles:nil];
+    [alert show];
+    [alert release];
 }
 
 
--(void) willSaveMapARPoints:(NSArray*)newMapPoints{
-    [[DataManager shared] addMapARPointsToStorage:newMapPoints];
+#pragma mark -
+#pragma mark UIActionSheetDelegate
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex{
+    int buttonsNum = actionSheet.numberOfButtons;
+    
+    switch (buttonIndex) {
+        case 0:{
+            
+            [self.view bringSubviewToFront:allFriendsSwitch];
+
+            UITabBarController *tabBarController = ((AppDelegate *)self.delegate).tabBarController;
+            ChatViewController* chatController = (ChatViewController*)[tabBarController.viewControllers objectAtIndex:chatIndex];
+            [chatController setSelectedUserAnnotation:self.selectedUserAnnotation];
+            [chatController.messageField becomeFirstResponder];
+            
+            [tabBarController setSelectedIndex:chatIndex];
+            
+        }
+            
+            break;
+            
+        case 1: {
+            if(buttonsNum == 3){
+                // View personal FB page
+                [self actionSheetViewFBProfile];
+            }else{
+                // Send FB message
+                [self actionSheetSendPrivateFBMessage];
+            }
+        }
+            break;
+            
+        case 2: {
+            // View personal FB page
+            if(buttonsNum != 3){
+                [self actionSheetViewFBProfile];
+            }
+        }
+			
+            break;
+            
+        default:
+            break;
+    }
+    
+    [userActionSheet release];
+    userActionSheet = nil;
+    
+    self.selectedUserAnnotation = nil;
 }
+
+- (void)actionSheetViewFBProfile{
+    // View personal FB page
+    
+    NSString *url = [NSString stringWithFormat:@"http://www.facebook.com/profile.php?id=%@",self.selectedUserAnnotation.fbUserId];
+    
+    WebViewController *webViewControleler = [[WebViewController alloc] init];
+    webViewControleler.urlAdress = url;
+    [self.navigationController pushViewController:webViewControleler animated:YES];
+    [webViewControleler autorelease];
+}
+
+- (void) actionSheetSendPrivateFBMessage{
+    NSString *selectedFriendId = self.selectedUserAnnotation.fbUserId;
+    
+    // get conversation
+    Conversation *conversation = [[DataManager shared].historyConversation objectForKey:selectedFriendId];
+    if(conversation == nil){
+        // 1st message -> create conversation
+        
+        Conversation *newConversation = [[Conversation alloc] init];
+        
+        // add to
+        NSMutableDictionary *to = [NSMutableDictionary dictionary];
+        [to setObject:selectedFriendId forKey:kId];
+        [to setObject:[self.selectedUserAnnotation.fbUser objectForKey:kName] forKey:kName];
+        newConversation.to = to;
+        
+        // add messages
+        NSMutableArray *emptryArray = [[NSMutableArray alloc] init];
+        newConversation.messages = emptryArray;
+        [emptryArray release];
+        
+        [[DataManager shared].historyConversation setObject:newConversation forKey:selectedFriendId];
+        [newConversation release];
+        
+        conversation = newConversation;
+    }
+    
+    // show Chat
+    FBChatViewController *chatController = [[FBChatViewController alloc] initWithNibName:@"FBChatViewController" bundle:nil];
+    chatController.chatHistory = conversation;
+    [self.navigationController pushViewController:chatController animated:YES];
+    [chatController release];
+    
+}
+
+#pragma mark - 
+#pragma mark Markers
+- (void)touchOnMarker:(UIView *)marker{
+    // get user name & id
+    NSString *userName = nil;
+    if([marker isKindOfClass:MapMarkerView.class]){ 
+        userName = ((MapMarkerView *)marker).userName.text;
+        self.selectedUserAnnotation = ((MapMarkerView *)marker).annotation;
+    }
+	NSString* title;
+	NSString* subTitle;
+	
+	title = userName;
+	if ([_selectedUserAnnotation.userStatus length] >=6)
+	{
+		if ([[self.selectedUserAnnotation.userStatus substringToIndex:6] isEqualToString:fbidIdentifier])
+		{
+			subTitle = [self.selectedUserAnnotation.userStatus substringFromIndex:[self.selectedUserAnnotation.userStatus rangeOfString:quoteDelimiter].location+1];
+		}
+		else
+		{
+			subTitle = self.selectedUserAnnotation.userStatus;
+		}
+	}
+	else
+	{
+		subTitle = self.selectedUserAnnotation.userStatus;
+	}
+	
+	subTitle = [NSString stringWithFormat:@"''%@''", subTitle];
+    
+    // show action sheet
+    [self showActionSheetWithTitle:title andSubtitle:subTitle];
+}
+
+- (void)showActionSheetWithTitle:(NSString *)title andSubtitle:(NSString *)subtitle
+{
+    // check yourself
+    if([_selectedUserAnnotation.fbUserId isEqualToString:[DataManager shared].currentFBUserId]){
+        return;
+    }
+    
+    // is this friend?
+    BOOL isThisFriend = YES;
+    if(![[[DataManager shared].myFriendsAsDictionary allKeys] containsObject:_selectedUserAnnotation.fbUserId]){
+        isThisFriend = NO;
+    }
+    
+    
+    // show Action Sheet
+    //
+    // add "Quote" item only in Chat
+    if(isThisFriend){
+        userActionSheet = [[UIActionSheet alloc] initWithTitle:title
+                                                      delegate:self
+                                             cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
+                                        destructiveButtonTitle:nil
+                                             otherButtonTitles:NSLocalizedString(@"Reply with quote", nil), NSLocalizedString(@"Send private FB message", nil), NSLocalizedString(@"View FB profile", nil), nil];
+    }else{
+        userActionSheet = [[UIActionSheet alloc] initWithTitle:title
+                                                      delegate:self
+                                             cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
+                                        destructiveButtonTitle:nil
+                                             otherButtonTitles:NSLocalizedString(@"Reply with quote", nil), NSLocalizedString(@"View FB profile", nil), nil];
+    }
+    
+	UILabel* titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 5, 280, 15)];
+	titleLabel.font = [UIFont boldSystemFontOfSize:14.0];
+	titleLabel.textAlignment = UITextAlignmentCenter;
+	titleLabel.backgroundColor = [UIColor clearColor];
+	titleLabel.textColor = [UIColor whiteColor];
+	titleLabel.text = title;
+	titleLabel.numberOfLines = 0;
+	[userActionSheet addSubview:titleLabel];
+	
+	UILabel* subTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 20, 280, 55)];
+	subTitleLabel.font = [UIFont boldSystemFontOfSize:12.0];
+	subTitleLabel.textAlignment = UITextAlignmentCenter;
+	subTitleLabel.backgroundColor = [UIColor clearColor];
+	subTitleLabel.textColor = [UIColor whiteColor];
+	subTitleLabel.text = subtitle;
+	subTitleLabel.numberOfLines = 0;
+	[userActionSheet addSubview:subTitleLabel];
+	
+	[subTitleLabel release];
+	[titleLabel release];
+	userActionSheet.title = @"";
+    
+	// Show
+	[userActionSheet showFromTabBar:self.tabBarController.tabBar];
+	
+	CGRect actionSheetRect = userActionSheet.frame;
+	actionSheetRect.origin.y -= 60.0;
+	actionSheetRect.size.height = 300.0;
+	[userActionSheet setFrame:actionSheetRect];
+	
+	for (int counter = 0; counter < [[userActionSheet subviews] count]; counter++)
+	{
+		UIView *object = [[userActionSheet subviews] objectAtIndex:counter];
+		if (![object isKindOfClass:[UILabel class]])
+		{
+			CGRect frame = object.frame;
+			frame.origin.y = frame.origin.y + 60.0;
+			object.frame = frame;
+		}
+	}
+}
+
+#pragma mark -
+#pragma mark Notifications reactions
+
 
 @end

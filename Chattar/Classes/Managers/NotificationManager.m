@@ -36,6 +36,9 @@ static AVAudioPlayer* audioPlayer;
     return  [enabled boolValue];
 }
 
++ (void)popUpEnable:(BOOL)popUpEnable{
+    
+}
 
 #pragma mark -
 #pragma mark Vibration
