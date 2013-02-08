@@ -21,6 +21,7 @@
 @synthesize FBfriends;
 @synthesize chatInitState;
 @synthesize mapInitState;
+@synthesize numberOfCheckinsRetrieved;
 
 static BackgroundWorker* instance = nil;
 
@@ -28,7 +29,7 @@ static BackgroundWorker* instance = nil;
 	@synchronized (self) {
 		if (instance == nil){
             instance = [[self alloc] init];
-            
+
         }
 	}
 	return instance;
@@ -36,8 +37,13 @@ static BackgroundWorker* instance = nil;
 
 -(id)init{
     if (self = [super init]) {
-        self.chatInitState = 1;
-        self.mapInitState = 1;
+        self.chatInitState = 0;
+        self.mapInitState = 0;
+        
+        CLLocationManager* locationManager = [[[CLLocationManager alloc] init] autorelease];
+        [locationManager startMonitoringSignificantLocationChanges];
+        currentLocation = [[CLLocation alloc] initWithLatitude:locationManager.location.coordinate.latitude longitude:locationManager.location.coordinate.longitude];
+        [locationManager stopMonitoringSignificantLocationChanges];
     }
     return self;
 }
@@ -45,6 +51,7 @@ static BackgroundWorker* instance = nil;
 -(void)dealloc{
     [FBfriends release];
     dispatch_release(getMoreMessagesWorkQueue);
+    [currentLocation release];
     [super dealloc];
 }
 
@@ -185,7 +192,7 @@ static BackgroundWorker* instance = nil;
     [self retrieveNewQBData];
 }
 
-- (void)retrieveFBCheckins{
+- (void)retrieveCachedFBCheckinsAndRequestNewCheckins{
     // get checkins from cash
     NSArray *cashedFBCheckins = [[DataManager shared] checkinsFromStorage];
     
@@ -195,7 +202,7 @@ static BackgroundWorker* instance = nil;
         for(FBCheckinModel *checkinCashedPoint in cashedFBCheckins){
             [cachedCheckins addObject:checkinCashedPoint.body];
         }
-                
+        
         if ([tabBarDelegate respondsToSelector:@selector(didReceiveCachedCheckins:)]) {
             [tabBarDelegate didReceiveCachedCheckins:cachedCheckins];
         }
@@ -406,6 +413,28 @@ static BackgroundWorker* instance = nil;
                 }
                 [checkinAnnotation release];
                 [chatAnnotation release];
+                
+                ++self.chatInitState;
+                
+                if(self.chatInitState == 2){
+                    dispatch_async( dispatch_get_main_queue(), ^{
+                        if ([tabBarDelegate respondsToSelector:@selector(chatEndRetrievingData)]) {
+                            [tabBarDelegate chatEndRetrievingData];
+                        }
+                    });
+                }
+                
+                ++self.mapInitState;
+                
+                if(self.chatInitState == 2){
+                    dispatch_async( dispatch_get_main_queue(), ^{
+                        if ([tabBarDelegate respondsToSelector:@selector(mapEndRetrievingData)]) {
+                            [tabBarDelegate chatEndRetrievingData];
+                        }
+                    });
+                }
+
+
             }
         }
     }
@@ -418,6 +447,10 @@ static BackgroundWorker* instance = nil;
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([tabBarDelegate respondsToSelector:@selector(willUpdate)]) {
             [tabBarDelegate willUpdate];
+        }
+        
+        if ([tabBarDelegate respondsToSelector:@selector(willUpdateMarkersForCenterLocation)]) {
+            [tabBarDelegate willUpdateMarkersForCenterLocation];
         }
     });
 }
@@ -569,9 +602,7 @@ static BackgroundWorker* instance = nil;
     
     
     // all data was retrieved
-    NSLog(@"%d",self.chatInitState);
     ++self.chatInitState;
-    NSLog(@"%d",self.chatInitState);
 
     NSLog(@"CHAT INIT OK");
     if(self.chatInitState == 2){
@@ -608,10 +639,8 @@ static BackgroundWorker* instance = nil;
         
         if ([geodata.user.facebookID isEqualToString:[DataManager shared].currentFBUserId])
         {
-            CLLocationManager* locationManager = [[[CLLocationManager alloc] init] autorelease];
-            [locationManager startMonitoringSignificantLocationChanges];
-            coordinate.latitude = locationManager.location.coordinate.latitude;
-            coordinate.longitude = locationManager.location.coordinate.longitude;
+            coordinate.latitude = currentLocation.coordinate.latitude;
+            coordinate.longitude = currentLocation.coordinate.longitude;
         }
         else
         {
@@ -644,7 +673,9 @@ static BackgroundWorker* instance = nil;
     
     // update AR
     dispatch_async( dispatch_get_main_queue(), ^{
-//        [arViewController updateMarkersPositionsForCenterLocation:arViewController.centerLocation];
+        if ([tabBarDelegate respondsToSelector:@selector(willUpdateMarkersForCenterLocation)]) {
+            [tabBarDelegate willUpdateMarkersForCenterLocation];
+        }
     });
     
     //
@@ -1419,12 +1450,6 @@ static BackgroundWorker* instance = nil;
     }
 	newAnnotation.createdAt = geoData.createdAt;
     
-    CLLocation* currentLocation = nil;
-    CLLocationManager* locationManager = [[[CLLocationManager alloc] init] autorelease];
-    [locationManager startMonitoringSignificantLocationChanges];
-    currentLocation = locationManager.location;
-    [locationManager stopMonitoringSignificantLocationChanges];
-    
     newAnnotation.distance  = [geoData.location distanceFromLocation:currentLocation];
     
     if(newAnnotation.coordinate.latitude == 0.0f && newAnnotation.coordinate.longitude == 0.0f)
@@ -1453,7 +1478,9 @@ static BackgroundWorker* instance = nil;
         });
         
         // update AR
-//        [arViewController updateMarkersPositionsForCenterLocation:arViewController.centerLocation];
+        if ([tabBarDelegate respondsToSelector:@selector(willUpdateMarkersForCenterLocation)]) {
+            [tabBarDelegate willUpdateMarkersForCenterLocation];
+        }
     }
     
 	[newAnnotation release];

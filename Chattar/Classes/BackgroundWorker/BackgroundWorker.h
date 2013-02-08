@@ -68,12 +68,20 @@
 -(void) willUpdatePointStatus:(UserAnnotation*)newPoint;
 @end
 
+@protocol ARControllerDelegate <NSObject>
+
+@optional
+-(void)willUpdateMarkersForCenterLocation;
+-(void)willAddMarker;
+-(void)AREndOfRetrieveInitialData;
+@end
+
 
 
 
 @interface BackgroundWorker : NSObject<QBActionStatusDelegate,FBRequestDelegate,FBServiceResultDelegate>{
     NSTimer* updateTimer;
-    short numberOfCheckinsRetrieved;
+    
     
     dispatch_queue_t processCheckinsQueue;
     
@@ -84,13 +92,17 @@
     NSDate *lastMessageDate;
     NSDate* lastPointDate;
     
+    CLLocation* currentLocation;
+    
 }
 
-@property (nonatomic, assign) id<FBDataDelegate,DataDelegate,QBDataDelegate,MapControllerDelegate,ChatControllerDelegate> tabBarDelegate;
+@property (nonatomic, assign) id<FBDataDelegate,DataDelegate,QBDataDelegate,MapControllerDelegate,ChatControllerDelegate,ARControllerDelegate> tabBarDelegate;
 
 @property (nonatomic, retain) NSMutableArray* FBfriends;
 @property (assign) short chatInitState;                 // 2 if all data(map/chat) was retrieved
 @property (assign) short mapInitState;
+@property (assign) short numberOfCheckinsRetrieved;
+
 
 +(BackgroundWorker*)instance;
 
@@ -102,4 +114,5 @@
 -(void)retrieveMoreChatMessages:(NSInteger)page;
 -(void)requestFriendWithFacebookID:(NSString*)fbID andMessageText:(NSString*)message;
 -(void)postGeoData:(QBLGeoData*)geoData;
+- (void)retrieveCachedFBCheckinsAndRequestNewCheckins;
 @end
