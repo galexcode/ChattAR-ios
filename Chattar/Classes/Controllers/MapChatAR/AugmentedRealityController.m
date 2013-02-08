@@ -11,6 +11,7 @@
 #import "ARGeoCoordinate.h"
 #import "ARMarkerView.h"
 #import "MapChatARViewController.h"
+#import "AppDelegate.h"
 
 #define kFilteringFactor 0.05
 #define degreesToRadian(x) (M_PI * (x) / 180.0)
@@ -31,14 +32,64 @@
 
 @implementation AugmentedRealityController
 
-@synthesize locationManager, accelerometerManager, displayView, centerCoordinate, scaleViewsBasedOnDistance, transparenViewsBasedOnDistance, rotateViewsBasedOnPerspective, maximumScaleDistance, minimumScaleFactor, maximumRotationAngle, centerLocation, coordinates, currentOrientation, degreeRange;
-@synthesize latestHeading, viewAngle, coordinateViews;
+@synthesize locationManager, accelerometerManager, displayView, centerCoordinate, scaleViewsBasedOnDistance, transparenViewsBasedOnDistance, rotateViewsBasedOnPerspective, maximumScaleDistance, minimumScaleFactor, maximumRotationAngle, centerLocation, currentOrientation, degreeRange;
+@synthesize latestHeading, viewAngle;
 @synthesize captureSession;
 @synthesize delegate, distanceSlider, distanceLabel;
 
-
+@synthesize userActionSheet;
+@synthesize selectedUserAnnotation;
+@synthesize allFriendsSwitch;
 #pragma mark - 
 #pragma mark Init & dealloc 
+
+-(id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil{
+    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+        self.title = NSLocalizedString(@"Radar", nil);
+        self.tabBarItem.image = [UIImage imageNamed:@"Around_toolbar_icon.png"];
+        
+        latestHeading	= -1.0f;
+        
+        self.maximumScaleDistance = 1.3;
+        self.minimumScaleFactor = 0.3;
+        
+        self.scaleViewsBasedOnDistance = YES;
+        self.transparenViewsBasedOnDistance = YES;
+        self.rotateViewsBasedOnPerspective = NO;
+        
+        self.maximumRotationAngle = M_PI / 6.0;
+        
+        self.currentOrientation = UIDeviceOrientationPortrait;
+        
+        
+        
+        // 1 km (все, кто в радиусе 1 км)
+        // 5 km
+        // 10 km
+        // 50 km
+        // 150 km
+        // 500 km
+        // 1000 km
+        // 3000 km
+        // 20000 km
+        sliderNumbers = [[NSMutableArray alloc] init];
+        [sliderNumbers addObject:[NSNumber numberWithInt:1000]];
+        [sliderNumbers addObject:[NSNumber numberWithInt:5000]];
+        [sliderNumbers addObject:[NSNumber numberWithInt:10000]];
+        [sliderNumbers addObject:[NSNumber numberWithInt:50000]];
+        [sliderNumbers addObject:[NSNumber numberWithInt:150000]];
+        [sliderNumbers addObject:[NSNumber numberWithInt:500000]];
+        [sliderNumbers addObject:[NSNumber numberWithInt:1000000]];
+        [sliderNumbers addObject:[NSNumber numberWithInt:3000000]];
+        [sliderNumbers addObject:[NSNumber numberWithInt:maxARDistance]];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(logoutDone) name:kNotificationLogout object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doUpdateMarkersForCenterLocation) name:kwillUpdateMarkersForCenterLocation object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveError:) name:kDidReceiveError object:nil ];
+
+    }
+    return self;
+}
 
 - (id)initWithViewFrame:(CGRect) _viewFrame{
     self = [super init];
@@ -46,47 +97,7 @@
         return nil;
     }
     
-	coordinates		= [[NSMutableArray alloc] init];
-	coordinateViews	= [[NSMutableArray alloc] init];
-	latestHeading	= -1.0f;
-    
-	self.maximumScaleDistance = 1.3;
-	self.minimumScaleFactor = 0.3;
-    
-	self.scaleViewsBasedOnDistance = YES;
-    self.transparenViewsBasedOnDistance = YES;
-	self.rotateViewsBasedOnPerspective = NO;
-    
-	self.maximumRotationAngle = M_PI / 6.0;
-    
-    self.currentOrientation = UIDeviceOrientationPortrait; 
-    self.degreeRange = _viewFrame.size.width / 12; 
-    
-    viewFrame = _viewFrame;
-    
-    
-    
-    // 1 km (все, кто в радиусе 1 км)
-    // 5 km
-    // 10 km
-    // 50 km
-    // 150 km
-    // 500 km 
-    // 1000 km
-    // 3000 km 
-    // 20000 km
-    sliderNumbers = [[NSMutableArray alloc] init];
-    [sliderNumbers addObject:[NSNumber numberWithInt:1000]];
-    [sliderNumbers addObject:[NSNumber numberWithInt:5000]];
-    [sliderNumbers addObject:[NSNumber numberWithInt:10000]];
-    [sliderNumbers addObject:[NSNumber numberWithInt:50000]];
-    [sliderNumbers addObject:[NSNumber numberWithInt:150000]];
-    [sliderNumbers addObject:[NSNumber numberWithInt:500000]];
-    [sliderNumbers addObject:[NSNumber numberWithInt:1000000]];
-    [sliderNumbers addObject:[NSNumber numberWithInt:3000000]];
-    [sliderNumbers addObject:[NSNumber numberWithInt:maxARDistance]];
-    
-    
+
     return self;
 }
 
@@ -161,6 +172,22 @@
     
 	[self.view bringSubviewToFront:distanceSlider];
     [self.view bringSubviewToFront:distanceLabel];
+    
+    allFriendsSwitch = [CustomSwitch customSwitch];
+    [allFriendsSwitch setAutoresizingMask:(UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin)];
+    
+    if(IS_HEIGHT_GTE_568){
+        [allFriendsSwitch setCenter:CGPointMake(280, 448)];
+    }else{
+        [allFriendsSwitch setCenter:CGPointMake(280, 360)];
+    }
+    
+    [allFriendsSwitch setValue:worldValue];
+    [allFriendsSwitch scaleSwitch:0.9];
+    [allFriendsSwitch addTarget:self action:@selector(allFriendsSwitchValueDidChanged:) forControlEvents:UIControlEventValueChanged];
+	[allFriendsSwitch setBackgroundColor:[UIColor clearColor]];
+	[self.view addSubview:allFriendsSwitch];
+
 	
 	[displayView setBackgroundColor:[UIColor clearColor]];
 }
@@ -170,14 +197,12 @@
 }
 
 - (void)dealloc {
-	[coordinates release];
 	[captureSession release];
 	[centerLocation release];
     
     [sliderNumbers release];
 	
 	self.locationManager = nil;
-	self.coordinateViews = nil;
 	
     [super dealloc];
 }
@@ -260,8 +285,8 @@
         
 		[view removeFromSuperview];
 	}
-	[self.coordinates removeAllObjects];
-	[coordinateViews removeAllObjects];
+	[[DataManager shared].coordinates removeAllObjects];
+	[[DataManager shared].coordinateViews removeAllObjects];
 	
     
     // add new
@@ -269,8 +294,8 @@
 }
 
 - (void)clear{
-    [self.coordinates removeAllObjects];
-	[coordinateViews removeAllObjects];
+    [[DataManager shared].coordinates removeAllObjects];
+	[[DataManager shared].coordinateViews removeAllObjects];
 }
 
 /*
@@ -333,7 +358,7 @@
  */
 
 - (UIView *)viewForExistAnnotation:(UserAnnotation *)userAnnotation{
-    for(ARMarkerView *marker in coordinateViews){
+    for(ARMarkerView *marker in [DataManager shared].coordinateViews){
         if([marker.userAnnotation.fbUserId isEqualToString:userAnnotation.fbUserId]){
             return marker;
         }
@@ -345,13 +370,13 @@
  Add AR coordinate 
  */
 - (void)addCoordinate:(ARCoordinate *)coordinate augmentedView:(UIView *)agView animated:(BOOL)animated {
-	[self.coordinates addObject:coordinate];
+	[[DataManager shared].coordinates addObject:coordinate];
 	
 	if (coordinate.radialDistance > self.maximumScaleDistance) {
 		self.maximumScaleDistance = coordinate.radialDistance;
     }
 	
-	[coordinateViews addObject:agView];
+	[[DataManager shared].coordinateViews addObject:agView];
 }
 
 /*
@@ -362,9 +387,9 @@
 }
 
 - (void)removeCoordinate:(ARCoordinate *)coordinate animated:(BOOL)animated {
-	NSUInteger indexToRemove = [coordinates indexOfObject:coordinate];
-    [self.coordinates	 removeObjectAtIndex:indexToRemove];
-    [coordinateViews removeObjectAtIndex:indexToRemove];
+	NSUInteger indexToRemove = [[DataManager shared].coordinates indexOfObject:coordinate];
+    [[DataManager shared].coordinates removeObjectAtIndex:indexToRemove];
+    [[DataManager shared].coordinateViews removeObjectAtIndex:indexToRemove];
 }
 
 - (void)removeCoordinates:(NSArray *)coordinateArray {	
@@ -516,10 +541,10 @@
 
 - (void)updateMarkersPositionsForCenterLocation:(CLLocation *)_centerLocation 
 {
-    int index			= 0;
+    int index = 0;
 
-    if([self.coordinates count]){
-        for (ARGeoCoordinate *geoLocation in self.coordinates) 
+    if([[DataManager shared].coordinates count]){
+        for (ARGeoCoordinate *geoLocation in [DataManager shared].coordinates) 
         {
 		
             if ([geoLocation isKindOfClass:[ARGeoCoordinate class]]) {
@@ -531,7 +556,7 @@
             }
         
             // update distance
-            ARMarkerView *marker = [coordinateViews objectAtIndex:index];
+            ARMarkerView *marker = [[DataManager shared].coordinateViews objectAtIndex:index];
             [marker updateDistance:_centerLocation];
         
             ++index;
@@ -542,13 +567,13 @@
         // sort markers by distance
         int i,j;
         UIView *temp;
-        int n = [coordinateViews count];
+        int n = [[DataManager shared].coordinateViews count];
         for (i=0; i<n-1; i++) {
             for (j=0; j<n-1-i; j++) {
-                if ([[coordinateViews objectAtIndex:j] distance] > [[coordinateViews objectAtIndex:j+1] distance]) {
-                    temp = [[coordinateViews objectAtIndex:j] retain];
-                    [coordinateViews replaceObjectAtIndex:j withObject:[coordinateViews objectAtIndex:j+1]];
-                    [coordinateViews replaceObjectAtIndex:j+1 withObject:temp];
+                if ([[[DataManager shared].coordinateViews objectAtIndex:j] distance] > [[[DataManager shared].coordinateViews objectAtIndex:j+1] distance]) {
+                    temp = [[[DataManager shared].coordinateViews objectAtIndex:j] retain];
+                    [[DataManager shared].coordinateViews replaceObjectAtIndex:j withObject:[[DataManager shared].coordinateViews objectAtIndex:j+1]];
+                    [[DataManager shared].coordinateViews replaceObjectAtIndex:j+1 withObject:temp];
                     [temp release];
                 }
             }
@@ -563,7 +588,7 @@
 
 - (void)updateLocations {
 	
-	if (!coordinateViews || [coordinateViews count] == 0) {
+	if (![DataManager shared].coordinateViews || [[DataManager shared].coordinateViews count] == 0) {
 		return;
     }
 	
@@ -575,9 +600,9 @@
     int count = 0;
 
     
-	for (ARCoordinate *item in self.coordinates) {
+	for (ARCoordinate *item in [DataManager shared].coordinates) {
 		
-		ARMarkerView *viewToDraw = [coordinateViews objectAtIndex:index];
+		ARMarkerView *viewToDraw = [[DataManager shared].coordinateViews objectAtIndex:index];
 
 		if ([self viewportContainsView:viewToDraw forCoordinate:item] && (viewToDraw.distance < switchedDistance)) {
 			
@@ -788,6 +813,344 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 	CVPixelBufferUnlockBaseAddress(imageBuffer,0);
 	
 	[pool drain];
-} 
+}
+
+#pragma mark -
+#pragma mark UIActionSheetDelegate
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex{
+    int buttonsNum = actionSheet.numberOfButtons;
+    
+    switch (buttonIndex) {
+        case 0:{
+            
+            // Reply in public chat/Reply with quote
+            //
+            //                // move wheel to front
+            //                if(activityIndicator){
+            //                    [self.view bringSubviewToFront:activityIndicator];
+            //                }
+            //                //
+            // move all/friends switch to front
+            //            }
+            [self.view bringSubviewToFront:allFriendsSwitch];
+            
+            UITabBarController *tabBarController = ((AppDelegate *)self.delegate).tabBarController;
+            ChatViewController* chatController = (ChatViewController*)[tabBarController.viewControllers objectAtIndex:chatIndex];
+            [chatController setSelectedUserAnnotation:self.selectedUserAnnotation];
+            [chatController.messageField becomeFirstResponder];
+            
+            [tabBarController setSelectedIndex:chatIndex];
+            
+        }
+            
+            break;
+            
+        case 1: {
+            if(buttonsNum == 3){
+                // View personal FB page
+                [self actionSheetViewFBProfile];
+            }else{
+                // Send FB message
+                [self actionSheetSendPrivateFBMessage];
+            }
+        }
+            break;
+            
+        case 2: {
+            // View personal FB page
+            if(buttonsNum != 3){
+                [self actionSheetViewFBProfile];
+            }
+        }
+			
+            break;
+            
+        default:
+            break;
+    }
+    
+    [userActionSheet release];
+    userActionSheet = nil;
+    
+    self.selectedUserAnnotation = nil;
+}
+
+- (void)actionSheetViewFBProfile{
+    // View personal FB page
+    
+    NSString *url = [NSString stringWithFormat:@"http://www.facebook.com/profile.php?id=%@",self.selectedUserAnnotation.fbUserId];
+    
+    WebViewController *webViewControleler = [[WebViewController alloc] init];
+    webViewControleler.urlAdress = url;
+    [self.navigationController pushViewController:webViewControleler animated:YES];
+    [webViewControleler autorelease];
+}
+
+- (void) actionSheetSendPrivateFBMessage{
+    NSString *selectedFriendId = self.selectedUserAnnotation.fbUserId;
+    
+    // get conversation
+    Conversation *conversation = [[DataManager shared].historyConversation objectForKey:selectedFriendId];
+    if(conversation == nil){
+        // 1st message -> create conversation
+        
+        Conversation *newConversation = [[Conversation alloc] init];
+        
+        // add to
+        NSMutableDictionary *to = [NSMutableDictionary dictionary];
+        [to setObject:selectedFriendId forKey:kId];
+        [to setObject:[self.selectedUserAnnotation.fbUser objectForKey:kName] forKey:kName];
+        newConversation.to = to;
+        
+        // add messages
+        NSMutableArray *emptryArray = [[NSMutableArray alloc] init];
+        newConversation.messages = emptryArray;
+        [emptryArray release];
+        
+        [[DataManager shared].historyConversation setObject:newConversation forKey:selectedFriendId];
+        [newConversation release];
+        
+        conversation = newConversation;
+    }
+    
+    // show Chat
+    FBChatViewController *chatController = [[FBChatViewController alloc] initWithNibName:@"FBChatViewController" bundle:nil];
+    chatController.chatHistory = conversation;
+    [self.navigationController pushViewController:chatController animated:YES];
+    [chatController release];
+    
+}
+
+#pragma mark -
+#pragma mark Markers
+- (void)touchOnMarker:(UIView *)marker{
+    // get user name & id
+    NSString *userName = nil;
+    if([marker isKindOfClass:ARMarkerView.class]){ 
+        userName = ((ARMarkerView *)marker).userName.text;
+        self.selectedUserAnnotation = ((ARMarkerView *)marker).userAnnotation;
+    }
+    NSString* title;
+	NSString* subTitle;
+	
+	title = userName;
+	if ([selectedUserAnnotation.userStatus length] >=6)
+	{
+		if ([[self.selectedUserAnnotation.userStatus substringToIndex:6] isEqualToString:fbidIdentifier])
+		{
+			subTitle = [self.selectedUserAnnotation.userStatus substringFromIndex:[self.selectedUserAnnotation.userStatus rangeOfString:quoteDelimiter].location+1];
+		}
+		else
+		{
+			subTitle = self.selectedUserAnnotation.userStatus;
+		}
+	}
+	else
+	{
+		subTitle = self.selectedUserAnnotation.userStatus;
+	}
+	
+	subTitle = [NSString stringWithFormat:@"''%@''", subTitle];
+    
+    // show action sheet
+    [self showActionSheetWithTitle:title andSubtitle:subTitle];
+}
+
+- (void)showActionSheetWithTitle:(NSString *)title andSubtitle:(NSString *)subtitle
+{
+    // check yourself
+    if([selectedUserAnnotation.fbUserId isEqualToString:[DataManager shared].currentFBUserId]){
+        return;
+    }
+    
+    // is this friend?
+    BOOL isThisFriend = YES;
+    if(![[[DataManager shared].myFriendsAsDictionary allKeys] containsObject:selectedUserAnnotation.fbUserId]){
+        isThisFriend = NO;
+    }
+    
+    
+    // show Action Sheet
+    //
+    // add "Quote" item only in Chat
+    if(isThisFriend){
+        userActionSheet = [[UIActionSheet alloc] initWithTitle:title
+                                                      delegate:self
+                                             cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
+                                        destructiveButtonTitle:nil
+                                             otherButtonTitles:NSLocalizedString(@"Reply with quote", nil), NSLocalizedString(@"Send private FB message", nil), NSLocalizedString(@"View FB profile", nil), nil];
+    }else{
+        userActionSheet = [[UIActionSheet alloc] initWithTitle:title
+                                                      delegate:self
+                                             cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
+                                        destructiveButtonTitle:nil
+                                             otherButtonTitles:NSLocalizedString(@"Reply with quote", nil), NSLocalizedString(@"View FB profile", nil), nil];
+    }
+    
+	UILabel* titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 5, 280, 15)];
+	titleLabel.font = [UIFont boldSystemFontOfSize:14.0];
+	titleLabel.textAlignment = UITextAlignmentCenter;
+	titleLabel.backgroundColor = [UIColor clearColor];
+	titleLabel.textColor = [UIColor whiteColor];
+	titleLabel.text = title;
+	titleLabel.numberOfLines = 0;
+	[userActionSheet addSubview:titleLabel];
+	
+	UILabel* subTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 20, 280, 55)];
+	subTitleLabel.font = [UIFont boldSystemFontOfSize:12.0];
+	subTitleLabel.textAlignment = UITextAlignmentCenter;
+	subTitleLabel.backgroundColor = [UIColor clearColor];
+	subTitleLabel.textColor = [UIColor whiteColor];
+	subTitleLabel.text = subtitle;
+	subTitleLabel.numberOfLines = 0;
+	[userActionSheet addSubview:subTitleLabel];
+	
+	[subTitleLabel release];
+	[titleLabel release];
+	userActionSheet.title = @"";
+    
+	// Show
+	[userActionSheet showFromTabBar:self.tabBarController.tabBar];
+	
+	CGRect actionSheetRect = userActionSheet.frame;
+	actionSheetRect.origin.y -= 60.0;
+	actionSheetRect.size.height = 300.0;
+	[userActionSheet setFrame:actionSheetRect];
+	
+	for (int counter = 0; counter < [[userActionSheet subviews] count]; counter++)
+	{
+		UIView *object = [[userActionSheet subviews] objectAtIndex:counter];
+		if (![object isKindOfClass:[UILabel class]])
+		{
+			CGRect frame = object.frame;
+			frame.origin.y = frame.origin.y + 60.0;
+			object.frame = frame;
+		}
+	}
+}
+
+#pragma mark -
+#pragma mark Intreface based methods
+- (void) showWorld{
+    
+    // Map/AR points
+    //
+    [[DataManager shared].mapPoints removeAllObjects];
+    //
+    // 1. add All from QB
+    NSMutableArray *friendsIdsWhoAlreadyAdded = [NSMutableArray array];
+    for(UserAnnotation *mapAnnotation in [DataManager shared].allmapPoints){
+        [[DataManager shared].mapPoints addObject:mapAnnotation];
+        [friendsIdsWhoAlreadyAdded addObject:mapAnnotation.fbUserId];
+    }
+    //
+    // add checkin
+    NSArray *allCheckinsCopy = [[DataManager shared].allCheckins copy];
+    for (UserAnnotation* checkin in allCheckinsCopy){
+        if (![friendsIdsWhoAlreadyAdded containsObject:checkin.fbUserId]){
+            [[DataManager shared].mapPoints addObject:checkin];
+            [friendsIdsWhoAlreadyAdded addObject:checkin.fbUserId];
+        }else{
+            // compare datetimes - add newest
+            NSDate *newCreateDateTime = checkin.createdAt;
+            
+            int index = [friendsIdsWhoAlreadyAdded indexOfObject:checkin.fbUserId];
+            NSDate *currentCreateDateTime = ((UserAnnotation *)[[DataManager shared].mapPoints objectAtIndex:index]).createdAt;
+            
+            if([newCreateDateTime compare:currentCreateDateTime] == NSOrderedDescending){ //The receiver(newCreateDateTime) is later in time than anotherDate, NSOrderedDescending
+                [[DataManager shared].mapPoints replaceObjectAtIndex:index withObject:checkin];
+                [friendsIdsWhoAlreadyAdded replaceObjectAtIndex:index withObject:checkin.fbUserId];
+            }
+        }
+    }
+    [allCheckinsCopy release];
+    
+    // Chat points
+    //
+    [[DataManager shared].chatPoints removeAllObjects];
+    //
+    // 2. add Friends from FB
+    [[DataManager shared].chatPoints addObjectsFromArray:[DataManager shared].allChatPoints];
+    //
+    // add all checkins
+    for(UserAnnotation *checkinAnnotatin in [DataManager shared].allCheckins){
+        if(![[DataManager shared].chatPoints containsObject:checkinAnnotatin]){
+            [[DataManager shared].chatPoints addObject:checkinAnnotatin];
+        }
+    }
+        
+    // notify controllers
+    [self refreshWithNewPoints:[DataManager shared].mapPoints];
+}
+
+- (void) showFriends{
+    NSMutableArray *friendsIds = [[[DataManager shared].myFriendsAsDictionary allKeys] mutableCopy];
+    [friendsIds addObject:[DataManager shared].currentFBUserId];// add me
+    
+    // add only friends QB points
+    NSMutableArray *friendsIdsWhoAlreadyAdded = [NSMutableArray array];
+    for(UserAnnotation *mapAnnotation in [DataManager shared].allmapPoints){
+        if([friendsIds containsObject:[mapAnnotation.fbUser objectForKey:kId]]){
+            [[DataManager shared].mapPoints addObject:mapAnnotation];
+            
+            [friendsIdsWhoAlreadyAdded addObject:[mapAnnotation.fbUser objectForKey:kId]];
+        }
+    }
+    //
+    // add checkin
+    NSArray *allCheckinsCopy = [[DataManager shared].allCheckins copy];
+    for (UserAnnotation* checkin in allCheckinsCopy){
+        if (![friendsIdsWhoAlreadyAdded containsObject:checkin.fbUserId]){
+            [[DataManager shared].mapPoints addObject:checkin];
+            [friendsIdsWhoAlreadyAdded addObject:checkin.fbUserId];
+        }else{
+            // compare datetimes - add newest
+            NSDate *newCreateDateTime = checkin.createdAt;
+            
+            int index = [friendsIdsWhoAlreadyAdded indexOfObject:checkin.fbUserId];
+            NSDate *currentCreateDateTime = ((UserAnnotation *)[[DataManager shared].mapPoints objectAtIndex:index]).createdAt;
+            
+            if([newCreateDateTime compare:currentCreateDateTime] == NSOrderedDescending){ //The receiver(newCreateDateTime) is later in time than anotherDate, NSOrderedDescending
+                [[DataManager shared].mapPoints replaceObjectAtIndex:index withObject:checkin];
+                [friendsIdsWhoAlreadyAdded replaceObjectAtIndex:index withObject:checkin.fbUserId];
+            }
+        }
+    }
+    [allCheckinsCopy release];
+    
+    [self refreshWithNewPoints:[DataManager shared].mapPoints];
+}
+
+#pragma mark -
+#pragma mark Notifications reactions
+- (void)logoutDone{
+    showAllUsers  = NO;
+    
+    [self.allFriendsSwitch setValue:1.0f];
+    
+    [self.distanceLabel setText:[NSString stringWithFormat:@"%d km", 10]];
+    [self.distanceSlider setValue:2];
+    
+    [self dissmisAR];
+    [self clear];
+}
+
+-(void)doReceiveError:(NSNotification*)notification{
+    NSString* errorMessage = [notification.userInfo objectForKey:@"errorMessage"];
+    
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Errors", nil)
+                                                    message:errorMessage
+                                                   delegate:self
+                                          cancelButtonTitle:NSLocalizedString(@"Ok", nil)
+                                          otherButtonTitles:nil];
+    [alert show];
+    [alert release];
+}
+
+-(void)doUpdateMarkersForCenterLocation{
+    [self updateMarkersPositionsForCenterLocation:self.centerLocation];
+}
+
 
 @end
