@@ -196,7 +196,7 @@
     for (NSDictionary* friendInfo in [[DataManager shared] myFriends]) {
         NSDecimalNumber* friendId = [friendInfo objectForKey:kId];
         if (fabs(friendId.doubleValue - ann.ownerId.doubleValue) < 0.00001) {
-            NSMutableString* friendFullName = [[NSMutableString alloc] init];
+            NSMutableString* friendFullName = [[[NSMutableString alloc] init] autorelease];
             [friendFullName appendString:[friendInfo objectForKey:@"first_name"]];
             [friendFullName appendString:@" "];
             [friendFullName appendString:[friendInfo objectForKey:@"last_name"]];

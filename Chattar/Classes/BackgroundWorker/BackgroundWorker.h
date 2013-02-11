@@ -24,11 +24,8 @@
 -(void)willClearMessageField;
 -(void)didSuccessfulMessageSending;
 -(void)willScrollToTop;
-@end
-
-@protocol QBDataDelegate <NSObject>
-@optional
-
+-(void)willSetEnabledMessageField:(BOOL)enabled;
+-(void)willSetAllFriendsSwitchEnabled:(BOOL)switchEnabled;
 @end
 
 @protocol DataDelegate <NSObject>
@@ -66,13 +63,15 @@
 
 @optional
 -(void) willUpdatePointStatus:(UserAnnotation*)newPoint;
+-(void)willSetAllFriendsSwitchEnabled:(BOOL)switchEnabled;
 @end
 
 @protocol ARControllerDelegate <NSObject>
-
 @optional
 -(void)willUpdateMarkersForCenterLocation;
 -(void)willAddMarker;
+-(void)willSetEnabledDistanceSlider:(BOOL)sliderEnabled;
+-(void)willSetAllFriendsSwitchEnabled:(BOOL)switchEnabled;
 @end
 
 
@@ -95,7 +94,7 @@
     
 }
 
-@property (nonatomic, assign) id<FBDataDelegate,DataDelegate,QBDataDelegate,MapControllerDelegate,ChatControllerDelegate,ARControllerDelegate> tabBarDelegate;
+@property (nonatomic, assign) id<FBDataDelegate,DataDelegate,MapControllerDelegate,ChatControllerDelegate,ARControllerDelegate> tabBarDelegate;
 
 @property (nonatomic, retain) NSMutableArray* FBfriends;
 @property (assign) short initState;                 // 2 if all data(map/chat) was retrieved

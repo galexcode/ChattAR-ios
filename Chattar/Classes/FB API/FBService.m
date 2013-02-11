@@ -263,6 +263,7 @@ static FBService *instance = nil;
         [friendsIDsString deleteCharactersInRange:NSMakeRange([friendsIDsString length]-1, 1) ];
         // create queries
         NSString* firstQuery = [NSString stringWithFormat:@"SELECT src,src_small,place_id,created,pid FROM photo WHERE (pid IN (SELECT pid FROM photo_tag WHERE subject IN (%@)) OR pid IN (SELECT pid FROM photo WHERE aid IN (SELECT aid FROM album WHERE owner IN (%@) AND type!='profile'))) AND place_id>0",friendsIDsString,friendsIDsString];
+        [friendsIDsString release];
         
         NSString* secondQuery = @"SELECT name,latitude,longitude,page_id FROM place WHERE page_id IN (SELECT place_id FROM #query1)";
         

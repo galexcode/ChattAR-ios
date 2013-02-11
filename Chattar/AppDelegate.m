@@ -134,7 +134,8 @@
 	[settingsNavigationController release];
     [messagesNavigationController release];
 	[contactsNavigationController release];
-	
+	[chatNavigationController release];
+    [mapNavigationController release];
     // show window
 	self.window.rootViewController = self.tabBarController;
     [self.window makeKeyAndVisible];

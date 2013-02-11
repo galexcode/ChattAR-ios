@@ -216,10 +216,6 @@
         
         // add ignored annotations
         [super addAnnotations: [annotationsToIgnore allObjects]];
-        
-        // memory
-        [annotationsToCluster release];
-    
     }
     
     else{
@@ -229,6 +225,7 @@
         [super addAnnotations:annotationsToCluster];
     }
     
+    [annotationsToCluster release];
     
 }
 
