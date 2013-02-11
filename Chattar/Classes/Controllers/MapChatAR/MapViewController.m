@@ -38,10 +38,12 @@
         // logout
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(logoutDone) name:kNotificationLogout object:nil];
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doMapEndRetrievingData) name:kMapEndRetrievingData object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAddNewPoint:) name:kWillAddPointIsFBCheckin object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doUpdatePointStatus:) name:kWillUpdatePointStatus object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveError:) name:kDidReceiveError object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doShowAllFriends) name:kWillShowAllFriends object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doMapEndRetrievingData) name:kDidEndRetrievingInitialData object:nil ];
+        isDataRetrieved = NO;
 
     }
     return self;
@@ -143,12 +145,9 @@
 	[allFriendsSwitch setBackgroundColor:[UIColor clearColor]];
 	[self.view addSubview:allFriendsSwitch];
     
-//    _loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-//    _loadingIndicator.center = self.view.center;
-//    _loadingIndicator.tag = 1101;
-//    [self.view addSubview:_loadingIndicator];
-
-    
+    if (!isDataRetrieved) {
+        [_loadingIndicator startAnimating];
+    }
 }
 
 - (void)viewDidUnload
@@ -250,7 +249,7 @@
     }
     //
     // add checkin
-    NSArray *allCheckinsCopy = [self.allCheckins copy];
+    NSArray *allCheckinsCopy = [[DataManager shared].allCheckins copy];
     for (UserAnnotation* checkin in allCheckinsCopy){
         if (![friendsIdsWhoAlreadyAdded containsObject:checkin.fbUserId]){
             [[DataManager shared].mapPoints addObject:checkin];
@@ -456,7 +455,7 @@
             }
             
             // set touch action
-            marker.target = delegate;
+            marker.target = self;
             marker.action = @selector(touchOnMarker:);
 
             if (IS_IOS_6) {
@@ -596,16 +595,21 @@
     [self clear];
 }
 
+-(void)doShowAllFriends{
+    [self showWorld];
+}
+
 
 -(void)doMapEndRetrievingData{
-//    [activityIndicator removeFromSuperview];
-    [self.allFriendsSwitch setEnabled:YES];
-    NSLog(@"%d",[DataManager shared].mapPoints.count);
-    NSLog(@"%@",[DataManager shared].mapPointsIDs);
-    NSLog(@"%@",[DataManager shared].allmapPoints);
-    NSLog(@"%@",[DataManager shared].allCheckins);
+    [_loadingIndicator stopAnimating];
     
-    [self refreshWithNewPoints:[DataManager shared].mapPoints];
+    isDataRetrieved = YES;
+    [self.allFriendsSwitch setEnabled:YES];
+    
+    NSLog(@"%d",[DataManager shared].mapPoints.count);
+    NSLog(@"%d",[DataManager shared].allmapPoints.count);
+    
+    [self refreshWithNewPoints:[DataManager shared].allmapPoints];
 }
 
 -(void)doAddNewPoint:(NSNotification*)notification{
@@ -710,10 +714,23 @@
         case 0:{
             
             [self.view bringSubviewToFront:allFriendsSwitch];
+            AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+            
 
-            UITabBarController *tabBarController = ((AppDelegate *)self.delegate).tabBarController;
-            ChatViewController* chatController = (ChatViewController*)[tabBarController.viewControllers objectAtIndex:chatIndex];
+            UITabBarController *tabBarController = appDelegate.tabBarController;
+            NSLog(@"%@",tabBarController);
+            ChatViewController* chatController;
+            for (UIViewController* viewController in tabBarController.viewControllers) {
+                UIViewController *vc = viewController;
+                if ([viewController isKindOfClass:[UINavigationController class]]) {
+                    vc = [(UINavigationController*)viewController visibleViewController];
+                }
+                if ([vc isKindOfClass:[ChatViewController class]]) {
+                    chatController = (ChatViewController*)vc;
+                }
+            }
             [chatController setSelectedUserAnnotation:self.selectedUserAnnotation];
+            [chatController addQuote];
             [chatController.messageField becomeFirstResponder];
             
             [tabBarController setSelectedIndex:chatIndex];
@@ -905,9 +922,5 @@
 		}
 	}
 }
-
-#pragma mark -
-#pragma mark Notifications reactions
-
 
 @end

@@ -33,6 +33,8 @@
     NSMutableArray* annotationsForClustering;
     MKMapRect previousRect;
     BOOL showAllUsers;
+                                                     
+    BOOL isDataRetrieved;
 }
 
 @property (nonatomic, assign) id delegate;
