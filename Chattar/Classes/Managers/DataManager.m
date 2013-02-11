@@ -52,7 +52,7 @@ static DataManager *instance = nil;
 @synthesize chatPoints;
 @synthesize mapPoints;
 @synthesize coordinates;
-
+@synthesize chatMessagesIDs;
 @synthesize mapPointsIDs;
 
 + (DataManager *)shared {
@@ -98,6 +98,15 @@ static DataManager *instance = nil;
     [managedObjectModel release];
     [persistentStoreCoordinator release];
     [photosWithLocations release];
+
+    [coordinates release];
+    [chatPoints release];
+    [allChatPoints release];
+    [mapPoints release];
+    [allCheckins release];
+    [allmapPoints release];
+    [mapPointsIDs release];
+    [chatMessagesIDs release];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kNotificationLogout object:nil];
 	
@@ -381,7 +390,7 @@ static DataManager *instance = nil;
 	NSError *error;
     persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: [self managedObjectModel]];
                             // set options for automating migration
-    NSMutableDictionary* options = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary* options = [[[NSMutableDictionary alloc] init] autorelease];
     [options setValue:[NSNumber numberWithBool:YES] forKey:NSMigratePersistentStoresAutomaticallyOption];
     [options setValue:[NSNumber numberWithBool:YES] forKey:NSInferMappingModelAutomaticallyOption];
     
@@ -401,7 +410,6 @@ static DataManager *instance = nil;
         return nil;
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:@"persistentStorageInitSuccess" object:self];
-    [options release];
     return persistentStoreCoordinator;
 }
 
@@ -723,7 +731,7 @@ static DataManager *instance = nil;
     
     NSError* fetchError = nil;
     NSArray* fetchResults = [ctx executeFetchRequest:fetchRequest error:&fetchError];
-    
+    [fetchRequest release];
     if (fetchError) {
         NSLog(@"ERROR FETCHING PHOTOS %@",fetchError.domain);
         return nil;
@@ -767,6 +775,7 @@ static DataManager *instance = nil;
         [photoToSave setOwnerId:photo.ownerId];
         NSError* error = nil;
         [context save:&error];
+        [photoToSave release];
         
         if (error) {
             NSLog(@"ERROR ADDING PHOTO %@",error.domain);
