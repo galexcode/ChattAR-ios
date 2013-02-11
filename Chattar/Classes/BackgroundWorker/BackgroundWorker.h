@@ -35,8 +35,6 @@
 
 @optional
 -(void)didReceiveError:(NSString*)errorMessage;
--(void)chatEndRetrievingData;
--(void)mapEndRetrievingData;
 
 -(void) didReceiveCachedMapPoints:(NSArray*)cachedMapPoints;
 -(void) didReceiveCachedMapPointsIDs:(NSArray*)cachedMapIDs;
@@ -47,7 +45,9 @@
 -(void)didReceiveErrorLoadingNewChatPoints;
 -(void)didReceiveCachedChatPoints:(NSArray*)cachedChatPoints;
 -(void)didReceiveCachedChatMessagesIDs:(NSArray*)cachedChatMessagesIDs;
+-(void)willShowAllFriends;
 
+-(void)endOfRetrievingInitialData;
 @end
 
 
@@ -73,7 +73,6 @@
 @optional
 -(void)willUpdateMarkersForCenterLocation;
 -(void)willAddMarker;
--(void)AREndOfRetrieveInitialData;
 @end
 
 
@@ -99,8 +98,7 @@
 @property (nonatomic, assign) id<FBDataDelegate,DataDelegate,QBDataDelegate,MapControllerDelegate,ChatControllerDelegate,ARControllerDelegate> tabBarDelegate;
 
 @property (nonatomic, retain) NSMutableArray* FBfriends;
-@property (assign) short chatInitState;                 // 2 if all data(map/chat) was retrieved
-@property (assign) short mapInitState;
+@property (assign) short initState;                 // 2 if all data(map/chat) was retrieved
 @property (assign) short numberOfCheckinsRetrieved;
 
 

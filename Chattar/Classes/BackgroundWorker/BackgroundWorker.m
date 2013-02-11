@@ -19,8 +19,7 @@
 @implementation BackgroundWorker
 @synthesize tabBarDelegate;
 @synthesize FBfriends;
-@synthesize chatInitState;
-@synthesize mapInitState;
+@synthesize initState;
 @synthesize numberOfCheckinsRetrieved;
 
 static BackgroundWorker* instance = nil;
@@ -37,8 +36,7 @@ static BackgroundWorker* instance = nil;
 
 -(id)init{
     if (self = [super init]) {
-        self.chatInitState = 0;
-        self.mapInitState = 0;
+        self.initState = 0;
         
         CLLocationManager* locationManager = [[[CLLocationManager alloc] init] autorelease];
         [locationManager startMonitoringSignificantLocationChanges];
@@ -168,6 +166,13 @@ static BackgroundWorker* instance = nil;
     }
     [chatPoints release];
     
+    if ([DataManager shared].allChatPoints > 0) {
+        if ([tabBarDelegate respondsToSelector:@selector(willShowAllFriends)]) {
+            [tabBarDelegate willShowAllFriends];
+            [self retrieveNewQBData];
+        }
+    }
+    
     if ([tabBarDelegate respondsToSelector:@selector(didReceiveCachedChatMessagesIDs:)]) {
         [tabBarDelegate didReceiveCachedChatMessagesIDs:chatMessagesIDs];
     }
@@ -189,7 +194,6 @@ static BackgroundWorker* instance = nil;
 	[QBLocation geoDataWithRequest:searchChatMessagesRequest delegate:self context:chatSearch];
 	[searchChatMessagesRequest release];
     
-    [self retrieveNewQBData];
 }
 
 - (void)retrieveCachedFBCheckinsAndRequestNewCheckins{
@@ -413,28 +417,6 @@ static BackgroundWorker* instance = nil;
                 }
                 [checkinAnnotation release];
                 [chatAnnotation release];
-                
-                ++self.chatInitState;
-                
-                if(self.chatInitState == 2){
-                    dispatch_async( dispatch_get_main_queue(), ^{
-                        if ([tabBarDelegate respondsToSelector:@selector(chatEndRetrievingData)]) {
-                            [tabBarDelegate chatEndRetrievingData];
-                        }
-                    });
-                }
-                
-                ++self.mapInitState;
-                
-                if(self.chatInitState == 2){
-                    dispatch_async( dispatch_get_main_queue(), ^{
-                        if ([tabBarDelegate respondsToSelector:@selector(mapEndRetrievingData)]) {
-                            [tabBarDelegate chatEndRetrievingData];
-                        }
-                    });
-                }
-
-
             }
         }
     }
@@ -602,13 +584,13 @@ static BackgroundWorker* instance = nil;
     
     
     // all data was retrieved
-    ++self.chatInitState;
+    ++self.initState;
 
     NSLog(@"CHAT INIT OK");
-    if(self.chatInitState == 2){
+    if(self.initState == 2){
         dispatch_async( dispatch_get_main_queue(), ^{
-            if ([tabBarDelegate respondsToSelector:@selector(chatEndRetrievingData)]) {
-                [tabBarDelegate chatEndRetrievingData];
+            if ([tabBarDelegate respondsToSelector:@selector(endOfRetrievingInitialData)]) {
+                [tabBarDelegate endOfRetrievingInitialData];
             }
         });
     }
@@ -687,12 +669,12 @@ static BackgroundWorker* instance = nil;
     [mapPointsMutable release];
     
     // all data was retrieved
-    ++self.mapInitState;
+    ++self.initState;
     NSLog(@"MAP INIT OK");
-    if(self.mapInitState == 2){
+    if(self.initState == 2){
         dispatch_async( dispatch_get_main_queue(), ^{
-            if ([tabBarDelegate respondsToSelector:@selector(mapEndRetrievingData)]) {
-                [tabBarDelegate mapEndRetrievingData];
+            if ([tabBarDelegate respondsToSelector:@selector(endOfRetrievingInitialData)]) {
+                [tabBarDelegate endOfRetrievingInitialData];
             }
         });
     }
@@ -758,18 +740,23 @@ static BackgroundWorker* instance = nil;
            else if([((NSString *)contextInfo) isEqualToString:mapSearch]){
                 
                 // get string of fb users ids
-                NSMutableArray *fbMapUsersIds = [[NSMutableArray alloc] init];
-                NSMutableArray *geodataProcessed = [NSMutableArray array];
+               NSMutableArray *fbMapUsersIds = [[NSMutableArray alloc] init];
+               NSMutableArray *geodataProcessed = [NSMutableArray array];
+               NSLog(@"%@",geoDataSearchResult.geodata);
                 
-                for (QBLGeoData *geodata in geoDataSearchResult.geodata){
-
-                    //add users with only nonzero coordinates
-                    if(geodata.latitude != 0 && geodata.longitude != 0){
-                        [fbMapUsersIds addObject:geodata.user.facebookID];
-                        
-                        [geodataProcessed addObject:geodata];
-                    }
-                }
+               for (QBLGeoData *geodata in geoDataSearchResult.geodata){
+                   // skip if already exist
+                   if([[DataManager shared].mapPointsIDs containsObject:[NSString stringWithFormat:@"%d", geodata.ID]]){
+                       continue;
+                   }
+                   
+                   //add users with only nonzero coordinates
+                   if(geodata.latitude != 0 && geodata.longitude != 0){
+                       [fbMapUsersIds addObject:geodata.user.facebookID];
+                       
+                       [geodataProcessed addObject:geodata];
+                   }
+               }
                 if([fbMapUsersIds count] == 0){
                     [fbMapUsersIds release];
                     return;
@@ -805,6 +792,11 @@ static BackgroundWorker* instance = nil;
                 
                 for (QBLGeoData *geodata in geoDataSearchResult.geodata){
                     // skip if already exist
+                    
+                    if([[DataManager shared].mapPointsIDs containsObject:[NSString stringWithFormat:@"%d", geodata.ID]]){
+                        continue;
+                    }
+
                     [fbChatUsersIds addObject:geodata.user.facebookID];
                     
                     [geodataProcessed addObject:geodata];
@@ -980,11 +972,11 @@ static BackgroundWorker* instance = nil;
                     NSDictionary *resultError = [result.body objectForKey:kError];
                     if(resultError != nil){
                         // all data was retrieved
-                        ++self.mapInitState;
+                        ++self.initState;
                         NSLog(@"MAP INIT FB ERROR");
-                        if(self.mapInitState == 2){
+                        if(self.initState == 2){
                             if ([tabBarDelegate respondsToSelector:@selector(mapEndRetrievingData)]) {
-                                [tabBarDelegate mapEndRetrievingData];
+                                [tabBarDelegate endOfRetrievingInitialData];
                             }
                         }
                         return;
@@ -1003,11 +995,11 @@ static BackgroundWorker* instance = nil;
                     
                     // Undefined format
                 }else{
-                    ++self.mapInitState;
+                    ++self.initState;
                     NSLog(@"MAP INIT FB Undefined format");
-                    if(self.mapInitState == 2){
-                        if ([tabBarDelegate respondsToSelector:@selector(mapEndRetrievingData)]) {
-                            [tabBarDelegate mapEndRetrievingData];
+                    if(self.initState == 2){
+                        if ([tabBarDelegate respondsToSelector:@selector(endOfRetrievingInitialData)]) {
+                            [tabBarDelegate endOfRetrievingInitialData];
                         }
                         
                     }
@@ -1020,11 +1012,11 @@ static BackgroundWorker* instance = nil;
                     NSDictionary *resultError = [result.body objectForKey:kError];
                     if(resultError != nil){
                         // all data was retrieved
-                        ++self.chatInitState;
+                        ++self.initState;
                         NSLog(@"CHAT INIT FB ERROR");
-                        if(self.chatInitState == 2){
-                            if ([tabBarDelegate respondsToSelector:@selector(chatEndRetrievingData)]) {
-                                [tabBarDelegate chatEndRetrievingData];
+                        if(self.initState == 2){
+                            if ([tabBarDelegate respondsToSelector:@selector(endOfRetrievingInitialData)]) {
+                                [tabBarDelegate endOfRetrievingInitialData];
                             }
                         }
                         return;
@@ -1044,11 +1036,11 @@ static BackgroundWorker* instance = nil;
                     
                     // Undefined format
                 }else{
-                    ++self.chatInitState;
+                    ++self.initState;
                     NSLog(@"CHAT INIT FB Undefined format");
-                    if(self.chatInitState == 2){
-                        if ([tabBarDelegate respondsToSelector:@selector(chatEndRetrievingData)]) {
-                            [tabBarDelegate chatEndRetrievingData];
+                    if(self.initState == 2){
+                        if ([tabBarDelegate respondsToSelector:@selector(endOfRetrievingInitialData)]) {
+                            [tabBarDelegate endOfRetrievingInitialData];
                         }
                     }
                 }
