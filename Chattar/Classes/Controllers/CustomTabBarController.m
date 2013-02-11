@@ -163,15 +163,19 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:kDidReceiveError object:nil userInfo:error];
 }
 
+-(void)willShowAllFriends{
+    [[NSNotificationCenter defaultCenter] postNotificationName:kWillShowAllFriends object:nil];
+}
+
+-(void)endOfRetrievingInitialData{
+    [[NSNotificationCenter defaultCenter] postNotificationName:kDidEndRetrievingInitialData object:nil];
+}
+
 
 #pragma mark -
 #pragma mark ChatControllerDelegate Methods
 -(void)didSuccessfulMessageSending{
     [[NSNotificationCenter defaultCenter] postNotificationName:kDidSuccessfulMessageSending object:nil];
-}
-
--(void)chatEndRetrievingData{
-    [[NSNotificationCenter defaultCenter] postNotificationName:kChatEndRetrievingData object:nil];
 }
 
 -(void)willRemoveLastChatPoint{
@@ -207,10 +211,6 @@
 
 #pragma mark -
 #pragma mark MapControllerDelegate Methods
--(void)mapEndRetrievingData{
-    [[NSNotificationCenter defaultCenter] postNotificationName:kMapEndRetrievingData object:nil];
-}
-
 -(void)willAddNewPoint:(UserAnnotation *)point isFBCheckin:(BOOL)isFBCheckin{
     NSMutableDictionary* newPointData = [[[NSMutableDictionary alloc] init] autorelease];
     [newPointData setObject:point forKey:@"newPoint"];

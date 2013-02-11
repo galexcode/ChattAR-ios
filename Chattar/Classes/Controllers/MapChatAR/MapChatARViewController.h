@@ -33,6 +33,7 @@ MKMapViewDelegate>{
     dispatch_queue_t processPhotosWithLocationsQueue;
     
     BOOL showAllUsers;
+    
 }
 
 @property (assign) NSMutableArray* allMapPoints;

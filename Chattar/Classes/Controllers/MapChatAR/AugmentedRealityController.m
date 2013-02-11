@@ -86,6 +86,8 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(logoutDone) name:kNotificationLogout object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doUpdateMarkersForCenterLocation) name:kwillUpdateMarkersForCenterLocation object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveError:) name:kDidReceiveError object:nil ];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doShowAllFriends) name:kWillShowAllFriends object:nil ];
+
 
     }
     return self;
@@ -203,6 +205,7 @@
     [sliderNumbers release];
 	
 	self.locationManager = nil;
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 	
     [super dealloc];
 }
@@ -1124,6 +1127,10 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 #pragma mark -
 #pragma mark Notifications reactions
+-(void)doShowAllFriends{
+    [self showWorld];
+}
+
 - (void)logoutDone{
     showAllUsers  = NO;
     
