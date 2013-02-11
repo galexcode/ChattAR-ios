@@ -31,6 +31,8 @@
 	BOOL isLoadingMoreMessages;
     
     BOOL showAllUsers;
+    
+    BOOL isDataRetrieved;
 }
 
 @property (nonatomic, assign) id delegate;

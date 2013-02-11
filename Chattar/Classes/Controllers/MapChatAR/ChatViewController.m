@@ -45,13 +45,14 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doClearMessageField) name:kWillClearMessageField object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doRemoveLastChatPoint) name:kWillRemoveLastChatPoint object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAddNewPointToChat:) name:kWillAddNewMessageToChat object:nil ];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChatEndRetrievingData) name:kChatEndRetrievingData object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveError:) name:kDidReceiveError object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doNotReceiveNewChatPoints) name:kDidNotReceiveNewChatPoints object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveErrorLoadingNewChatPoints) name:kdidReceiveErrorLoadingNewChatPoints object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doSuccessfulMessageSending) name:kDidSuccessfulMessageSending object:nil ];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doShowAllFriends) name:kWillShowAllFriends object:nil ];
 
-        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChatEndRetrievingData) name:kDidEndRetrievingInitialData object:nil ];
+
     }
     return self;
 }
@@ -94,11 +95,9 @@
 	[allFriendsSwitch setBackgroundColor:[UIColor clearColor]];
 	[self.view addSubview:allFriendsSwitch];
     
-    _loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-    _loadingIndicator.center = self.view.center;
-    _loadingIndicator.tag = 1101;
-    [self.view addSubview:_loadingIndicator];
-    [_loadingIndicator startAnimating];
+    if (!isDataRetrieved) {
+        [_loadingIndicator startAnimating];
+    }
 }
 
 - (void)removeQuote
@@ -340,7 +339,6 @@
 
     // add new
     // sort chat messaged due to created date
-    
 	NSSortDescriptor *sortDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"createdAt" ascending: NO] autorelease];
 	NSArray* sortedArray = [[DataManager shared].chatPoints sortedArrayUsingDescriptors:[NSArray arrayWithObject:sortDescriptor]];
 
@@ -977,6 +975,9 @@
 
 #pragma mark -
 #pragma mark Notifications Reaction
+-(void)doShowAllFriends{
+    [self showWorld];
+}
 -(void)doSuccessfulMessageSending{
     [sendMessageActivityIndicator stopAnimating];
     messageField.rightView = nil;
@@ -985,7 +986,9 @@
 
 -(void)doChatEndRetrievingData{
     messageField.enabled = YES;
-    [_loadingIndicator removeFromSuperview];
+    isDataRetrieved = YES;
+    
+    [_loadingIndicator stopAnimating];
     
     NSLog(@"%@",[DataManager shared].allChatPoints);
     NSLog(@"%@",[DataManager shared].chatMessagesIDs);
@@ -993,7 +996,8 @@
     NSLog(@"%@",[DataManager shared].allCheckins);
     
 
-    [messagesTableView reloadData];
+//    [messagesTableView reloadData];
+    [self refresh];
 }
 -(void)doUpdate{
     [self refresh];
