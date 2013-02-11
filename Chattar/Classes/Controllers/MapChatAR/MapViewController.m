@@ -43,6 +43,8 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveError:) name:kDidReceiveError object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doShowAllFriends) name:kWillShowAllFriends object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doMapEndRetrievingData) name:kDidEndRetrievingInitialData object:nil ];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetAllFriendsSwitchEnabled:) name:kWillSetAllFriendsSwitchEnabled object:nil ];
+        
         isDataRetrieved = NO;
 
     }
@@ -198,6 +200,7 @@
 
 - (void)refreshWithNewPoints:(NSArray *)newMapPoints{
     // remove old
+    NSLog(@"%@",mapView.annotations);
 	[mapView removeAnnotations:mapView.annotations];
 	
     // add new
@@ -289,7 +292,7 @@
             [friendsIdsWhoAlreadyAdded addObject:[mapAnnotation.fbUser objectForKey:kId]];
         }
     }
-    //
+    [friendsIds release];
     // add checkin
     NSArray *allCheckinsCopy = [[DataManager shared].allCheckins copy];
     for (UserAnnotation* checkin in allCheckinsCopy){
@@ -599,17 +602,18 @@
     [self showWorld];
 }
 
+-(void)doWillSetAllFriendsSwitchEnabled:(NSNotification*)notification{
+    BOOL enabled = [[[notification userInfo] objectForKey:@"switchEnabled"] boolValue];
+    [allFriendsSwitch setEnabled:enabled];
+}
+
+
 
 -(void)doMapEndRetrievingData{
     [_loadingIndicator stopAnimating];
     
     isDataRetrieved = YES;
     [self.allFriendsSwitch setEnabled:YES];
-    
-    NSLog(@"%d",[DataManager shared].mapPoints.count);
-    NSLog(@"%d",[DataManager shared].allmapPoints.count);
-    
-    [self refreshWithNewPoints:[DataManager shared].allmapPoints];
 }
 
 -(void)doAddNewPoint:(NSNotification*)notification{
@@ -718,8 +722,7 @@
             
 
             UITabBarController *tabBarController = appDelegate.tabBarController;
-            NSLog(@"%@",tabBarController);
-            ChatViewController* chatController;
+            ChatViewController* chatController = nil;
             for (UIViewController* viewController in tabBarController.viewControllers) {
                 UIViewController *vc = viewController;
                 if ([viewController isKindOfClass:[UINavigationController class]]) {

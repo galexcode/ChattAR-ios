@@ -18,7 +18,7 @@
 
 @protocol FBDataDelegate;
 @interface MapViewController : UIViewController <MKMapViewDelegate, UIGestureRecognizerDelegate,PhotoMarkerProtocol,
-                                                 FBDataDelegate, QBDataDelegate, MapControllerDelegate,  DataDelegate,UIActionSheetDelegate>{
+                                                 FBDataDelegate, MapControllerDelegate,  DataDelegate,UIActionSheetDelegate>{
     CGFloat count;
     CGFloat lastCount;
     
