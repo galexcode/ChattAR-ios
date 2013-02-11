@@ -43,6 +43,9 @@
 #define kAREndOfRetrieveInitialData @"kAREndOfRetrieveInitialData"
 #define kWillShowAllFriends @"kWillShowAllFriends"
 #define kDidEndRetrievingInitialData @"kDidEndRetrievingInitialData"
+#define kWillSetAllFriendsSwitchEnabled @"kWillSetAllFriendsSwitchEnabled"
+#define kWillSetMessageFieldEnabled @"kWillSetMessageFieldEnabled"
+#define kWillSetDistanceSliderEnabled @"kWillSetDistanceSliderEnabled"
 // Strings
 #define appName @"ChattAR"
 
