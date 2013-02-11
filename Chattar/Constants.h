@@ -28,8 +28,6 @@
 #define kDidNotReceiveNewChatPoints @"kDidNotReceiveNewChatPoints"
 #define kDidReceiveError @"kDidReceiveError"
 #define kDidSuccessfulMessageSending @"kDidSuccessfulMessageSending"
-#define kChatEndRetrievingData @"kChatRetrievingData"
-#define kMapEndRetrievingData @"kMapEndRetrievingData"
 #define kWillRemoveLastChatPoint @"kWillRemoveLastChatPoint"
 #define kdidReceiveErrorLoadingNewChatPoints @"kdidReceiveErrorLoadingNewChatPoints"
 #define kWillUpdate @"kWillUpdate"
@@ -43,6 +41,8 @@
 #define kWillScrollToTop @"kWillScrollToTop"
 #define kwillUpdateMarkersForCenterLocation @"kwillUpdateMarkersForCenterLocation"
 #define kAREndOfRetrieveInitialData @"kAREndOfRetrieveInitialData"
+#define kWillShowAllFriends @"kWillShowAllFriends"
+#define kDidEndRetrievingInitialData @"kDidEndRetrievingInitialData"
 // Strings
 #define appName @"ChattAR"
 
