@@ -87,8 +87,12 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doUpdateMarkersForCenterLocation) name:kwillUpdateMarkersForCenterLocation object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveError:) name:kDidReceiveError object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doShowAllFriends) name:kWillShowAllFriends object:nil ];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAREndRetrievingData) name:kDidEndRetrievingInitialData object:nil ];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetDistanceSliderEnabled:) name:kWillSetDistanceSliderEnabled object:nil ];
+        
+        isDataRetrieved = NO;
 
-
+        
     }
     return self;
 }
@@ -192,9 +196,16 @@
 
 	
 	[displayView setBackgroundColor:[UIColor clearColor]];
+    [self displayAR];
+    [self.view bringSubviewToFront:_loadingIndicator];
+    
+    if (!isDataRetrieved) {
+        [_loadingIndicator startAnimating];
+    }
 }
 
 - (void)viewDidUnload{
+    [self setLoadingIndicator:nil];
     [super viewDidUnload];
 }
 
@@ -207,6 +218,7 @@
 	self.locationManager = nil;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	
+    [_loadingIndicator release];
     [super dealloc];
 }
 
@@ -351,7 +363,7 @@
  */
 - (UIView *)viewForAnnotation:(UserAnnotation *)userAnnotation{
     ARMarkerView *marker = [[[ARMarkerView alloc] initWithGeoPoint:userAnnotation] autorelease];
-    marker.target = delegate;
+    marker.target = self;
     marker.action = @selector(touchOnMarker:);
     return marker;
 }
@@ -826,21 +838,24 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     
     switch (buttonIndex) {
         case 0:{
-            
-            // Reply in public chat/Reply with quote
-            //
-            //                // move wheel to front
-            //                if(activityIndicator){
-            //                    [self.view bringSubviewToFront:activityIndicator];
-            //                }
-            //                //
-            // move all/friends switch to front
-            //            }
             [self.view bringSubviewToFront:allFriendsSwitch];
             
-            UITabBarController *tabBarController = ((AppDelegate *)self.delegate).tabBarController;
-            ChatViewController* chatController = (ChatViewController*)[tabBarController.viewControllers objectAtIndex:chatIndex];
+            AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+            
+            
+            UITabBarController *tabBarController = appDelegate.tabBarController;
+            ChatViewController* chatController = nil;
+            for (UIViewController* viewController in tabBarController.viewControllers) {
+                UIViewController *vc = viewController;
+                if ([viewController isKindOfClass:[UINavigationController class]]) {
+                    vc = [(UINavigationController*)viewController visibleViewController];
+                }
+                if ([vc isKindOfClass:[ChatViewController class]]) {
+                    chatController = (ChatViewController*)vc;
+                }
+            }
             [chatController setSelectedUserAnnotation:self.selectedUserAnnotation];
+            [chatController addQuote];
             [chatController.messageField becomeFirstResponder];
             
             [tabBarController setSelectedIndex:chatIndex];
@@ -1035,6 +1050,39 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 #pragma mark -
 #pragma mark Intreface based methods
+
+- (void)allFriendsSwitchValueDidChanged:(id)sender{
+    
+    // switch All/Friends
+    float origValue = [(CustomSwitch *)sender value];
+    int stateValue;
+    if(origValue >= worldValue){
+        stateValue = 1;
+    }else if(origValue <= friendsValue){
+        stateValue = 0;
+    }
+    
+    switch (stateValue) {
+            // show Friends
+        case 0:{
+            if(!showAllUsers){
+                [self showFriends];
+                showAllUsers = YES;
+            }
+        }
+            break;
+            
+            // show World
+        case 1:{
+            if(showAllUsers){
+                [self showWorld];
+                showAllUsers = NO;
+            }
+        }
+            break;
+    }
+}
+
 - (void) showWorld{
     
     // Map/AR points
@@ -1083,7 +1131,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         }
     }
         
-    // notify controllers
     [self refreshWithNewPoints:[DataManager shared].mapPoints];
 }
 
@@ -1100,6 +1147,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
             [friendsIdsWhoAlreadyAdded addObject:[mapAnnotation.fbUser objectForKey:kId]];
         }
     }
+    [friendsIds release];
     //
     // add checkin
     NSArray *allCheckinsCopy = [[DataManager shared].allCheckins copy];
@@ -1129,6 +1177,23 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 #pragma mark Notifications reactions
 -(void)doShowAllFriends{
     [self showWorld];
+}
+
+-(void)doWillSetAllFriendsSwitchEnabled:(NSNotification*)notification{
+    BOOL enabled = [[[notification userInfo] objectForKey:@"switchEnabled"] boolValue];
+    [allFriendsSwitch setEnabled:enabled];
+}
+
+-(void)doWillSetDistanceSliderEnabled:(NSNotification*)notification{
+    BOOL enabled = [[[notification userInfo] objectForKey:@"distanceSliderEnabled"] boolValue];
+    [distanceSlider setEnabled:enabled];
+}
+
+-(void)doAREndRetrievingData{
+    [_loadingIndicator stopAnimating];
+    [self.distanceSlider setEnabled:YES];
+    [allFriendsSwitch setEnabled:YES];
+    isDataRetrieved = YES;
 }
 
 - (void)logoutDone{

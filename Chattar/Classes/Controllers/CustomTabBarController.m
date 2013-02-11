@@ -111,6 +111,7 @@
     }
     else
         [[DataManager shared].allmapPoints addObjectsFromArray:cachedMapPoints];
+    NSLog(@"%d",[DataManager shared].allmapPoints.count);
     
     if (![DataManager shared].mapPoints) {
         [DataManager shared].mapPoints = [[NSMutableArray alloc] init];
@@ -194,6 +195,12 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:kWillClearMessageField object:nil];
 }
 
+-(void)willSetAllFriendsSwitchEnabled:(BOOL)switchEnabled{
+    NSMutableDictionary* data = [[[NSMutableDictionary alloc] init] autorelease];
+    [data setObject:[NSNumber numberWithBool:switchEnabled] forKey:@"switchEnabled"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kWillSetAllFriendsSwitchEnabled object:nil userInfo:data];
+}
+
 -(void)willAddNewMessageToChat:(UserAnnotation *)annotation addToTop:(BOOL)toTop withReloadTable:(BOOL)reloadTable isFBCheckin:(BOOL)isFBCheckin{
     NSMutableDictionary* newMessageData = [[[NSMutableDictionary alloc] init] autorelease];
     [newMessageData setObject:annotation forKey:@"newMessage"];
@@ -206,6 +213,12 @@
 
 -(void)willScrollToTop{
     [[NSNotificationCenter defaultCenter] postNotificationName:kWillScrollToTop object:nil];
+}
+
+-(void)willSetEnabledMessageField:(BOOL)enabled{
+    NSMutableDictionary* data = [[[NSMutableDictionary alloc] init] autorelease];
+    [data setObject:[NSNumber numberWithBool:enabled] forKey:@"messageFieldEnabled"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kWillSetMessageFieldEnabled object:nil userInfo:data];
 }
 
 
@@ -241,6 +254,12 @@
 
 -(void)AREndOfRetrieveInitialData{
     [[NSNotificationCenter defaultCenter] postNotificationName:kAREndOfRetrieveInitialData object:nil];
+}
+
+-(void)willSetEnabledDistanceSlider:(BOOL)sliderEnabled{
+    NSMutableDictionary* data = [[[NSMutableDictionary alloc] init] autorelease];
+    [data setObject:[NSNumber numberWithBool:sliderEnabled] forKey:@"sliderEnabled"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kWillSetDistanceSliderEnabled object:nil userInfo:data];
 }
 
 

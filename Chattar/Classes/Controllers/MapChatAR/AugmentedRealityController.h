@@ -25,6 +25,8 @@
     
     NSMutableArray *sliderNumbers;
     BOOL showAllUsers;
+    
+    BOOL isDataRetrieved;
 }
 
 @property (nonatomic, assign) BOOL scaleViewsBasedOnDistance;
@@ -48,6 +50,7 @@
 @property (nonatomic, assign) id delegate;
 
 @property (nonatomic, assign) UISlider* distanceSlider;
+@property (retain, nonatomic) IBOutlet UIActivityIndicatorView *loadingIndicator;
 @property (nonatomic, assign) UILabel* distanceLabel;
 @property (nonatomic, retain) UIActionSheet* userActionSheet;
 @property (retain) UserAnnotation *selectedUserAnnotation;

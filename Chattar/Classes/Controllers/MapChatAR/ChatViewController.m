@@ -52,6 +52,8 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doShowAllFriends) name:kWillShowAllFriends object:nil ];
 
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChatEndRetrievingData) name:kDidEndRetrievingInitialData object:nil ];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetAllFriendsSwitchEnabled:) name:kWillSetAllFriendsSwitchEnabled object:nil ];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetMessageFieldEnabled:) name:kWillSetMessageFieldEnabled object:nil ];
 
     }
     return self;
@@ -975,6 +977,16 @@
 
 #pragma mark -
 #pragma mark Notifications Reaction
+-(void)doWillSetAllFriendsSwitchEnabled:(NSNotification*)notification{
+    BOOL enabled = [[[notification userInfo] objectForKey:@"switchEnabled"] boolValue];
+    [allFriendsSwitch setEnabled:enabled];
+}
+
+-(void)doWillSetMessageFieldEnabled:(NSNotification*)notification{
+    BOOL enabled = [[[notification userInfo] objectForKey:@"messageFieldEnabled"] boolValue];
+    [messageField setEnabled:enabled];
+}
+
 -(void)doShowAllFriends{
     [self showWorld];
 }
@@ -989,14 +1001,8 @@
     isDataRetrieved = YES;
     
     [_loadingIndicator stopAnimating];
-    
-    NSLog(@"%@",[DataManager shared].allChatPoints);
-    NSLog(@"%@",[DataManager shared].chatMessagesIDs);
-    NSLog(@"%@",[DataManager shared].chatPoints);
-    NSLog(@"%@",[DataManager shared].allCheckins);
-    
-
-//    [messagesTableView reloadData];
+        
+    [allFriendsSwitch setEnabled:YES];
     [self refresh];
 }
 -(void)doUpdate{
@@ -1032,10 +1038,6 @@
     // Add to Chat
     __block BOOL addedToCurrentChatState = NO;
     
-    if (![DataManager shared].chatPoints) {
-        [DataManager shared].chatPoints = [[NSMutableArray alloc] init];
-    }
-
     dispatch_async( dispatch_get_main_queue(), ^{
 
         // New messages
