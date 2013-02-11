@@ -168,7 +168,7 @@
 }
 
 - (NSString *)description{
-    return [NSString stringWithFormat:@"distance=%d", distance];
+    return [NSString stringWithFormat:@"distance=%d\n annotation=%@\n userName=%@", distance,userAnnotation,userName.text];
 }
 
 @end

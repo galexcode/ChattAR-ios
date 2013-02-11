@@ -300,6 +300,7 @@
         
 		[view removeFromSuperview];
 	}
+    NSLog(@"%@",mapPoints);
 	[[DataManager shared].coordinates removeAllObjects];
 	[[DataManager shared].coordinateViews removeAllObjects];
 	
@@ -345,6 +346,7 @@
     
     // get view for annotation
     UIView *markerView = [self viewForAnnotation:userAnnotation];
+    NSLog(@"%@",markerView);
     
     // create marker location
     CLLocation *location = [[CLLocation alloc] initWithLatitude:userAnnotation.coordinate.longitude 
@@ -365,6 +367,7 @@
     ARMarkerView *marker = [[[ARMarkerView alloc] initWithGeoPoint:userAnnotation] autorelease];
     marker.target = self;
     marker.action = @selector(touchOnMarker:);
+    NSLog(@"%@",marker);
     return marker;
 }
 
