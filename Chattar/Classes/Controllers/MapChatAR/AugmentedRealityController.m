@@ -61,7 +61,7 @@
         
         self.currentOrientation = UIDeviceOrientationPortrait;
         
-        
+
         
         // 1 km (все, кто в радиусе 1 км)
         // 5 km
@@ -91,8 +91,8 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetDistanceSliderEnabled:) name:kWillSetDistanceSliderEnabled object:nil ];
         
         isDataRetrieved = NO;
-
         
+        viewFrame = CGRectMake(0, 45, 320, 415);
     }
     return self;
 }
@@ -109,10 +109,12 @@
 
 - (void)loadView{
     // add canvas
-	displayView = [[UIImageView alloc] initWithFrame:viewFrame]; 
+	displayView = [[UIImageView alloc] initWithFrame:viewFrame];
     displayView.clipsToBounds = YES;
     [displayView setUserInteractionEnabled:YES];
-	
+    
+    self.degreeRange = viewFrame.size.width / 12;
+
     self.view = displayView;
     [displayView release];
     
@@ -150,6 +152,8 @@
         distanceLabelFrame.origin.y += 44;
         [self.distanceLabel setFrame:distanceLabelFrame];
     }
+    
+    [self displayAR];
 }
 
 -(void)distanceDidChanged:(UISlider *)slider
@@ -214,6 +218,7 @@
 	[centerLocation release];
     
     [sliderNumbers release];
+    [displayView release];
 	
 	self.locationManager = nil;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -300,7 +305,6 @@
         
 		[view removeFromSuperview];
 	}
-    NSLog(@"%@",mapPoints);
 	[[DataManager shared].coordinates removeAllObjects];
 	[[DataManager shared].coordinateViews removeAllObjects];
 	
@@ -346,7 +350,6 @@
     
     // get view for annotation
     UIView *markerView = [self viewForAnnotation:userAnnotation];
-    NSLog(@"%@",markerView);
     
     // create marker location
     CLLocation *location = [[CLLocation alloc] initWithLatitude:userAnnotation.coordinate.longitude 
@@ -367,7 +370,6 @@
     ARMarkerView *marker = [[[ARMarkerView alloc] initWithGeoPoint:userAnnotation] autorelease];
     marker.target = self;
     marker.action = @selector(touchOnMarker:);
-    NSLog(@"%@",marker);
     return marker;
 }
 
@@ -393,7 +395,6 @@
 	if (coordinate.radialDistance > self.maximumScaleDistance) {
 		self.maximumScaleDistance = coordinate.radialDistance;
     }
-	
 	[[DataManager shared].coordinateViews addObject:agView];
 }
 
@@ -621,7 +622,7 @@
 	for (ARCoordinate *item in [DataManager shared].coordinates) {
 		
 		ARMarkerView *viewToDraw = [[DataManager shared].coordinateViews objectAtIndex:index];
-
+        
 		if ([self viewportContainsView:viewToDraw forCoordinate:item] && (viewToDraw.distance < switchedDistance)) {
 			
             // mraker location
@@ -1088,92 +1089,95 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 - (void) showWorld{
     
-    // Map/AR points
-    //
-    [[DataManager shared].mapPoints removeAllObjects];
-    //
-    // 1. add All from QB
-    NSMutableArray *friendsIdsWhoAlreadyAdded = [NSMutableArray array];
-    for(UserAnnotation *mapAnnotation in [DataManager shared].allmapPoints){
-        [[DataManager shared].mapPoints addObject:mapAnnotation];
-        [friendsIdsWhoAlreadyAdded addObject:mapAnnotation.fbUserId];
-    }
-    //
-    // add checkin
-    NSArray *allCheckinsCopy = [[DataManager shared].allCheckins copy];
-    for (UserAnnotation* checkin in allCheckinsCopy){
-        if (![friendsIdsWhoAlreadyAdded containsObject:checkin.fbUserId]){
-            [[DataManager shared].mapPoints addObject:checkin];
-            [friendsIdsWhoAlreadyAdded addObject:checkin.fbUserId];
-        }else{
-            // compare datetimes - add newest
-            NSDate *newCreateDateTime = checkin.createdAt;
-            
-            int index = [friendsIdsWhoAlreadyAdded indexOfObject:checkin.fbUserId];
-            NSDate *currentCreateDateTime = ((UserAnnotation *)[[DataManager shared].mapPoints objectAtIndex:index]).createdAt;
-            
-            if([newCreateDateTime compare:currentCreateDateTime] == NSOrderedDescending){ //The receiver(newCreateDateTime) is later in time than anotherDate, NSOrderedDescending
-                [[DataManager shared].mapPoints replaceObjectAtIndex:index withObject:checkin];
-                [friendsIdsWhoAlreadyAdded replaceObjectAtIndex:index withObject:checkin.fbUserId];
+    dispatch_queue_t showWorldQueue = dispatch_queue_create("showWorldQueue", NULL);
+    dispatch_async(showWorldQueue, ^{
+        [[DataManager shared].ARmapPoints removeAllObjects];
+        
+        
+        NSMutableArray *friendsIdsWhoAlreadyAdded = [NSMutableArray array];
+        
+        for(UserAnnotation *mapAnnotation in [DataManager shared].allARMapPoints){
+            [[DataManager shared].ARmapPoints addObject:mapAnnotation];
+            [friendsIdsWhoAlreadyAdded addObject:mapAnnotation.fbUserId];
+        }
+        //
+        // add checkin
+        NSArray *allCheckinsCopy = [[DataManager shared].allCheckins copy];
+        
+        for (UserAnnotation* checkin in allCheckinsCopy){
+            if (![friendsIdsWhoAlreadyAdded containsObject:checkin.fbUserId]){
+                [[DataManager shared].ARmapPoints addObject:checkin];
+                [friendsIdsWhoAlreadyAdded addObject:checkin.fbUserId];
+            }else{
+                // compare datetimes - add newest
+                NSDate *newCreateDateTime = checkin.createdAt;
+                
+                int index = [friendsIdsWhoAlreadyAdded indexOfObject:checkin.fbUserId];
+                NSDate *currentCreateDateTime = ((UserAnnotation *)[[DataManager shared].ARmapPoints objectAtIndex:index]).createdAt;
+                
+                if([newCreateDateTime compare:currentCreateDateTime] == NSOrderedDescending){ //The receiver(newCreateDateTime) is later in time than anotherDate, NSOrderedDescending
+                    [[DataManager shared].ARmapPoints replaceObjectAtIndex:index withObject:checkin];
+                    [friendsIdsWhoAlreadyAdded replaceObjectAtIndex:index withObject:checkin.fbUserId];
+                }
             }
         }
-    }
-    [allCheckinsCopy release];
-    
-    // Chat points
-    //
-    [[DataManager shared].chatPoints removeAllObjects];
-    //
-    // 2. add Friends from FB
-    [[DataManager shared].chatPoints addObjectsFromArray:[DataManager shared].allChatPoints];
-    //
-    // add all checkins
-    for(UserAnnotation *checkinAnnotatin in [DataManager shared].allCheckins){
-        if(![[DataManager shared].chatPoints containsObject:checkinAnnotatin]){
-            [[DataManager shared].chatPoints addObject:checkinAnnotatin];
-        }
-    }
-        
-    [self refreshWithNewPoints:[DataManager shared].mapPoints];
+        [allCheckinsCopy release];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self refreshWithNewPoints:[DataManager shared].ARmapPoints];
+        });
+    });
+    dispatch_release(showWorldQueue);
 }
 
 - (void) showFriends{
-    NSMutableArray *friendsIds = [[[DataManager shared].myFriendsAsDictionary allKeys] mutableCopy];
-    [friendsIds addObject:[DataManager shared].currentFBUserId];// add me
+    dispatch_queue_t showFriendsQueue = dispatch_queue_create("showFriendsQueue", NULL);
     
-    // add only friends QB points
-    NSMutableArray *friendsIdsWhoAlreadyAdded = [NSMutableArray array];
-    for(UserAnnotation *mapAnnotation in [DataManager shared].allmapPoints){
-        if([friendsIds containsObject:[mapAnnotation.fbUser objectForKey:kId]]){
-            [[DataManager shared].mapPoints addObject:mapAnnotation];
-            
-            [friendsIdsWhoAlreadyAdded addObject:[mapAnnotation.fbUser objectForKey:kId]];
-        }
-    }
-    [friendsIds release];
-    //
-    // add checkin
-    NSArray *allCheckinsCopy = [[DataManager shared].allCheckins copy];
-    for (UserAnnotation* checkin in allCheckinsCopy){
-        if (![friendsIdsWhoAlreadyAdded containsObject:checkin.fbUserId]){
-            [[DataManager shared].mapPoints addObject:checkin];
-            [friendsIdsWhoAlreadyAdded addObject:checkin.fbUserId];
-        }else{
-            // compare datetimes - add newest
-            NSDate *newCreateDateTime = checkin.createdAt;
-            
-            int index = [friendsIdsWhoAlreadyAdded indexOfObject:checkin.fbUserId];
-            NSDate *currentCreateDateTime = ((UserAnnotation *)[[DataManager shared].mapPoints objectAtIndex:index]).createdAt;
-            
-            if([newCreateDateTime compare:currentCreateDateTime] == NSOrderedDescending){ //The receiver(newCreateDateTime) is later in time than anotherDate, NSOrderedDescending
-                [[DataManager shared].mapPoints replaceObjectAtIndex:index withObject:checkin];
-                [friendsIdsWhoAlreadyAdded replaceObjectAtIndex:index withObject:checkin.fbUserId];
+    dispatch_async(showFriendsQueue, ^{
+        [[DataManager shared].ARmapPoints removeAllObjects];
+        
+        NSMutableArray *friendsIds = [[[DataManager shared].myFriendsAsDictionary allKeys] mutableCopy];
+        [friendsIds addObject:[DataManager shared].currentFBUserId];// add me
+        
+        // add only friends QB points
+        NSMutableArray *friendsIdsWhoAlreadyAdded = [NSMutableArray array];
+        
+        for(UserAnnotation *mapAnnotation in [DataManager shared].allARMapPoints){
+            if([friendsIds containsObject:[mapAnnotation.fbUser objectForKey:kId]]){
+                [[DataManager shared].ARmapPoints addObject:mapAnnotation];
+                
+                [friendsIdsWhoAlreadyAdded addObject:[mapAnnotation.fbUser objectForKey:kId]];
             }
         }
-    }
-    [allCheckinsCopy release];
-    
-    [self refreshWithNewPoints:[DataManager shared].mapPoints];
+        [friendsIds release];
+        //
+        // add checkin
+        NSArray *allCheckinsCopy = [[DataManager shared].allCheckins copy];
+        
+        for (UserAnnotation* checkin in allCheckinsCopy){
+            if (![friendsIdsWhoAlreadyAdded containsObject:checkin.fbUserId]){
+                [[DataManager shared].ARmapPoints addObject:checkin];
+                [friendsIdsWhoAlreadyAdded addObject:checkin.fbUserId];
+            }else{
+                // compare datetimes - add newest
+                NSDate *newCreateDateTime = checkin.createdAt;
+                
+                int index = [friendsIdsWhoAlreadyAdded indexOfObject:checkin.fbUserId];
+                NSDate *currentCreateDateTime = ((UserAnnotation *)[[DataManager shared].ARmapPoints objectAtIndex:index]).createdAt;
+                
+                if([newCreateDateTime compare:currentCreateDateTime] == NSOrderedDescending){ //The receiver(newCreateDateTime) is later in time than anotherDate, NSOrderedDescending
+                    [[DataManager shared].ARmapPoints replaceObjectAtIndex:index withObject:checkin];
+                    [friendsIdsWhoAlreadyAdded replaceObjectAtIndex:index withObject:checkin.fbUserId];
+                }
+            }
+        }
+        [allCheckinsCopy release];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self refreshWithNewPoints:[DataManager shared].ARmapPoints];
+        });
+
+    });
+    dispatch_release(showFriendsQueue);
 }
 
 #pragma mark -
