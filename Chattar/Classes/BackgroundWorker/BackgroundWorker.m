@@ -118,16 +118,21 @@ static BackgroundWorker* instance = nil;
         }
     }
     
+    NSLog(@"%@",mapPoints);
+    
     if ([tabBarDelegate respondsToSelector:@selector(didReceiveCachedMapPoints:)]) {
         [tabBarDelegate didReceiveCachedMapPoints:mapPoints];
     }
     
     [mapPoints release];
 
-    if ([DataManager shared].allmapPoints > 0) {
+    if ([DataManager shared].allmapPoints.count > 0) {
+        
         if ([tabBarDelegate respondsToSelector:@selector(willShowAllFriends)]) {
             [tabBarDelegate willShowAllFriends];
         }
+        
+        [self retrieveNewQBData];
     }
     else{
         if ([tabBarDelegate respondsToSelector:@selector(willSetAllFriendsSwitchEnabled:)]) {
@@ -151,9 +156,7 @@ static BackgroundWorker* instance = nil;
         searchMapARPointsRequest.minCreatedAt = lastPointDate;
     }
 	[QBLocation geoDataWithRequest:searchMapARPointsRequest delegate:self context:mapSearch];
-	[searchMapARPointsRequest release];
-    
-    [self retrieveNewQBData];
+	[searchMapARPointsRequest release];    
 }
 
 -(void)retrieveCachedChatDataAndRequestNewData{
@@ -178,10 +181,9 @@ static BackgroundWorker* instance = nil;
     }
     [chatPoints release];
     
-    if ([DataManager shared].allChatPoints > 0) {
+    if ([DataManager shared].allChatPoints.count > 0) {
         if ([tabBarDelegate respondsToSelector:@selector(willShowAllFriends)]) {
             [tabBarDelegate willShowAllFriends];
-            [self retrieveNewQBData];
         }
     }
     else{
