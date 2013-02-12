@@ -51,8 +51,11 @@
 @property (nonatomic, retain) NSMutableArray* mapPointsIDs;
 @property (nonatomic, retain) NSMutableArray* allmapPoints;
 @property (nonatomic, retain) NSMutableArray* mapPoints;
+
 @property (nonatomic, retain) NSMutableArray *coordinateViews;
 @property (nonatomic, retain) NSMutableArray* coordinates;
+@property (nonatomic, retain) NSMutableArray* ARmapPoints;
+@property (nonatomic, retain) NSMutableArray* allARMapPoints;
 
 + (DataManager *) shared;
 

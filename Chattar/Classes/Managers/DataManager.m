@@ -54,6 +54,8 @@ static DataManager *instance = nil;
 @synthesize coordinates;
 @synthesize chatMessagesIDs;
 @synthesize mapPointsIDs;
+@synthesize allARMapPoints;
+@synthesize ARmapPoints;
 
 + (DataManager *)shared {
 	@synchronized (self) {
@@ -107,6 +109,8 @@ static DataManager *instance = nil;
     [allmapPoints release];
     [mapPointsIDs release];
     [chatMessagesIDs release];
+    [ARmapPoints release];
+    [allARMapPoints release];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kNotificationLogout object:nil];
 	
