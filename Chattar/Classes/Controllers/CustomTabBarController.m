@@ -111,10 +111,25 @@
     }
     else
         [[DataManager shared].allmapPoints addObjectsFromArray:cachedMapPoints];
-    NSLog(@"%d",[DataManager shared].allmapPoints.count);
     
     if (![DataManager shared].mapPoints) {
         [DataManager shared].mapPoints = [[NSMutableArray alloc] init];
+    }
+    
+    if (![DataManager shared].coordinates) {
+        [DataManager shared].coordinates = [[NSMutableArray alloc] init];
+    }
+    
+    if (![DataManager shared].coordinateViews) {
+        [DataManager shared].coordinateViews = [[NSMutableArray alloc] init];
+    }
+    
+    if (![DataManager shared].allARMapPoints) {
+        [DataManager shared].allARMapPoints = cachedMapPoints.mutableCopy;
+    }
+    
+    if (![DataManager shared].ARmapPoints) {
+        [DataManager shared].ARmapPoints = [[NSMutableArray alloc] init];
     }
 }
 
