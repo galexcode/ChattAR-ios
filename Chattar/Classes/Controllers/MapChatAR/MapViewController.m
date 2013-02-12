@@ -11,6 +11,7 @@
 #import "UserAnnotation.h"
 #import "AppDelegate.h"
 #import "ARMarkerView.h"
+#import "AugmentedRealityController.h"
 
 @interface MapViewController ()
 
@@ -200,7 +201,6 @@
 
 - (void)refreshWithNewPoints:(NSArray *)newMapPoints{
     // remove old
-    NSLog(@"%@",mapView.annotations);
 	[mapView removeAnnotations:mapView.annotations];
 	
     // add new
@@ -599,7 +599,7 @@
 }
 
 -(void)doShowAllFriends{
-    [self showWorld];
+    //[self showWorld];
 }
 
 -(void)doWillSetAllFriendsSwitchEnabled:(NSNotification*)notification{
@@ -614,6 +614,7 @@
     
     isDataRetrieved = YES;
     [self.allFriendsSwitch setEnabled:YES];
+    [self showWorld];
 }
 
 -(void)doAddNewPoint:(NSNotification*)notification{
@@ -648,9 +649,50 @@
 
     [currentMapAnnotations release];
     
-    if (isExistPoint) {
-        [[DataManager shared] updateARCoordinateViewWithPoint:newPoint];
-        isExistPoint = YES;
+    if(isExistPoint){
+        
+        NSArray *currentARMarkers = [[DataManager shared].coordinateViews copy];
+        
+        for (ARMarkerView *marker in currentARMarkers)
+		{
+            NSDate *newCreateDateTime = newPoint.createdAt;
+            NSDate *currentCreateDateTime = marker.userAnnotation.createdAt;
+            // already exist, change status
+            if([newPoint.fbUserId isEqualToString:marker.userAnnotation.fbUserId])
+			{
+                if([newCreateDateTime compare:currentCreateDateTime] == NSOrderedDescending){
+                    AugmentedRealityController* ARController = nil;
+                    if ([newPoint.userStatus length] < 6 ||
+                        ([newPoint.userStatus length] >= 6 &&
+                         ![[newPoint.userStatus substringToIndex:6] isEqualToString:fbidIdentifier])){
+
+                        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+                        UITabBarController *tabBarController = appDelegate.tabBarController;
+                            // find needed ARController
+                            
+                        for (UIViewController* viewController in tabBarController.viewControllers) {
+                            UIViewController *vc = viewController;
+                            if ([viewController isKindOfClass:[UINavigationController class]]) {
+                                vc = [(UINavigationController*)viewController visibleViewController];
+                            }
+                            if ([vc isKindOfClass:[ChatViewController class]]) {
+                                ARController = (AugmentedRealityController*)vc;
+                            }
+                        }
+                            
+                        ARMarkerView *marker = (ARMarkerView *)[ARController viewForExistAnnotation:newPoint];
+                        [marker updateStatus:newPoint.userStatus];// update status
+                        [marker updateCoordinate:newPoint.coordinate]; // update location
+                    }
+                }
+                
+                isExistPoint = YES;
+                
+                break;
+            }
+        }
+        
+        [currentARMarkers release];
     }
 
     if(!isExistPoint){
@@ -658,22 +700,34 @@
 
         
         [[DataManager shared].mapPoints addObject:newPoint];
-
+        
         if(newPoint.geoDataID != -1){
             [[DataManager shared].mapPointsIDs addObject:[NSString stringWithFormat:@"%d", newPoint.geoDataID]];
         }
 
         if([self isAllShowed] || [friendsIds containsObject:newPoint.fbUserId]){
             [[DataManager shared].mapPoints addObject:newPoint];
+            [[DataManager shared].ARmapPoints addObject:newPoint];
             addedToCurrentMapState = YES;
         }
 
         if(addedToCurrentMapState){
             [self addPoint:newPoint];
             
-            UITabBarController *tabBarController = ((AppDelegate *)self.delegate).tabBarController;
-            AugmentedRealityController* arController = (AugmentedRealityController*)[tabBarController.viewControllers objectAtIndex:radarIndex];
-            [arController addPoint:newPoint];
+            AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+            UITabBarController *tabBarController = appDelegate.tabBarController;
+            // find needed ARController
+            AugmentedRealityController* ARController = nil;
+            for (UIViewController* viewController in tabBarController.viewControllers) {
+                UIViewController *vc = viewController;
+                if ([viewController isKindOfClass:[UINavigationController class]]) {
+                    vc = [(UINavigationController*)viewController visibleViewController];
+                }
+                if ([vc isKindOfClass:[AugmentedRealityController class]]) {
+                    ARController = (AugmentedRealityController*)vc;
+                }
+            }
+            [ARController addPoint:newPoint];
         }
     }
 
