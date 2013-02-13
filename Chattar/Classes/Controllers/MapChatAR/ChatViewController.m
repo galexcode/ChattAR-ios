@@ -35,7 +35,7 @@
     if (self) {
         // Custom initialization
 		self.title = NSLocalizedString(@"Chat", nil);
-		self.tabBarItem.image = [UIImage imageNamed:@"Around_toolbar_icon.png"];
+		self.tabBarItem.image = [UIImage imageNamed:@"chatTab.png"];
 
                     // logout
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(logoutDone) name:kNotificationLogout object:nil];
