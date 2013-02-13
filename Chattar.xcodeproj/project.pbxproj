@@ -51,7 +51,6 @@
 		ED4C8F6916BFEB5D000751D4 /* FBChatViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C8E8D16BFEB5D000751D4 /* FBChatViewController.m */; };
 		ED4C8F6A16BFEB5D000751D4 /* AugmentedRealityController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C8E9016BFEB5D000751D4 /* AugmentedRealityController.m */; };
 		ED4C8F6B16BFEB5D000751D4 /* ChatViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C8E9216BFEB5D000751D4 /* ChatViewController.m */; };
-		ED4C8F6C16BFEB5D000751D4 /* MapChatARViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C8E9416BFEB5D000751D4 /* MapChatARViewController.m */; };
 		ED4C8F6D16BFEB5D000751D4 /* MapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C8E9616BFEB5D000751D4 /* MapViewController.m */; };
 		ED4C8F6E16BFEB5D000751D4 /* MessagesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C8E9816BFEB5D000751D4 /* MessagesViewController.m */; };
 		ED4C8F6F16BFEB5D000751D4 /* SettingsController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C8E9A16BFEB5D000751D4 /* SettingsController.m */; };
@@ -300,8 +299,6 @@
 		ED4C8E9016BFEB5D000751D4 /* AugmentedRealityController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AugmentedRealityController.m; sourceTree = "<group>"; };
 		ED4C8E9116BFEB5D000751D4 /* ChatViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatViewController.h; sourceTree = "<group>"; };
 		ED4C8E9216BFEB5D000751D4 /* ChatViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatViewController.m; sourceTree = "<group>"; };
-		ED4C8E9316BFEB5D000751D4 /* MapChatARViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapChatARViewController.h; sourceTree = "<group>"; };
-		ED4C8E9416BFEB5D000751D4 /* MapChatARViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapChatARViewController.m; sourceTree = "<group>"; };
 		ED4C8E9516BFEB5D000751D4 /* MapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapViewController.h; sourceTree = "<group>"; };
 		ED4C8E9616BFEB5D000751D4 /* MapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapViewController.m; sourceTree = "<group>"; };
 		ED4C8E9716BFEB5D000751D4 /* MessagesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessagesViewController.h; sourceTree = "<group>"; };
@@ -771,8 +768,6 @@
 				ED4C8E9016BFEB5D000751D4 /* AugmentedRealityController.m */,
 				ED4C8E9116BFEB5D000751D4 /* ChatViewController.h */,
 				ED4C8E9216BFEB5D000751D4 /* ChatViewController.m */,
-				ED4C8E9316BFEB5D000751D4 /* MapChatARViewController.h */,
-				ED4C8E9416BFEB5D000751D4 /* MapChatARViewController.m */,
 				ED4C8E9516BFEB5D000751D4 /* MapViewController.h */,
 				ED4C8E9616BFEB5D000751D4 /* MapViewController.m */,
 			);
@@ -1485,7 +1480,6 @@
 				ED4C8F6916BFEB5D000751D4 /* FBChatViewController.m in Sources */,
 				ED4C8F6A16BFEB5D000751D4 /* AugmentedRealityController.m in Sources */,
 				ED4C8F6B16BFEB5D000751D4 /* ChatViewController.m in Sources */,
-				ED4C8F6C16BFEB5D000751D4 /* MapChatARViewController.m in Sources */,
 				ED4C8F6D16BFEB5D000751D4 /* MapViewController.m in Sources */,
 				ED4C8F6E16BFEB5D000751D4 /* MessagesViewController.m in Sources */,
 				ED4C8F6F16BFEB5D000751D4 /* SettingsController.m in Sources */,

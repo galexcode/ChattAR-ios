@@ -106,6 +106,7 @@ static BackgroundWorker* instance = nil;
     NSMutableArray* mapPoints = [[NSMutableArray alloc] init];
     NSMutableArray* mapPointsIds = [[NSMutableArray alloc] init];
     
+    NSDate* lastPointDate = nil;
     // get map/ar points from cash
     NSArray *cashedMapARPoints = [[DataManager shared] mapARPointsFromStorage];
     if([cashedMapARPoints count] > 0){
@@ -165,6 +166,9 @@ static BackgroundWorker* instance = nil;
     
     NSMutableArray* chatPoints = [[NSMutableArray alloc] init];
     NSMutableArray* chatMessagesIDs = [[NSMutableArray alloc] init];
+    
+    NSDate *lastMessageDate = nil;
+
     
     if([cashedChatMessages count] > 0){
         for(QBChatMessageModel *chatCashedMessage in cashedChatMessages){

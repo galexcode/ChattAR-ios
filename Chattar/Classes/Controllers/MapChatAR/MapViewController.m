@@ -7,11 +7,12 @@
 //
 
 #import "MapViewController.h"
-#import "MapChatARViewController.h"
 #import "UserAnnotation.h"
 #import "AppDelegate.h"
 #import "ARMarkerView.h"
 #import "AugmentedRealityController.h"
+#import "WebViewController.h"
+#import "ChatViewController.h"
 
 @interface MapViewController ()
 
@@ -149,9 +150,7 @@
     
     if (!isDataRetrieved) {
         [_loadingIndicator startAnimating];
-    }
-    
-    [self showWorld];
+    }    
 }
 
 - (void)viewDidUnload
@@ -169,6 +168,9 @@
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
+-(void)viewWillAppear:(BOOL)animated{
+    [self showWorld];
+}
 
 
 
@@ -338,11 +340,16 @@
 
 - (void)clear{
     
-    [self.mapView setRegion:initialRegion animated:NO];
-    
     [mapView setUserInteractionEnabled:NO];
     [mapView removeAnnotations:mapView.annotations];
+    [self.mapView setRegion:initialRegion animated:NO];
 	mapView.userInteractionEnabled = YES;
+    
+    [[DataManager shared].allmapPoints removeAllObjects];
+    [[DataManager shared].mapPoints removeAllObjects];
+    [[DataManager shared].mapPointsIDs removeAllObjects];
+    [[DataManager shared].allCheckins removeAllObjects];
+    
 }
 
 -(void)updateStatus:(UserAnnotation*)point{
@@ -589,13 +596,6 @@
     
     [self.allFriendsSwitch setValue:1.0f];
     
-    
-	[[DataManager shared].allmapPoints removeAllObjects];
-    
-    [[DataManager shared].mapPoints removeAllObjects];
-    
-    [[DataManager shared].mapPointsIDs removeAllObjects];
-    
     [self clear];
 }
 
@@ -671,7 +671,7 @@
                             if ([viewController isKindOfClass:[UINavigationController class]]) {
                                 vc = [(UINavigationController*)viewController visibleViewController];
                             }
-                            if ([vc isKindOfClass:[ChatViewController class]]) {
+                            if ([vc isKindOfClass:[AugmentedRealityController class]]) {
                                 ARController = (AugmentedRealityController*)vc;
                             }
                         }

@@ -9,7 +9,6 @@
 #import "AppDelegate.h"
 
 #import "MessagesViewController.h"
-#import "MapChatARViewController.h"
 #import "ContactsController.h"
 #import "SettingsController.h"
 #import "SplashController.h"
@@ -21,7 +20,8 @@
 #import "AugmentedRealityController.h"
 #import "ARManager.h"
 #import "ProvisionManager.h"
-
+#import "ChatViewController.h"
+#import "MapViewController.h"
 @implementation AppDelegate
 
 @synthesize window = _window;
@@ -43,18 +43,18 @@
     [NotificationManager playNotificationSoundAndVibrate];
     
     // if not in chat
-    MapChatARViewController *mapChatArViewController = [[((UINavigationController *)[self.tabBarController.viewControllers objectAtIndex:1]) viewControllers] objectAtIndex:0];
-    int mapChatArSelectedSegmentIndex = mapChatArViewController.segmentControl.selectedSegmentIndex;
-    //
-    if(self.tabBarController.selectedIndex != 1 || mapChatArSelectedSegmentIndex != (mapChatArViewController.segmentControl.numberOfSegments-1)){
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(appName, "")
-                                                        message:message
-                                                       delegate:self
-                                              cancelButtonTitle:NSLocalizedString(@"Ok", "OK")
-                                              otherButtonTitles:nil];
-        [alert show];
-        [alert release];
-    }
+//    MapChatARViewController *mapChatArViewController = [[((UINavigationController *)[self.tabBarController.viewControllers objectAtIndex:1]) viewControllers] objectAtIndex:0];
+//    int mapChatArSelectedSegmentIndex = mapChatArViewController.segmentControl.selectedSegmentIndex;
+//    //
+//    if(self.tabBarController.selectedIndex != 1 || mapChatArSelectedSegmentIndex != (mapChatArViewController.segmentControl.numberOfSegments-1)){
+//        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(appName, "")
+//                                                        message:message
+//                                                       delegate:self
+//                                              cancelButtonTitle:NSLocalizedString(@"Ok", "OK")
+//                                              otherButtonTitles:nil];
+//        [alert show];
+//        [alert release];
+//    }
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions{

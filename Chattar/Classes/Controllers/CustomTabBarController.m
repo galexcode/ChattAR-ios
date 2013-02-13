@@ -127,6 +127,9 @@
     if (![DataManager shared].allARMapPoints) {
         [DataManager shared].allARMapPoints = cachedMapPoints.mutableCopy;
     }
+    else{
+        [[DataManager shared].allARMapPoints addObjectsFromArray:cachedMapPoints];
+    }
     
     if (![DataManager shared].ARmapPoints) {
         [DataManager shared].ARmapPoints = [[NSMutableArray alloc] init];
@@ -137,7 +140,9 @@
     if (![DataManager shared].mapPointsIDs) {
         [DataManager shared].mapPointsIDs = cachedMapIDs.mutableCopy;
     }
-    [[DataManager shared].mapPointsIDs addObjectsFromArray:cachedMapIDs];
+    else{
+        [[DataManager shared].mapPointsIDs addObjectsFromArray:cachedMapIDs];
+    }
 }
 
 -(void)didReceiveCachedChatPoints:(NSArray*)cachedChatPoints{
@@ -150,14 +155,16 @@
     if (![DataManager shared].chatPoints) {
         [DataManager shared].chatPoints = [[NSMutableArray alloc] init];
     }
+    
 }
 
 -(void)didReceiveCachedChatMessagesIDs:(NSArray*)cachedChatMessagesIDs{
     if (![DataManager shared].chatMessagesIDs) {
         [DataManager shared].chatMessagesIDs = cachedChatMessagesIDs.mutableCopy;
     }
-    
-    [[DataManager shared].chatMessagesIDs addObjectsFromArray:cachedChatMessagesIDs];
+    else{
+        [[DataManager shared].chatMessagesIDs addObjectsFromArray:cachedChatMessagesIDs];
+    }
 }
 
 -(void)didReceiveCachedCheckins:(NSArray *)cachedCheckins{
@@ -165,7 +172,8 @@
         [DataManager shared].allCheckins = cachedCheckins.mutableCopy;
     }
     
-    else [[DataManager shared].allCheckins addObjectsFromArray:cachedCheckins];
+    else
+        [[DataManager shared].allCheckins addObjectsFromArray:cachedCheckins];
     
 }
 

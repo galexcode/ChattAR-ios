@@ -10,8 +10,8 @@
 #import "ARCoordinate.h"
 #import "ARGeoCoordinate.h"
 #import "ARMarkerView.h"
-#import "MapChatARViewController.h"
 #import "AppDelegate.h"
+#import "ChatViewController.h"
 
 #define kFilteringFactor 0.05
 #define degreesToRadian(x) (M_PI * (x) / 180.0)
@@ -151,20 +151,11 @@
         distanceLabelFrame.origin.y += 44;
         [self.distanceLabel setFrame:distanceLabelFrame];
     }
-    
-    [self displayAR];
-    [self showWorld];
 }
 
--(void)distanceDidChanged:(UISlider *)slider
-{
-    NSUInteger index = slider.value;
-    [slider setValue:index animated:NO];
-    
-    // set dist
-    switchedDistance = [[sliderNumbers objectAtIndex:index] intValue]; // <-- This is the number you want.
-    
-    distanceLabel.text = [NSString stringWithFormat:@"%d km", switchedDistance/1000];
+-(void)viewWillAppear:(BOOL)animated{
+    [self displayAR];
+    [self showWorld];
 }
 
 - (void) viewDidLoad{
@@ -227,74 +218,8 @@
     [super dealloc];
 }
 
-// touch on marker
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event{
-    UITouch *lastTouch = [touches anyObject];
-    
-    for(int i=[self.view.subviews count]-1; i>=0; i--)
-	{
-        ARMarkerView *marker = [self.view.subviews objectAtIndex:i];
-        if(![marker isKindOfClass:ARMarkerView.class])
-		{
-            //continue;
-            break;
-        }
-        
-		CGPoint point = [lastTouch locationInView:marker];
-        
-        if(point.x > 0 && point.y > 0)
-		{
-            [marker.target performSelector:marker.action withObject:marker];
-            break;
-        }
-    }
-}
-
-// This is needed to start showing the Camera of the Augemented Reality Toolkit.
-- (void)displayAR{
-	
-    [self initCapture];
-    
-	[self startListening];
-}
-
-- (void)dissmisAR {
-    [captureSession stopRunning];
-    
-    [displayView setImage:nil];
-    
-    for(UIView *view in self.view.subviews){
-        if([view isKindOfClass:[CustomSwitch class]] || view == distanceSlider || view == distanceLabel){
-			continue;
-        }
-        
-		[view removeFromSuperview];
-    }
-    
-    self.captureSession = nil;
-}
-
-- (void)startListening {
-	
-	// start our heading readings and our accelerometer readings.
-	if (!self.locationManager) {
-		locationManager = [[CLLocationManager alloc] init];
-		self.locationManager.headingFilter = kCLHeadingFilterNone;
-		self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-		[self.locationManager startUpdatingHeading];
-		[self.locationManager startUpdatingLocation];
-		self.locationManager.delegate = self;
-	}
-    
-	if (!self.accelerometerManager) {
-		self.accelerometerManager = [UIAccelerometer sharedAccelerometer];
-		self.accelerometerManager.updateInterval = 0.1;
-		self.accelerometerManager.delegate = self;
-	}
-	
-	if (!self.centerCoordinate) 
-		self.centerCoordinate = [ARCoordinate coordinateWithRadialDistance:1.0 inclination:0 azimuth:0];
-}
+#pragma mark -
+#pragma mark Internal data methods
 
 - (void)refreshWithNewPoints:(NSArray *)mapPoints{
 	// remove old
@@ -1059,6 +984,86 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 #pragma mark -
 #pragma mark Intreface based methods
+
+// touch on marker
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event{
+    UITouch *lastTouch = [touches anyObject];
+    
+    for(int i=[self.view.subviews count]-1; i>=0; i--)
+	{
+        ARMarkerView *marker = [self.view.subviews objectAtIndex:i];
+        if(![marker isKindOfClass:ARMarkerView.class])
+		{
+            //continue;
+            break;
+        }
+        
+		CGPoint point = [lastTouch locationInView:marker];
+        
+        if(point.x > 0 && point.y > 0)
+		{
+            [marker.target performSelector:marker.action withObject:marker];
+            break;
+        }
+    }
+}
+
+-(void)distanceDidChanged:(UISlider *)slider
+{
+    NSUInteger index = slider.value;
+    [slider setValue:index animated:NO];
+    
+    // set dist
+    switchedDistance = [[sliderNumbers objectAtIndex:index] intValue]; // <-- This is the number you want.
+    
+    distanceLabel.text = [NSString stringWithFormat:@"%d km", switchedDistance/1000];
+}
+
+// This is needed to start showing the Camera of the Augemented Reality Toolkit.
+- (void)displayAR{
+	
+    [self initCapture];
+    
+	[self startListening];
+}
+
+- (void)dissmisAR {
+    [captureSession stopRunning];
+    
+    [displayView setImage:nil];
+    
+    for(UIView *view in self.view.subviews){
+        if([view isKindOfClass:[CustomSwitch class]] || view == distanceSlider || view == distanceLabel){
+			continue;
+        }
+        
+		[view removeFromSuperview];
+    }
+    
+    self.captureSession = nil;
+}
+
+- (void)startListening {
+	
+	// start our heading readings and our accelerometer readings.
+	if (!self.locationManager) {
+		locationManager = [[CLLocationManager alloc] init];
+		self.locationManager.headingFilter = kCLHeadingFilterNone;
+		self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+		[self.locationManager startUpdatingHeading];
+		[self.locationManager startUpdatingLocation];
+		self.locationManager.delegate = self;
+	}
+    
+	if (!self.accelerometerManager) {
+		self.accelerometerManager = [UIAccelerometer sharedAccelerometer];
+		self.accelerometerManager.updateInterval = 0.1;
+		self.accelerometerManager.delegate = self;
+	}
+	
+	if (!self.centerCoordinate)
+		self.centerCoordinate = [ARCoordinate coordinateWithRadialDistance:1.0 inclination:0 azimuth:0];
+}
 
 - (void)allFriendsSwitchValueDidChanged:(id)sender{
     

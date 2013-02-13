@@ -86,9 +86,6 @@
     dispatch_queue_t processPhotosWithLocationsQueue;
     
     dispatch_queue_t getMoreMessagesWorkQueue;
-
-    NSDate *lastMessageDate;
-    NSDate* lastPointDate;
     
     CLLocation* currentLocation;
     

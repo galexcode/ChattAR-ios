@@ -11,7 +11,6 @@
 #define getQuotedId			@"getQuotedId"
 
 #import "ChatViewController.h"
-#import "MapChatARViewController.h"
 #import "ARMarkerView.h"
 #import "WebViewController.h"
 #import "ProvisionManager.h"
@@ -1112,9 +1111,7 @@
     [self.messageField setText:nil];
     
     [[DataManager shared].allChatPoints removeAllObjects];
-	[[DataManager shared].allCheckins removeAllObjects];
     [[DataManager shared].chatPoints removeAllObjects];
-    
     [[DataManager shared].chatMessagesIDs removeAllObjects];
 
     [self.messagesTableView reloadData];
