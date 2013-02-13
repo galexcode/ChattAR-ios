@@ -46,6 +46,8 @@
 #define kWillSetAllFriendsSwitchEnabled @"kWillSetAllFriendsSwitchEnabled"
 #define kWillSetMessageFieldEnabled @"kWillSetMessageFieldEnabled"
 #define kWillSetDistanceSliderEnabled @"kWillSetDistanceSliderEnabled"
+
+#define INDICATOR_TAG 23458
 // Strings
 #define appName @"ChattAR"
 

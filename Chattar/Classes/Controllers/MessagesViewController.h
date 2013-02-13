@@ -14,13 +14,12 @@
 
 #import "FBChatViewController.h"
 
-@interface MessagesViewController : UIViewController<UITableViewDataSource, UITableViewDelegate, FBServiceResultDelegate, UISearchBarDelegate, MBProgressHUDDelegate>
+@interface MessagesViewController : UIViewController<UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, MBProgressHUDDelegate>
 {	
 	// data
     NSMutableArray		*searchArray;
     
     ViewTouch				*backView;
-    MBProgressHUD *HUD;
     
     BOOL isInitialized;
 }

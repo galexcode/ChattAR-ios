@@ -42,9 +42,12 @@ static BackgroundWorker* instance = nil;
         [locationManager startMonitoringSignificantLocationChanges];
         currentLocation = [[CLLocation alloc] initWithLatitude:locationManager.location.coordinate.latitude longitude:locationManager.location.coordinate.longitude];
         [locationManager stopMonitoringSignificantLocationChanges];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(stopRequestingNewData) name:kNotificationLogout object:nil];
     }
     return self;
 }
+
 
 -(void)dealloc{
     [FBfriends release];
@@ -143,7 +146,7 @@ static BackgroundWorker* instance = nil;
 
     
     if ([tabBarDelegate respondsToSelector:@selector(didReceiveCachedMapPointsIDs:)]) {
-        [tabBarDelegate respondsToSelector:@selector(mapPointsIDs)];
+        [tabBarDelegate didReceiveCachedMapPointsIDs:mapPointsIds];
     }
     
     [mapPointsIds release];
@@ -221,8 +224,7 @@ static BackgroundWorker* instance = nil;
     if(lastMessageDate){
         searchChatMessagesRequest.minCreatedAt = lastMessageDate;
     }
-    
-    
+        
 	[QBLocation geoDataWithRequest:searchChatMessagesRequest delegate:self context:chatSearch];
 	[searchChatMessagesRequest release];
     
@@ -1561,5 +1563,13 @@ static BackgroundWorker* instance = nil;
     return nil;
 }
 
-
+#pragma mark -
+#pragma mark Logout
+-(void)stopRequestingNewData{
+    if(updateTimer){
+        [updateTimer invalidate];
+        [updateTimer release];
+        updateTimer = nil;
+    }
+}
 @end

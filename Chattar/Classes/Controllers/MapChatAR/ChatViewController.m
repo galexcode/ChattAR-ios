@@ -96,9 +96,13 @@
 	[allFriendsSwitch setBackgroundColor:[UIColor clearColor]];
 	[self.view addSubview:allFriendsSwitch];
     
-    if (!isDataRetrieved) {
-        [_loadingIndicator startAnimating];
-    }
+    _loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    [_loadingIndicator setTag:INDICATOR_TAG];
+    [self.view addSubview:_loadingIndicator];
+    
+    _loadingIndicator.center = self.view.center;
+    [self.view bringSubviewToFront:_loadingIndicator];
+
 }
 
 - (void)removeQuote
@@ -131,9 +135,35 @@
     // e.g. self.myOutlet = nil;
 }
 
--(void)viewDidAppear:(BOOL)animated
-{
-	[super viewDidAppear:animated];
+
+-(void)viewWillAppear:(BOOL)animated{
+    
+    if ([DataManager shared].isFirstStartApp) {
+        
+        // show Alert with info at startapp
+        [[DataManager shared] setFirstStartApp:NO];
+        
+        NSString *alertBody = nil;
+        if([ARManager deviceSupportsAR]){
+            alertBody = NSLocalizedString(@"You can see and chat with all\nusers within 10km. Increase\nsearch radius using slider (left). \nSwitch to 'Facebook only' mode (bottom right) to see your friends and their check-ins only.", nil);
+            
+        }else{
+            alertBody = NSLocalizedString(@"Switch to 'Facebook only' mode (bottom right) to see your friends and their check-ins only.", nil);
+        }
+    
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"'World' mode", nil)
+                                                        message:alertBody
+                                                       delegate:nil
+                                              cancelButtonTitle:NSLocalizedString(@"Ok", nil)
+                                              otherButtonTitles:nil];
+        [alert show];
+        [alert release];
+        
+        [_loadingIndicator startAnimating];
+        [_loadingIndicator setHidesWhenStopped:YES];
+
+    }
+
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -998,12 +1028,13 @@
 -(void)doChatEndRetrievingData{
     messageField.enabled = YES;
     isDataRetrieved = YES;
-    
-    [_loadingIndicator stopAnimating];
-        
+            
     [allFriendsSwitch setEnabled:YES];
+    [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) stopAnimating];
+    
     [self refresh];
 }
+
 -(void)doUpdate{
     [self refresh];
 }
@@ -1106,13 +1137,18 @@
     showAllUsers  = NO;
     
     [self.allFriendsSwitch setValue:1.0f];
-    
+    isDataRetrieved = NO;
     
     [self.messageField setText:nil];
     
     [[DataManager shared].allChatPoints removeAllObjects];
     [[DataManager shared].chatPoints removeAllObjects];
     [[DataManager shared].chatMessagesIDs removeAllObjects];
+    
+    [[DataManager shared].myFriends removeAllObjects];
+    [[DataManager shared].myPopularFriends removeAllObjects];
+    [[DataManager shared].myFriendsAsDictionary removeAllObjects];
+
 
     [self.messagesTableView reloadData];
 }

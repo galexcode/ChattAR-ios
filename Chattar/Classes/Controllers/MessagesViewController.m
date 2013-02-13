@@ -63,18 +63,14 @@
         [_messageTableView reloadData];
         
         isInitialized = YES;
+                
+        UIActivityIndicatorView* loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        [loadingIndicator setTag:INDICATOR_TAG];
+        [self.view addSubview:loadingIndicator];
+        [self.view bringSubviewToFront:loadingIndicator];
+        [loadingIndicator release];
         
-        // get inboxes messages
-        [[FBService shared] inboxMessagesWithDelegate:self];
-       
-        // show progress
-        HUD = [[MBProgressHUD alloc] initWithView:self.tabBarController.view];
-        [self.tabBarController.view addSubview:HUD];
-        HUD.dimBackground = YES;
-        HUD.delegate = self;
-        HUD.labelText = NSLocalizedString(@"Loading", nil);
-        [HUD show:YES];
-    
+           
     }else{
         [self showInboxMessages];
     }
@@ -109,7 +105,8 @@
         [_messageTableView reloadData];
     }
     
-    [HUD hide:YES];
+    [((UIActivityIndicatorView*)[self.view viewWithTag:INDICATOR_TAG]) stopAnimating];
+    [[self.view viewWithTag:INDICATOR_TAG] removeFromSuperview];
 }
 
 
@@ -425,205 +422,4 @@
 	// reload last message in table 
 	[_messageTableView reloadData];
 }
-
-#pragma mark -
-#pragma mark FBServiceResultDelegate
-
--(void)completedWithFBResult:(FBServiceResult *)result{
-
-    // get inbox messages
-    if (result.queryType == FBQueriesTypesGetInboxMessages){
-        
-        if(![result.body isKindOfClass:NSDictionary.class]){
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Facebook"
-                                                            message:@"Something went wrong, please restart application"
-                                                           delegate:nil
-                                                  cancelButtonTitle:NSLocalizedString(@"Ok", nil)
-                                                  otherButtonTitles:nil];
-            [alert show];
-            [alert release];
-            
-            [HUD hide:YES];
-            
-            return;
-        }
-        
-        NSArray *resultData = [result.body objectForKey:kData];
-        NSDictionary *resultError = [result.body objectForKey:kError];
-        if(resultError && !resultData){
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Facebook: %@", [resultError objectForKey:@"type"]]
-                                                            message:[resultError objectForKey:@"message"]   
-                                                           delegate:nil 
-                                                  cancelButtonTitle:NSLocalizedString(@"Ok", nil) 
-                                                  otherButtonTitles:nil];
-            [alert show];
-            [alert release];
-            
-            [HUD hide:YES];
-            
-            return;
-        }
-        
-        // each inbox message
-		for(NSDictionary *inboxConversation in resultData)
-		{
-            if([inboxConversation objectForKey:kComments] == nil){
-                continue;
-            }
-            
-            // crop own id and name
-            NSMutableArray *to = [[[[inboxConversation objectForKey:kTo] objectForKey:kData] mutableCopy] autorelease];
-            
-            // skip multiple conversations
-            if ([to count] > 2){
-                continue;
-            }
-            
-            // remove self from 'To'
-            for(int i = 0; i<[to count]; i++){
-                if([[[to objectAtIndex:i] objectForKey:kId] isEqualToString:[DataManager shared].currentFBUserId]){
-                    [to removeObject:[to objectAtIndex:i]];
-                }
-            }
-            if([to count] == 0){
-                continue;
-            }
-            
-            // create and add conversation
-            Conversation *conersation = [[Conversation alloc] init];
-            conersation.to = [to objectAtIndex:0];
-
-            
-            // add to popular
-            [[DataManager shared] addPopularFriendID:[conersation.to objectForKey:kId]];
-            
-            
-            // add comments
-            if([inboxConversation objectForKey:kComments]){
-                conersation.messages = [[[[inboxConversation objectForKey:kComments] objectForKey:kData] mutableCopy] autorelease];
-            }else{
-                NSMutableArray *emptryArray = [[NSMutableArray alloc] init];
-                conersation.messages = emptryArray;
-                [emptryArray release];
-            }
-            
-            // save to cache
-            [[DataManager shared].historyConversation setObject:conersation forKey:[conersation.to objectForKey:kId]];
-            [DataManager shared].historyConversationAsArray = [[[[DataManager shared].historyConversation allValues] mutableCopy] autorelease];
-            [conersation release];
-		}
-        
-        
-        // get friends
-        [[FBService shared] friendsGetWithDelegate:self];
-        
-    // get friends
-    }else if (result.queryType == FBQueriesTypesFriendsGet){
-        
-        if(![result.body isKindOfClass:NSDictionary.class]){
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Facebook"
-                                                            message:@"Something went wrong, please restart application"
-                                                           delegate:nil
-                                                  cancelButtonTitle:NSLocalizedString(@"Ok", nil)
-                                                  otherButtonTitles:nil];
-            [alert show];
-            [alert release];
-            
-            [HUD hide:YES];
-            
-            return;
-        }
-        
-		// save friends
-		[DataManager shared].myFriends = [result.body objectForKey:kData];
-		
-        // add online/offline & favs keys
-		for(int i=0; i<[[DataManager shared].myFriends count]; i++){
-			[[[DataManager shared].myFriends objectAtIndex:i] setObject:kOffline forKey:kOnOffStatus];
-			[[[DataManager shared].myFriends objectAtIndex:i] setObject:[NSNumber numberWithBool:NO] forKey:kFavorites];
-		}
-        
-        // make friends as dictionary
-        [[DataManager shared] makeFriendsDictionary];
-        
-        
-        // get home feeds
-        [[FBService shared] userWallWithDelegate:self];
-        
-    // Wall
-	}else if(result.queryType == FBQueriesTypesWall){
-        if(![result.body isKindOfClass:NSDictionary.class]){
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Facebook"
-                                                            message:@"Something went wrong, please restart application"
-                                                           delegate:nil
-                                                  cancelButtonTitle:NSLocalizedString(@"Ok", nil)
-                                                  otherButtonTitles:nil];
-            [alert show];
-            [alert release];
-            
-            [HUD hide:YES];
-            
-            return;
-        }
-        
-        NSArray *feeds = [result.body objectForKey:kData];
-        NSLog(@"%@",result.body);
-        
-        NSArray *friendsIds = [[[DataManager shared].myFriendsAsDictionary allKeys] copy];
-        NSLog(@"%@",friendsIds);
-        
-        for(NSDictionary *feed in feeds){
-            NSArray *likes = [[feed objectForKey:kLikes] objectForKey:kData];
-            NSDictionary *comments = [[feed objectForKey:kComments] objectForKey:kData];
-            
-            if(likes == nil && comments == nil){
-                continue;
-            }
-            
-            if([[[DataManager shared].myPopularFriends allObjects] count] > maxPopularFriends){
-                break;
-            }
-            
-            // add likes
-            if(likes != nil){
-                for(NSDictionary *like in likes){
-                    NSString *userID = [like objectForKey:kId];
-                    if([friendsIds containsObject:userID]){
-                        // add popular friend's ID
-                        [[DataManager shared] addPopularFriendID:userID];
-                    }
-                }
-            }
-            
-            // add comments
-            if(comments != nil){
-                for(NSDictionary *comment in comments){
-                    NSString *userID = [[comment objectForKey:kFrom] objectForKey:kId];
-                    if([friendsIds containsObject:userID]){
-                        // add popular friend's ID
-                        [[DataManager shared] addPopularFriendID:userID];
-                    }
-                }
-            }
-        }
-        
-        [friendsIds release];
-
-        // show messages
-        [self showInboxMessages];
-    }
-}
-
-
-#pragma mark -
-#pragma mark MBProgressHUDDelegate methods
-
-- (void)hudWasHidden:(MBProgressHUD *)hud {
-	// Remove HUD from screen when the HUD was hidded
-	[HUD removeFromSuperview];
-	[HUD release];
-	HUD = nil;
-}
-
-
 @end

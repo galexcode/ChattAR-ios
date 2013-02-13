@@ -47,7 +47,7 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetAllFriendsSwitchEnabled:) name:kWillSetAllFriendsSwitchEnabled object:nil ];
         
         isDataRetrieved = NO;
-
+        isViewLoaded = NO;
     }
     return self;
 }
@@ -63,7 +63,9 @@
     [super viewDidLoad];
     [mapView setUserInteractionEnabled:NO];
 	mapView.userInteractionEnabled = YES;
-
+    
+    isViewLoaded = YES;
+    
 	MKCoordinateRegion region;
 	//Set Zoom level using Span
 	MKCoordinateSpan span;  
@@ -146,11 +148,7 @@
     [allFriendsSwitch scaleSwitch:0.9];
     [allFriendsSwitch addTarget:self action:@selector(allFriendsSwitchValueDidChanged:) forControlEvents:UIControlEventValueChanged];
 	[allFriendsSwitch setBackgroundColor:[UIColor clearColor]];
-	[self.view addSubview:allFriendsSwitch];
-    
-    if (!isDataRetrieved) {
-        [_loadingIndicator startAnimating];
-    }    
+	[self.view addSubview:allFriendsSwitch];    
 }
 
 - (void)viewDidUnload
@@ -169,13 +167,31 @@
 }
 
 -(void)viewWillAppear:(BOOL)animated{
-    [self showWorld];
+    if ([DataManager shared].isFirstStartApp) {
+        _loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        [self.view addSubview:_loadingIndicator];
+        _loadingIndicator.center = self.view.center;
+        [self.view bringSubviewToFront:_loadingIndicator];
+        
+        [_loadingIndicator startAnimating];
+        [_loadingIndicator setHidesWhenStopped:YES];
+        [_loadingIndicator setTag:INDICATOR_TAG];
+    }
+    else{
+        [self showWorld];
+    }
 }
 
 
 
 #pragma mark -
 #pragma mark Interface based methods
+
+-(void)checkForShowingData{
+    if (isViewLoaded && isDataRetrieved) {
+        [self showWorld];
+    }
+}
 
 - (void)spin:(UIRotationGestureRecognizer *)gestureRecognizer {
     if(canRotate){
@@ -593,6 +609,7 @@
 #pragma mark Notifications Reaction
 - (void)logoutDone{
     showAllUsers  = NO;
+    isDataRetrieved = NO;
     
     [self.allFriendsSwitch setValue:1.0f];
     
@@ -607,10 +624,14 @@
 
 
 -(void)doMapEndRetrievingData{
-    [_loadingIndicator stopAnimating];
-    
     isDataRetrieved = YES;
+    [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) stopAnimating];
+   
+    
+    [self checkForShowingData];
     [self.allFriendsSwitch setEnabled:YES];
+    
+    [self refreshWithNewPoints:[DataManager shared].mapPoints];
 }
 
 -(void)doAddNewPoint:(NSNotification*)notification{
@@ -729,7 +750,6 @@
 
     if(!isFBCheckin){
         [[DataManager shared] addMapARPointToStorage:newPoint];
-        
     }
 }
 
@@ -975,5 +995,7 @@
 		}
 	}
 }
+
+
 
 @end

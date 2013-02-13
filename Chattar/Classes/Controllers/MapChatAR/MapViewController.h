@@ -35,10 +35,12 @@
     BOOL showAllUsers;
                                                      
     BOOL isDataRetrieved;
+                                                     
+    BOOL isViewLoaded;
 }
 
 @property (nonatomic, assign) id delegate;
-@property (retain, nonatomic) IBOutlet UIActivityIndicatorView *loadingIndicator;
+@property (retain, nonatomic) UIActivityIndicatorView *loadingIndicator;
                                         // add custom map view with clusterization
 @property (nonatomic, assign) OCMapView *mapView;
 @property (nonatomic, retain) UIImageView *compass;

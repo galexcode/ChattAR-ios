@@ -155,7 +155,20 @@
 
 -(void)viewWillAppear:(BOOL)animated{
     [self displayAR];
-    [self showWorld];
+    if ([DataManager shared].isFirstStartApp) {
+        _loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        
+        [self.view addSubview:_loadingIndicator];
+        _loadingIndicator.center = self.view.center;
+        [self.view bringSubviewToFront:_loadingIndicator];
+        
+        [_loadingIndicator startAnimating];
+        [_loadingIndicator setHidesWhenStopped:YES];
+        [_loadingIndicator setTag:INDICATOR_TAG];
+    }
+    else{
+        [self showWorld];
+    }
 }
 
 - (void) viewDidLoad{
@@ -191,12 +204,6 @@
 
 	
 	[displayView setBackgroundColor:[UIColor clearColor]];
-    [self displayAR];
-    [self.view bringSubviewToFront:_loadingIndicator];
-    
-    if (!isDataRetrieved) {
-        [_loadingIndicator startAnimating];
-    }
 }
 
 - (void)viewDidUnload{
@@ -1205,14 +1212,19 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 }
 
 -(void)doAREndRetrievingData{
-    [_loadingIndicator stopAnimating];
+    [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) stopAnimating];
+    
     [self.distanceSlider setEnabled:YES];
     [allFriendsSwitch setEnabled:YES];
     isDataRetrieved = YES;
+    
+    [self refreshWithNewPoints:[DataManager shared].mapPoints];
 }
 
 - (void)logoutDone{
     showAllUsers  = NO;
+    isDataRetrieved = NO;
+    isDataShowed = NO;
     
     [self.allFriendsSwitch setValue:1.0f];
     
