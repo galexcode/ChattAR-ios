@@ -86,7 +86,6 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(logoutDone) name:kNotificationLogout object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doUpdateMarkersForCenterLocation) name:kwillUpdateMarkersForCenterLocation object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveError:) name:kDidReceiveError object:nil ];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doShowAllFriends) name:kWillShowAllFriends object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAREndRetrievingData) name:kDidEndRetrievingInitialData object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetDistanceSliderEnabled:) name:kWillSetDistanceSliderEnabled object:nil ];
         
@@ -154,6 +153,7 @@
     }
     
     [self displayAR];
+    [self showWorld];
 }
 
 -(void)distanceDidChanged:(UISlider *)slider
@@ -298,6 +298,8 @@
 
 - (void)refreshWithNewPoints:(NSArray *)mapPoints{
 	// remove old
+    NSLog(@"%@",displayView.subviews);
+    
 	for (UIView* view in displayView.subviews){
 		if ([view isKindOfClass:[CustomSwitch class]] || view == distanceLabel || view == distanceSlider){
 			continue;
@@ -316,6 +318,9 @@
 - (void)clear{
     [[DataManager shared].coordinates removeAllObjects];
 	[[DataManager shared].coordinateViews removeAllObjects];
+    
+    [[DataManager shared].ARmapPoints removeAllObjects];
+    [[DataManager shared].allARMapPoints removeAllObjects];
 }
 
 /*
@@ -1148,6 +1153,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
                 [friendsIdsWhoAlreadyAdded addObject:[mapAnnotation.fbUser objectForKey:kId]];
             }
         }
+        
         [friendsIds release];
         //
         // add checkin
@@ -1182,9 +1188,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 #pragma mark -
 #pragma mark Notifications reactions
--(void)doShowAllFriends{
-    [self showWorld];
-}
 
 -(void)doWillSetAllFriendsSwitchEnabled:(NSNotification*)notification{
     BOOL enabled = [[[notification userInfo] objectForKey:@"switchEnabled"] boolValue];
