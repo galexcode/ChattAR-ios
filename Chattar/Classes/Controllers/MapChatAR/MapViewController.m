@@ -35,7 +35,7 @@
     if (self) {
         // Custom initialization
 		self.title = NSLocalizedString(@"Map", nil);
-		self.tabBarItem.image = [UIImage imageNamed:@"Around_toolbar_icon.png"];
+		self.tabBarItem.image = [UIImage imageNamed:@"mapTab.png"];
         
         // logout
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(logoutDone) name:kNotificationLogout object:nil];

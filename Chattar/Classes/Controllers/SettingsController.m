@@ -32,7 +32,7 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
 		self.title = NSLocalizedString(@"Settings", @"Settings");
-        self.tabBarItem.image = [UIImage imageNamed:@"DockSettings.png"];
+        self.tabBarItem.image = [UIImage imageNamed:@"settingsTab.png"];
         
         isInitialized = NO;
     }
