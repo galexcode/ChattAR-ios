@@ -42,7 +42,6 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAddNewPoint:) name:kWillAddPointIsFBCheckin object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doUpdatePointStatus:) name:kWillUpdatePointStatus object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveError:) name:kDidReceiveError object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doShowAllFriends) name:kWillShowAllFriends object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doMapEndRetrievingData) name:kDidEndRetrievingInitialData object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetAllFriendsSwitchEnabled:) name:kWillSetAllFriendsSwitchEnabled object:nil ];
         
@@ -151,6 +150,8 @@
     if (!isDataRetrieved) {
         [_loadingIndicator startAnimating];
     }
+    
+    [self showWorld];
 }
 
 - (void)viewDidUnload
@@ -598,10 +599,6 @@
     [self clear];
 }
 
--(void)doShowAllFriends{
-    //[self showWorld];
-}
-
 -(void)doWillSetAllFriendsSwitchEnabled:(NSNotification*)notification{
     BOOL enabled = [[[notification userInfo] objectForKey:@"switchEnabled"] boolValue];
     [allFriendsSwitch setEnabled:enabled];
@@ -614,7 +611,6 @@
     
     isDataRetrieved = YES;
     [self.allFriendsSwitch setEnabled:YES];
-    [self showWorld];
 }
 
 -(void)doAddNewPoint:(NSNotification*)notification{
