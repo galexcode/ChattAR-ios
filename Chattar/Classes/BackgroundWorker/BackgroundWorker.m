@@ -1535,12 +1535,7 @@ static BackgroundWorker* instance = nil;
             if ([tabBarDelegate respondsToSelector:@selector(willAddNewPoint:isFBCheckin:)]) {
                 [tabBarDelegate willAddNewPoint:[[newAnnotation copy] autorelease] isFBCheckin:NO];
             }
-        });
-        
-        // update AR
-        if ([tabBarDelegate respondsToSelector:@selector(willUpdateMarkersForCenterLocation)]) {
-            [tabBarDelegate willUpdateMarkersForCenterLocation];
-        }
+        });        
     }
     
 	[newAnnotation release];
