@@ -19,7 +19,7 @@
     if (self) 
 	{
 		self.title = NSLocalizedString(@"Dialogs", @"Dialogs");
-		self.tabBarItem.image = [UIImage imageNamed:@"DockMessages.png"];
+		self.tabBarItem.image = [UIImage imageNamed:@"dialogsTab.png"];
 		
         // logout
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(logoutDone) name:kNotificationLogout object:nil];
