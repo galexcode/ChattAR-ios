@@ -42,19 +42,15 @@
 
     [NotificationManager playNotificationSoundAndVibrate];
     
-    // if not in chat
-//    MapChatARViewController *mapChatArViewController = [[((UINavigationController *)[self.tabBarController.viewControllers objectAtIndex:1]) viewControllers] objectAtIndex:0];
-//    int mapChatArSelectedSegmentIndex = mapChatArViewController.segmentControl.selectedSegmentIndex;
-//    //
-//    if(self.tabBarController.selectedIndex != 1 || mapChatArSelectedSegmentIndex != (mapChatArViewController.segmentControl.numberOfSegments-1)){
-//        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(appName, "")
-//                                                        message:message
-//                                                       delegate:self
-//                                              cancelButtonTitle:NSLocalizedString(@"Ok", "OK")
-//                                              otherButtonTitles:nil];
-//        [alert show];
-//        [alert release];
-//    }
+    if (self.tabBarController.selectedIndex != chatIndex) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(appName, "")
+                                                        message:message
+                                                       delegate:self
+                                              cancelButtonTitle:NSLocalizedString(@"Ok", "OK")
+                                              otherButtonTitles:nil];
+        [alert show];
+        [alert release];
+    }
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions{
@@ -80,29 +76,17 @@
 	
 	_window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	
-//    // Radar
-//	MapChatARViewController *mapChatARViewController = [[MapChatARViewController alloc] initWithNibName:@"MapChatARViewController" bundle:nil];
-//	UINavigationController* mapChatARNavigationController = [[UINavigationController alloc] initWithRootViewController:mapChatARViewController];
-//	[mapChatARViewController.navigationController setValue:[[[FBNavigationBar alloc]init] autorelease] forKeyPath:@"navigationBar"];
-//    [mapChatARViewController release];
-
     // Settings
 	SettingsController *settingsViewController = [[SettingsController alloc] initWithNibName:@"SettingsController" bundle:nil];
     UINavigationController *settingsNavigationController = [[UINavigationController alloc] initWithRootViewController:settingsViewController];
 	[settingsViewController.navigationController setValue:[[[FBNavigationBar alloc]init] autorelease] forKeyPath:@"navigationBar"];
     [settingsViewController release];
     
-    // Messages
+    // Dialogs
     MessagesViewController *messagesViewController = [[MessagesViewController alloc] initWithNibName:@"MessagesViewController" bundle:nil];
 	UINavigationController *messagesNavigationController = [[UINavigationController alloc] initWithRootViewController:messagesViewController];
 	[messagesViewController.navigationController setValue:[[[FBNavigationBar alloc]init] autorelease] forKeyPath:@"navigationBar"];
     [messagesViewController release];
-    
-    // Contacts
-    ContactsController *contactsViewController = [[ContactsController alloc] initWithNibName:@"ContactsController" bundle:nil];
-    UINavigationController *contactsNavigationController = [[UINavigationController alloc] initWithRootViewController:contactsViewController];
-	[contactsViewController.navigationController setValue:[[[FBNavigationBar alloc]init] autorelease] forKeyPath:@"navigationBar"];
-    [contactsViewController release];
     
     // Chat
     ChatViewController* chatViewController = [[ChatViewController alloc] initWithNibName:@"ChatViewController" bundle:nil];
@@ -123,17 +107,16 @@
         UINavigationController* arNavigationController = [[UINavigationController alloc] initWithRootViewController:arController];
         [arController release];
 
-        viewControllers = [NSArray arrayWithObjects: chatNavigationController,mapNavigationController,arNavigationController,contactsNavigationController, settingsNavigationController, nil];
+        viewControllers = [NSArray arrayWithObjects: chatNavigationController,mapNavigationController,arNavigationController,messagesNavigationController, settingsNavigationController, nil];
         [arNavigationController release];
     }
     else
-        viewControllers = [NSArray arrayWithObjects: chatNavigationController,mapNavigationController,contactsNavigationController, settingsNavigationController, nil];
+        viewControllers = [NSArray arrayWithObjects: chatNavigationController,mapNavigationController,messagesNavigationController, settingsNavigationController, nil];
 	_tabBarController.viewControllers = viewControllers;
 	
 	// release controllers
 	[settingsNavigationController release];
     [messagesNavigationController release];
-	[contactsNavigationController release];
 	[chatNavigationController release];
     [mapNavigationController release];
     // show window
