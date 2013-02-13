@@ -183,7 +183,6 @@
 		ED4C8FEF16BFEB5D000751D4 /* ContactsController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ED4C8F5616BFEB5D000751D4 /* ContactsController.xib */; };
 		ED4C8FF016BFEB5D000751D4 /* FBChatViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ED4C8F5716BFEB5D000751D4 /* FBChatViewController.xib */; };
 		ED4C8FF116BFEB5D000751D4 /* ChatViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ED4C8F5916BFEB5D000751D4 /* ChatViewController.xib */; };
-		ED4C8FF216BFEB5D000751D4 /* MapChatARViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ED4C8F5A16BFEB5D000751D4 /* MapChatARViewController.xib */; };
 		ED4C8FF316BFEB5D000751D4 /* MapViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ED4C8F5B16BFEB5D000751D4 /* MapViewController.xib */; };
 		ED4C8FF416BFEB5D000751D4 /* MessagesViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ED4C8F5C16BFEB5D000751D4 /* MessagesViewController.xib */; };
 		ED4C8FF516BFEB5D000751D4 /* SettingsController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ED4C8F5D16BFEB5D000751D4 /* SettingsController.xib */; };
@@ -192,6 +191,10 @@
 		ED4C900316C0F3F1000751D4 /* BackgroundWorker.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C900216C0F3F1000751D4 /* BackgroundWorker.m */; };
 		ED4C901716C1229F000751D4 /* CustomTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C901616C1229B000751D4 /* CustomTabBarController.m */; };
 		ED70277E168B3D4B003F6829 /* Quickblox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAD8E4E8164BB65700CBCB79 /* Quickblox.framework */; };
+		ED9FFE6B16CBFF730075B3EB /* chatTab.png in Resources */ = {isa = PBXBuildFile; fileRef = ED9FFE6716CBFF730075B3EB /* chatTab.png */; };
+		ED9FFE6C16CBFF730075B3EB /* dialogsTab.png in Resources */ = {isa = PBXBuildFile; fileRef = ED9FFE6816CBFF730075B3EB /* dialogsTab.png */; };
+		ED9FFE6D16CBFF730075B3EB /* mapTab.png in Resources */ = {isa = PBXBuildFile; fileRef = ED9FFE6916CBFF730075B3EB /* mapTab.png */; };
+		ED9FFE6E16CBFF730075B3EB /* settingsTab.png in Resources */ = {isa = PBXBuildFile; fileRef = ED9FFE6A16CBFF730075B3EB /* settingsTab.png */; };
 		EDDDD39616C50F9000942F6F /* ARViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = EDDDD39516C50F8F00942F6F /* ARViewController.xib */; };
 		FA8E4EF11580887B00476EF7 /* Facebook.m in Sources */ = {isa = PBXBuildFile; fileRef = FA8E4E991580887B00476EF7 /* Facebook.m */; };
 		FA8E4EF31580887B00476EF7 /* FBDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = FA8E4E9D1580887B00476EF7 /* FBDialog.m */; };
@@ -476,7 +479,6 @@
 		ED4C8F5616BFEB5D000751D4 /* ContactsController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ContactsController.xib; sourceTree = "<group>"; };
 		ED4C8F5716BFEB5D000751D4 /* FBChatViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FBChatViewController.xib; sourceTree = "<group>"; };
 		ED4C8F5916BFEB5D000751D4 /* ChatViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ChatViewController.xib; sourceTree = "<group>"; };
-		ED4C8F5A16BFEB5D000751D4 /* MapChatARViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MapChatARViewController.xib; sourceTree = "<group>"; };
 		ED4C8F5B16BFEB5D000751D4 /* MapViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MapViewController.xib; sourceTree = "<group>"; };
 		ED4C8F5C16BFEB5D000751D4 /* MessagesViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MessagesViewController.xib; sourceTree = "<group>"; };
 		ED4C8F5D16BFEB5D000751D4 /* SettingsController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SettingsController.xib; sourceTree = "<group>"; };
@@ -486,7 +488,11 @@
 		ED4C900216C0F3F1000751D4 /* BackgroundWorker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BackgroundWorker.m; sourceTree = "<group>"; };
 		ED4C901516C12298000751D4 /* CustomTabBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomTabBarController.h; sourceTree = "<group>"; };
 		ED4C901616C1229B000751D4 /* CustomTabBarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomTabBarController.m; sourceTree = "<group>"; };
-		EDDDD39516C50F8F00942F6F /* ARViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ARViewController.xib; path = MapChatAR/ARViewController.xib; sourceTree = "<group>"; };
+		ED9FFE6716CBFF730075B3EB /* chatTab.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = chatTab.png; sourceTree = "<group>"; };
+		ED9FFE6816CBFF730075B3EB /* dialogsTab.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dialogsTab.png; sourceTree = "<group>"; };
+		ED9FFE6916CBFF730075B3EB /* mapTab.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mapTab.png; sourceTree = "<group>"; };
+		ED9FFE6A16CBFF730075B3EB /* settingsTab.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = settingsTab.png; sourceTree = "<group>"; };
+		EDDDD39516C50F8F00942F6F /* ARViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ARViewController.xib; sourceTree = "<group>"; };
 		FA8E4E981580887B00476EF7 /* Facebook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Facebook.h; sourceTree = "<group>"; };
 		FA8E4E991580887B00476EF7 /* Facebook.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Facebook.m; sourceTree = "<group>"; };
 		FA8E4E9A1580887B00476EF7 /* FBConnect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FBConnect.h; sourceTree = "<group>"; };
@@ -1032,6 +1038,10 @@
 		ED4C8F4316BFEB5D000751D4 /* tabbar */ = {
 			isa = PBXGroup;
 			children = (
+				ED9FFE6716CBFF730075B3EB /* chatTab.png */,
+				ED9FFE6816CBFF730075B3EB /* dialogsTab.png */,
+				ED9FFE6916CBFF730075B3EB /* mapTab.png */,
+				ED9FFE6A16CBFF730075B3EB /* settingsTab.png */,
 				ED4C8F4416BFEB5D000751D4 /* Around_toolbar_icon.png */,
 				ED4C8F4516BFEB5D000751D4 /* Around_toolbar_icon@2x.png */,
 				ED4C8F4616BFEB5D000751D4 /* DockContacts.png */,
@@ -1056,7 +1066,6 @@
 				ED4C8F5D16BFEB5D000751D4 /* SettingsController.xib */,
 				ED4C8F5E16BFEB5D000751D4 /* SplashController.xib */,
 				ED4C8F5F16BFEB5D000751D4 /* WebViewController.xib */,
-				EDDDD39516C50F8F00942F6F /* ARViewController.xib */,
 			);
 			path = xibs;
 			sourceTree = "<group>";
@@ -1064,8 +1073,8 @@
 		ED4C8F5816BFEB5D000751D4 /* MapChatAR */ = {
 			isa = PBXGroup;
 			children = (
+				EDDDD39516C50F8F00942F6F /* ARViewController.xib */,
 				ED4C8F5916BFEB5D000751D4 /* ChatViewController.xib */,
-				ED4C8F5A16BFEB5D000751D4 /* MapChatARViewController.xib */,
 				ED4C8F5B16BFEB5D000751D4 /* MapViewController.xib */,
 			);
 			path = MapChatAR;
@@ -1411,13 +1420,16 @@
 				ED4C8FEF16BFEB5D000751D4 /* ContactsController.xib in Resources */,
 				ED4C8FF016BFEB5D000751D4 /* FBChatViewController.xib in Resources */,
 				ED4C8FF116BFEB5D000751D4 /* ChatViewController.xib in Resources */,
-				ED4C8FF216BFEB5D000751D4 /* MapChatARViewController.xib in Resources */,
 				ED4C8FF316BFEB5D000751D4 /* MapViewController.xib in Resources */,
 				ED4C8FF416BFEB5D000751D4 /* MessagesViewController.xib in Resources */,
 				ED4C8FF516BFEB5D000751D4 /* SettingsController.xib in Resources */,
 				ED4C8FF616BFEB5D000751D4 /* SplashController.xib in Resources */,
 				ED4C8FF716BFEB5D000751D4 /* WebViewController.xib in Resources */,
 				EDDDD39616C50F9000942F6F /* ARViewController.xib in Resources */,
+				ED9FFE6B16CBFF730075B3EB /* chatTab.png in Resources */,
+				ED9FFE6C16CBFF730075B3EB /* dialogsTab.png in Resources */,
+				ED9FFE6D16CBFF730075B3EB /* mapTab.png in Resources */,
+				ED9FFE6E16CBFF730075B3EB /* settingsTab.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
