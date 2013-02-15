@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "CustomTabBarController.h"
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate, UIAlertViewDelegate>{
+@interface AppDelegate : UIResponder <UIApplicationDelegate, UIAlertViewDelegate,UITabBarControllerDelegate>{
 }
 @property (retain, nonatomic) UIWindow *window;
 @property (retain, nonatomic) CustomTabBarController *tabBarController;

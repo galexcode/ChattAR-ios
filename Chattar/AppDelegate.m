@@ -239,4 +239,10 @@ void uncaughtExceptionHandler(NSException *exception) {
 #endif
 }
 
+#pragma mark -
+#pragma mark UITabBarControllerDelegate methods
+-(void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController{
+    
+}
+
 @end
