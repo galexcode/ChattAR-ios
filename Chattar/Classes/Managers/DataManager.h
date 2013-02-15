@@ -57,6 +57,7 @@
 @property (nonatomic, retain) NSMutableArray* ARmapPoints;
 @property (nonatomic, retain) NSMutableArray* allARMapPoints;
 
+
 + (DataManager *) shared;
 
 - (void)sortMessagesArray;
@@ -69,11 +70,6 @@
 - (void)makeFriendsDictionary;
 - (void)addPopularFriendID:(NSString *)friendID;
 
-#pragma mark -
-#pragma mark Controllers data methods
--(UIView*)viewForExistingPoint:(UserAnnotation*)point;
--(void)addPointToARCoordinateViews:(UserAnnotation*)point;
--(void)updateARCoordinateViewWithPoint:(UserAnnotation*)point;
 #pragma mark -
 #pragma mark FB
 
