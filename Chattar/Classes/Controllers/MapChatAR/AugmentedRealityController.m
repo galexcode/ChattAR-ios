@@ -86,7 +86,7 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(logoutDone) name:kNotificationLogout object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doUpdateMarkersForCenterLocation) name:kwillUpdateMarkersForCenterLocation object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveError:) name:kDidReceiveError object:nil ];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAREndRetrievingData) name:kDidEndRetrievingInitialData object:nil ];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAREndRetrievingData) name:kMapEndOfRetrievingInitialData object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetDistanceSliderEnabled:) name:kWillSetDistanceSliderEnabled object:nil ];
         
         isDataRetrieved = NO;
@@ -168,6 +168,15 @@
     }
     else{
         [self showWorld];
+    }
+}
+
+-(void)viewDidAppear:(BOOL)animated{
+                                // if all controllers data was cleared
+    if ([DataManager shared].mapPoints.count == 0 && [DataManager shared].mapPointsIDs.count == 0  && [DataManager shared].checkinsFromStorage.count == 0) {
+                        // load data
+        [[BackgroundWorker instance] retrieveCachedMapDataAndRequestNewData];                   // AR uses map controller data
+        [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
     }
 }
 

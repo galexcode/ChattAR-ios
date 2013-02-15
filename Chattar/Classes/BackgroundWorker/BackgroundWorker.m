@@ -20,6 +20,9 @@
 @synthesize tabBarDelegate;
 @synthesize FBfriends;
 @synthesize initState;
+@synthesize chatInitState;
+@synthesize mapInitState;
+
 @synthesize numberOfCheckinsRetrieved;
 
 static BackgroundWorker* instance = nil;
@@ -37,6 +40,8 @@ static BackgroundWorker* instance = nil;
 -(id)init{
     if (self = [super init]) {
         self.initState = 0;
+        self.chatInitState = 0;
+        self.mapInitState = 0;
         
         CLLocationManager* locationManager = [[[CLLocationManager alloc] init] autorelease];
         [locationManager startMonitoringSignificantLocationChanges];
@@ -630,17 +635,17 @@ static BackgroundWorker* instance = nil;
     
     
     // all data was retrieved
-    ++self.initState;
+    ++self.chatInitState;
 
     NSLog(@"CHAT INIT OK");
-    if(self.initState == 2){
+    if(self.chatInitState == 1){
         dispatch_async( dispatch_get_main_queue(), ^{
             if ([tabBarDelegate respondsToSelector:@selector(willSetAllFriendsSwitchEnabled:)]) {
                 [tabBarDelegate willSetAllFriendsSwitchEnabled:YES];
             }
 
-            if ([tabBarDelegate respondsToSelector:@selector(endOfRetrievingInitialData)]) {
-                [tabBarDelegate endOfRetrievingInitialData];
+            if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialData)]) {
+                [tabBarDelegate chatEndOfRetrievingInitialData];
             }
         });
     }
@@ -719,18 +724,19 @@ static BackgroundWorker* instance = nil;
     [mapPointsMutable release];
     
     // all data was retrieved
-    ++self.initState;
+    ++self.mapInitState;
     NSLog(@"MAP INIT OK");
-    if(self.initState == 2){
+    if(self.mapInitState == 1){
         dispatch_async( dispatch_get_main_queue(), ^{
             if ([tabBarDelegate respondsToSelector:@selector(willSetAllFriendsSwitchEnabled:)]) {
                 [tabBarDelegate willSetAllFriendsSwitchEnabled:YES];
             }
 
             
-            if ([tabBarDelegate respondsToSelector:@selector(endOfRetrievingInitialData)]) {
-                [tabBarDelegate endOfRetrievingInitialData];
+            if ([tabBarDelegate respondsToSelector:@selector(mapEndOfRetrievingInitialData)]) {
+                [tabBarDelegate mapEndOfRetrievingInitialData];
             }
+            
         });
     }
 }
@@ -1027,16 +1033,16 @@ static BackgroundWorker* instance = nil;
                     NSDictionary *resultError = [result.body objectForKey:kError];
                     if(resultError != nil){
                         // all data was retrieved
-                        ++self.initState;
+                        ++self.mapInitState;
                         NSLog(@"MAP INIT FB ERROR");
-                        if(self.initState == 2){
+                        if(self.mapInitState == 1){
                             if ([tabBarDelegate respondsToSelector:@selector(willSetAllFriendsSwitchEnabled:)]) {
                                 [tabBarDelegate willSetAllFriendsSwitchEnabled:YES];
                             }
 
                             if ([tabBarDelegate respondsToSelector:@selector(mapEndRetrievingData)]) {
 
-                                [tabBarDelegate endOfRetrievingInitialData];
+                                [tabBarDelegate mapEndOfRetrievingInitialData];
                             }
                         }
                         return;
@@ -1055,15 +1061,15 @@ static BackgroundWorker* instance = nil;
                     
                     // Undefined format
                 }else{
-                    ++self.initState;
+                    ++self.mapInitState;
                     NSLog(@"MAP INIT FB Undefined format");
-                    if(self.initState == 2){
+                    if(self.mapInitState == 1){
                         if ([tabBarDelegate respondsToSelector:@selector(willSetAllFriendsSwitchEnabled:)]) {
                             [tabBarDelegate willSetAllFriendsSwitchEnabled:YES];
                         }
 
-                        if ([tabBarDelegate respondsToSelector:@selector(endOfRetrievingInitialData)]) {
-                            [tabBarDelegate endOfRetrievingInitialData];
+                        if ([tabBarDelegate respondsToSelector:@selector(mapEndOfRetrievingInitialData)]) {
+                            [tabBarDelegate mapEndOfRetrievingInitialData];
                         }
                         
                     }
@@ -1076,15 +1082,15 @@ static BackgroundWorker* instance = nil;
                     NSDictionary *resultError = [result.body objectForKey:kError];
                     if(resultError != nil){
                         // all data was retrieved
-                        ++self.initState;
+                        ++self.chatInitState;
                         NSLog(@"CHAT INIT FB ERROR");
-                        if(self.initState == 2){
+                        if(self.chatInitState == 1){
                             if ([tabBarDelegate respondsToSelector:@selector(willSetAllFriendsSwitchEnabled:)]) {
                                 [tabBarDelegate willSetAllFriendsSwitchEnabled:YES];
                             }
 
-                            if ([tabBarDelegate respondsToSelector:@selector(endOfRetrievingInitialData)]) {
-                                [tabBarDelegate endOfRetrievingInitialData];
+                            if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialData)]) {
+                                [tabBarDelegate chatEndOfRetrievingInitialData];
                             }
                         }
                         return;
@@ -1104,15 +1110,15 @@ static BackgroundWorker* instance = nil;
                     
                     // Undefined format
                 }else{
-                    ++self.initState;
+                    ++self.chatInitState;
                     NSLog(@"CHAT INIT FB Undefined format");
-                    if(self.initState == 2){
+                    if(self.chatInitState == 1){
                         if ([tabBarDelegate respondsToSelector:@selector(willSetAllFriendsSwitchEnabled:)]) {
                             [tabBarDelegate willSetAllFriendsSwitchEnabled:YES];
                         }
 
-                        if ([tabBarDelegate respondsToSelector:@selector(endOfRetrievingInitialData)]) {
-                            [tabBarDelegate endOfRetrievingInitialData];
+                        if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialData)]) {
+                            [tabBarDelegate chatEndOfRetrievingInitialData];
                         }
                     }
                 }

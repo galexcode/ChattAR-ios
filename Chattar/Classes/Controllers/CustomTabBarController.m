@@ -191,9 +191,6 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:kWillShowAllFriends object:nil];
 }
 
--(void)endOfRetrievingInitialData{
-    [[NSNotificationCenter defaultCenter] postNotificationName:kDidEndRetrievingInitialData object:nil];
-}
 
 
 #pragma mark -
@@ -244,6 +241,10 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:kWillSetMessageFieldEnabled object:nil userInfo:data];
 }
 
+-(void)chatEndOfRetrievingInitialData{
+    [[NSNotificationCenter defaultCenter] postNotificationName:kChatEndOfRetrievingInitialData object:nil];
+}
+
 
 #pragma mark -
 #pragma mark MapControllerDelegate Methods
@@ -265,6 +266,11 @@
     [[DataManager shared] addMapARPointsToStorage:newMapPoints];
 }
 
+-(void)mapEndOfRetrievingInitialData{
+    [[NSNotificationCenter defaultCenter] postNotificationName:kMapEndOfRetrievingInitialData object:nil];
+}
+
+
 #pragma mark -
 #pragma mark ARControllerDelegate Methods
 -(void)willUpdateMarkersForCenterLocation{
@@ -273,10 +279,6 @@
 
 -(void)willAddMarker{
     
-}
-
--(void)AREndOfRetrieveInitialData{
-    [[NSNotificationCenter defaultCenter] postNotificationName:kAREndOfRetrieveInitialData object:nil];
 }
 
 -(void)willSetEnabledDistanceSlider:(BOOL)sliderEnabled{

@@ -50,7 +50,7 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doSuccessfulMessageSending) name:kDidSuccessfulMessageSending object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doShowAllFriends) name:kWillShowAllFriends object:nil ];
 
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChatEndRetrievingData) name:kDidEndRetrievingInitialData object:nil ];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChatEndRetrievingData) name:kChatEndOfRetrievingInitialData object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetAllFriendsSwitchEnabled:) name:kWillSetAllFriendsSwitchEnabled object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetMessageFieldEnabled:) name:kWillSetMessageFieldEnabled object:nil ];
 
@@ -161,9 +161,14 @@
         
         [_loadingIndicator startAnimating];
         [_loadingIndicator setHidesWhenStopped:YES];
+    }    
+}
 
+-(void)viewDidAppear:(BOOL)animated{
+    if ([DataManager shared].chatPoints.count == 0 && [DataManager shared].chatMessagesIDs.count == 0 && [DataManager shared].checkinsFromStorage.count == 0) {
+        [[BackgroundWorker instance] retrieveCachedChatDataAndRequestNewData];
+        [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
     }
-
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation

@@ -43,7 +43,7 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAddNewPoint:) name:kWillAddPointIsFBCheckin object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doUpdatePointStatus:) name:kWillUpdatePointStatus object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveError:) name:kDidReceiveError object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doMapEndRetrievingData) name:kDidEndRetrievingInitialData object:nil ];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doMapEndRetrievingData) name:kMapEndOfRetrievingInitialData object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetAllFriendsSwitchEnabled:) name:kWillSetAllFriendsSwitchEnabled object:nil ];
         
         isDataRetrieved = NO;
@@ -179,6 +179,13 @@
     }
     else{
         [self showWorld];
+    }    
+}
+
+-(void)viewDidAppear:(BOOL)animated{
+    if ([DataManager shared].mapPoints.count == 0 && [DataManager shared].mapPointsIDs.count == 0  && [DataManager shared].checkinsFromStorage.count == 0) {
+        [[BackgroundWorker instance] retrieveCachedMapDataAndRequestNewData];                   
+        [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
     }
 }
 
@@ -389,10 +396,6 @@
         }
     }
     [currentMapAnnotations release];
-    
-    if (isExistPoint) {
-        [[DataManager shared] updateARCoordinateViewWithPoint:point];
-    }
 }
 
 #pragma mark -

@@ -40,12 +40,13 @@
 #define kWillClearMessageField @"kWillClearMessageField"
 #define kWillScrollToTop @"kWillScrollToTop"
 #define kwillUpdateMarkersForCenterLocation @"kwillUpdateMarkersForCenterLocation"
-#define kAREndOfRetrieveInitialData @"kAREndOfRetrieveInitialData"
 #define kWillShowAllFriends @"kWillShowAllFriends"
-#define kDidEndRetrievingInitialData @"kDidEndRetrievingInitialData"
 #define kWillSetAllFriendsSwitchEnabled @"kWillSetAllFriendsSwitchEnabled"
 #define kWillSetMessageFieldEnabled @"kWillSetMessageFieldEnabled"
 #define kWillSetDistanceSliderEnabled @"kWillSetDistanceSliderEnabled"
+
+#define kChatEndOfRetrievingInitialData @"kChatEndOfRetrievingInitialData"
+#define kMapEndOfRetrievingInitialData @"kMapEndOfRetrievingInitialData"
 
 #define INDICATOR_TAG 23458
 // Strings

@@ -26,6 +26,7 @@
 -(void)willScrollToTop;
 -(void)willSetEnabledMessageField:(BOOL)enabled;
 -(void)willSetAllFriendsSwitchEnabled:(BOOL)switchEnabled;
+-(void)chatEndOfRetrievingInitialData;
 @end
 
 @protocol DataDelegate <NSObject>
@@ -44,7 +45,6 @@
 -(void)didReceiveCachedChatMessagesIDs:(NSArray*)cachedChatMessagesIDs;
 -(void)willShowAllFriends;
 
--(void)endOfRetrievingInitialData;
 @end
 
 
@@ -64,6 +64,7 @@
 @optional
 -(void) willUpdatePointStatus:(UserAnnotation*)newPoint;
 -(void)willSetAllFriendsSwitchEnabled:(BOOL)switchEnabled;
+-(void)mapEndOfRetrievingInitialData;
 @end
 
 @protocol ARControllerDelegate <NSObject>
@@ -95,6 +96,8 @@
 
 @property (nonatomic, retain) NSMutableArray* FBfriends;
 @property (assign) short initState;                 // 2 if all data(map/chat) was retrieved
+@property (assign) short chatInitState;
+@property (assign) short mapInitState;
 @property (assign) short numberOfCheckinsRetrieved;
 
 
