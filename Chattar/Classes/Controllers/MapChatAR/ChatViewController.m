@@ -14,6 +14,7 @@
 #import "ARMarkerView.h"
 #import "WebViewController.h"
 #import "ProvisionManager.h"
+#import "AppDelegate.h"
 
 @interface ChatViewController ()
 
@@ -96,13 +97,6 @@
 	[allFriendsSwitch setBackgroundColor:[UIColor clearColor]];
 	[self.view addSubview:allFriendsSwitch];
     
-    _loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    [_loadingIndicator setTag:INDICATOR_TAG];
-    [self.view addSubview:_loadingIndicator];
-    
-    _loadingIndicator.center = self.view.center;
-    [self.view bringSubviewToFront:_loadingIndicator];
-
 }
 
 - (void)removeQuote
@@ -136,38 +130,26 @@
 }
 
 
--(void)viewWillAppear:(BOOL)animated{
+-(void)viewWillAppear:(BOOL)animated{   
     
+    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
+    NSLog(@"%@",topController.presentingViewController);
+
     if ([DataManager shared].isFirstStartApp) {
         
         // show Alert with info at startapp
         [[DataManager shared] setFirstStartApp:NO];
         
-        NSString *alertBody = nil;
-        if([ARManager deviceSupportsAR]){
-            alertBody = NSLocalizedString(@"You can see and chat with all\nusers within 10km. Increase\nsearch radius using slider (left). \nSwitch to 'Facebook only' mode (bottom right) to see your friends and their check-ins only.", nil);
-            
-        }else{
-            alertBody = NSLocalizedString(@"Switch to 'Facebook only' mode (bottom right) to see your friends and their check-ins only.", nil);
-        }
-    
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"'World' mode", nil)
-                                                        message:alertBody
-                                                       delegate:nil
-                                              cancelButtonTitle:NSLocalizedString(@"Ok", nil)
-                                              otherButtonTitles:nil];
-        [alert show];
-        [alert release];
-        
-        [_loadingIndicator startAnimating];
-        [_loadingIndicator setHidesWhenStopped:YES];
-    }    
+        [self addSpinner];
+    }
 }
 
 -(void)viewDidAppear:(BOOL)animated{
     if ([DataManager shared].chatPoints.count == 0 && [DataManager shared].chatMessagesIDs.count == 0 && [DataManager shared].checkinsFromStorage.count == 0) {
+        [messagesTableView reloadData];
         [[BackgroundWorker instance] retrieveCachedChatDataAndRequestNewData];
         [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
+        [self addSpinner];
     }
 }
 
@@ -183,6 +165,17 @@
 
 #pragma mark -
 #pragma mark Interface based methods
+
+-(void)addSpinner{
+    _loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    [self.view addSubview:_loadingIndicator];
+    _loadingIndicator.center = self.view.center;
+    [self.view bringSubviewToFront:_loadingIndicator];
+    
+    [_loadingIndicator startAnimating];
+    [_loadingIndicator setHidesWhenStopped:YES];
+    [_loadingIndicator setTag:INDICATOR_TAG];
+}
 
 - (IBAction)sendMessageDidPress:(id)sender{
     
