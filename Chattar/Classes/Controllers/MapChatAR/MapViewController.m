@@ -178,14 +178,20 @@
         [_loadingIndicator setTag:INDICATOR_TAG];
     }
     else{
-        [self showWorld];
-    }    
+        if ([allFriendsSwitch value] == friendsValue) {
+            [self showFriends];
+        }
+        else
+            [self showWorld];
+    }
 }
 
 -(void)viewDidAppear:(BOOL)animated{
     if ([DataManager shared].mapPoints.count == 0 && [DataManager shared].mapPointsIDs.count == 0  && [DataManager shared].checkinsFromStorage.count == 0) {
+        [self mapClear];
         [[BackgroundWorker instance] retrieveCachedMapDataAndRequestNewData];                   
         [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
+        [self addSpinner];
     }
 }
 
@@ -194,10 +200,15 @@
 #pragma mark -
 #pragma mark Interface based methods
 
--(void)checkForShowingData{
-    if (isViewLoaded && isDataRetrieved) {
-        [self showWorld];
-    }
+-(void)addSpinner{
+    _loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    [self.view addSubview:_loadingIndicator];
+    _loadingIndicator.center = self.view.center;
+    [self.view bringSubviewToFront:_loadingIndicator];
+    
+    [_loadingIndicator startAnimating];
+    [_loadingIndicator setHidesWhenStopped:YES];
+    [_loadingIndicator setTag:INDICATOR_TAG];
 }
 
 - (void)spin:(UIRotationGestureRecognizer *)gestureRecognizer {
@@ -361,18 +372,21 @@
     [self.mapView addAnnotation:newMapPoint];
 }
 
-- (void)clear{
-    
+-(void)mapClear{
     [mapView setUserInteractionEnabled:NO];
     [mapView removeAnnotations:mapView.annotations];
     [self.mapView setRegion:initialRegion animated:NO];
 	mapView.userInteractionEnabled = YES;
+
+}
+
+- (void)clear{
     
+    [self mapClear];
     [[DataManager shared].allmapPoints removeAllObjects];
     [[DataManager shared].mapPoints removeAllObjects];
     [[DataManager shared].mapPointsIDs removeAllObjects];
     [[DataManager shared].allCheckins removeAllObjects];
-    
 }
 
 -(void)updateStatus:(UserAnnotation*)point{
@@ -631,7 +645,6 @@
     [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) stopAnimating];
    
     
-    [self checkForShowingData];
     [self.allFriendsSwitch setEnabled:YES];
     
     [self refreshWithNewPoints:[DataManager shared].mapPoints];
