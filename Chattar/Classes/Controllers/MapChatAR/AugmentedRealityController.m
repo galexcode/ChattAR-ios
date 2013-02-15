@@ -156,18 +156,33 @@
 -(void)viewWillAppear:(BOOL)animated{
     [self displayAR];
     if ([DataManager shared].isFirstStartApp) {
-        _loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        NSString *alertBody = nil;
+        if([ARManager deviceSupportsAR]){
+            alertBody = NSLocalizedString(@"You can see and chat with all\nusers within 10km. Increase\nsearch radius using slider (left). \nSwitch to 'Facebook only' mode (bottom right) to see your friends and their check-ins only.", nil);
+            
+        }else{
+            alertBody = NSLocalizedString(@"Switch to 'Facebook only' mode (bottom right) to see your friends and their check-ins only.", nil);
+        }
         
-        [self.view addSubview:_loadingIndicator];
-        _loadingIndicator.center = self.view.center;
-        [self.view bringSubviewToFront:_loadingIndicator];
         
-        [_loadingIndicator startAnimating];
-        [_loadingIndicator setHidesWhenStopped:YES];
-        [_loadingIndicator setTag:INDICATOR_TAG];
+        
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"'World' mode", nil)
+                                                        message:alertBody
+                                                       delegate:nil
+                                              cancelButtonTitle:NSLocalizedString(@"Ok", nil)
+                                              otherButtonTitles:nil];
+        [alert show];
+        [alert release];
+        
+        [self addSpinner];
     }
     else{
-        [self showWorld];
+        if ([allFriendsSwitch value] == friendsValue) {
+            [self showFriends];
+        }
+        else
+            [self showWorld];
+
     }
 }
 
@@ -177,6 +192,7 @@
                         // load data
         [[BackgroundWorker instance] retrieveCachedMapDataAndRequestNewData];                   // AR uses map controller data
         [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
+        [self addSpinner];
     }
 }
 
@@ -1000,6 +1016,18 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 #pragma mark -
 #pragma mark Intreface based methods
+
+-(void)addSpinner{
+    _loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    [self.view addSubview:_loadingIndicator];
+    _loadingIndicator.center = self.view.center;
+    [self.view bringSubviewToFront:_loadingIndicator];
+    
+    [_loadingIndicator startAnimating];
+    [_loadingIndicator setHidesWhenStopped:YES];
+    [_loadingIndicator setTag:INDICATOR_TAG];
+}
+
 
 // touch on marker
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event{
