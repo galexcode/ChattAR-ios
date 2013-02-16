@@ -345,7 +345,6 @@
         
         [[NSNotificationCenter defaultCenter] removeObserver:self];
         
-        // show messages
         ((AppDelegate *)[[UIApplication sharedApplication] delegate]).tabBarController.selectedIndex = 0;
                     // notify tabbar for request FB info
         [[NSNotificationCenter defaultCenter] postNotificationName:@"splashScreenDidHide" object:nil];

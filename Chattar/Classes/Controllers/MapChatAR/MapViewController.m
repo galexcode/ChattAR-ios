@@ -168,14 +168,25 @@
 
 -(void)viewWillAppear:(BOOL)animated{
     if ([DataManager shared].isFirstStartApp) {
-        _loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-        [self.view addSubview:_loadingIndicator];
-        _loadingIndicator.center = self.view.center;
-        [self.view bringSubviewToFront:_loadingIndicator];
-        
-        [_loadingIndicator startAnimating];
-        [_loadingIndicator setHidesWhenStopped:YES];
-        [_loadingIndicator setTag:INDICATOR_TAG];
+        [self addSpinner];
+    }
+}
+
+-(void)viewDidAppear:(BOOL)animated{
+    [self checkForShowingData];
+}
+
+
+
+#pragma mark -
+#pragma mark Interface based methods
+
+-(void)checkForShowingData{
+    if ([DataManager shared].mapPoints.count == 0 && [DataManager shared].mapPointsIDs.count == 0) {
+        [self mapClear];
+        [[BackgroundWorker instance] retrieveCachedMapDataAndRequestNewData];
+        [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
+        [self addSpinner];
     }
     else{
         if ([allFriendsSwitch value] == friendsValue) {
@@ -186,28 +197,19 @@
     }
 }
 
--(void)viewDidAppear:(BOOL)animated{
-    if ([DataManager shared].mapPoints.count == 0 && [DataManager shared].mapPointsIDs.count == 0  && [DataManager shared].checkinsFromStorage.count == 0) {
-        [self mapClear];
-        [[BackgroundWorker instance] retrieveCachedMapDataAndRequestNewData];                   
-        [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
-        [self addSpinner];
-    }
-}
-
-
-
-#pragma mark -
-#pragma mark Interface based methods
-
 -(void)addSpinner{
-    _loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    [self.view addSubview:_loadingIndicator];
+    if (!_loadingIndicator) {
+        _loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    }
+    
+    if (![self.view viewWithTag:INDICATOR_TAG]) {
+        [self.view addSubview:_loadingIndicator];
+        [_loadingIndicator startAnimating];
+    }
+    
     _loadingIndicator.center = self.view.center;
     [self.view bringSubviewToFront:_loadingIndicator];
     
-    [_loadingIndicator startAnimating];
-    [_loadingIndicator setHidesWhenStopped:YES];
     [_loadingIndicator setTag:INDICATOR_TAG];
 }
 
@@ -377,11 +379,9 @@
     [mapView removeAnnotations:mapView.annotations];
     [self.mapView setRegion:initialRegion animated:NO];
 	mapView.userInteractionEnabled = YES;
-
 }
 
 - (void)clear{
-    
     [self mapClear];
     [[DataManager shared].allmapPoints removeAllObjects];
     [[DataManager shared].mapPoints removeAllObjects];
@@ -642,7 +642,7 @@
 
 -(void)doMapEndRetrievingData{
     isDataRetrieved = YES;
-    [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) stopAnimating];
+    [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
    
     
     [self.allFriendsSwitch setEnabled:YES];
@@ -791,6 +791,12 @@
                                           otherButtonTitles:nil];
     [alert show];
     [alert release];
+    
+    // remove loading indicator
+    if ([self.view viewWithTag:INDICATOR_TAG]) {
+        [[self.view viewWithTag:INDICATOR_TAG] removeFromSuperview];
+    }
+
 }
 
 

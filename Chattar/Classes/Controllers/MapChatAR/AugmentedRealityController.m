@@ -88,7 +88,6 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveError:) name:kDidReceiveError object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAREndRetrievingData) name:kMapEndOfRetrievingInitialData object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetDistanceSliderEnabled:) name:kWillSetDistanceSliderEnabled object:nil ];
-        
         isDataRetrieved = NO;
         
         viewFrame = CGRectMake(0, 45, 320, 415);
@@ -176,24 +175,10 @@
         
         [self addSpinner];
     }
-    else{
-        if ([allFriendsSwitch value] == friendsValue) {
-            [self showFriends];
-        }
-        else
-            [self showWorld];
-
-    }
 }
 
 -(void)viewDidAppear:(BOOL)animated{
-                                // if all controllers data was cleared
-    if ([DataManager shared].mapPoints.count == 0 && [DataManager shared].mapPointsIDs.count == 0  && [DataManager shared].checkinsFromStorage.count == 0) {
-                        // load data
-        [[BackgroundWorker instance] retrieveCachedMapDataAndRequestNewData];                   // AR uses map controller data
-        [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
-        [self addSpinner];
-    }
+    [self checkForShowingData];
 }
 
 - (void) viewDidLoad{
@@ -1017,6 +1002,23 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 #pragma mark -
 #pragma mark Intreface based methods
 
+-(void)checkForShowingData{
+    // if all controllers data was cleared
+    if ([DataManager shared].mapPoints.count == 0 && [DataManager shared].mapPointsIDs.count == 0) {
+        // load data
+        [[BackgroundWorker instance] retrieveCachedMapDataAndRequestNewData];                   // AR uses map controller data
+        [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
+        [self addSpinner];
+    }
+    else{
+        if ([allFriendsSwitch value] == friendsValue) {
+            [self showFriends];
+        }
+        else
+            [self showWorld];
+    }
+}
+
 -(void)addSpinner{
     _loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     [self.view addSubview:_loadingIndicator];
@@ -1249,7 +1251,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 }
 
 -(void)doAREndRetrievingData{
-    [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) stopAnimating];
+    [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
     
     [self.distanceSlider setEnabled:YES];
     [allFriendsSwitch setEnabled:YES];
@@ -1282,6 +1284,11 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
                                           otherButtonTitles:nil];
     [alert show];
     [alert release];
+    
+    // remove loading indicator
+    if ([self.view viewWithTag:INDICATOR_TAG]) {
+        [[self.view viewWithTag:INDICATOR_TAG] removeFromSuperview];
+    }
 }
 
 -(void)doUpdateMarkersForCenterLocation{

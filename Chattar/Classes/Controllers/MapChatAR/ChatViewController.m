@@ -54,7 +54,7 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChatEndRetrievingData) name:kChatEndOfRetrievingInitialData object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetAllFriendsSwitchEnabled:) name:kWillSetAllFriendsSwitchEnabled object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetMessageFieldEnabled:) name:kWillSetMessageFieldEnabled object:nil ];
-
+        
     }
     return self;
 }
@@ -131,13 +131,7 @@
 
 
 -(void)viewWillAppear:(BOOL)animated{   
-    
-    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
-    NSLog(@"%@",topController.presentingViewController);
-
     if ([DataManager shared].isFirstStartApp) {
-        
-        // show Alert with info at startapp
         [[DataManager shared] setFirstStartApp:NO];
         
         [self addSpinner];
@@ -145,16 +139,10 @@
 }
 
 -(void)viewDidAppear:(BOOL)animated{
-    if ([DataManager shared].chatPoints.count == 0 && [DataManager shared].chatMessagesIDs.count == 0 && [DataManager shared].checkinsFromStorage.count == 0) {
-        [messagesTableView reloadData];
-        [[BackgroundWorker instance] retrieveCachedChatDataAndRequestNewData];
-        [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
-        [self addSpinner];
-    }
+    [self checkForShowingData];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation{
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
@@ -166,14 +154,34 @@
 #pragma mark -
 #pragma mark Interface based methods
 
+-(void)checkForShowingData{
+    if ([DataManager shared].chatPoints.count == 0 && [DataManager shared].chatMessagesIDs.count == 0) {
+        [messagesTableView reloadData];
+        [[BackgroundWorker instance] retrieveCachedChatDataAndRequestNewData];
+        [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
+        [self addSpinner];
+    }
+    else{
+        if ([allFriendsSwitch value] == friendsValue) {
+            [self showFriends];
+        }
+        else
+            [self showWorld];
+    }
+}
+
 -(void)addSpinner{
-    _loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    [self.view addSubview:_loadingIndicator];
+    if (!_loadingIndicator) {
+        _loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    }
+    
+    if (![self.view viewWithTag:INDICATOR_TAG]) {
+        [self.view addSubview:_loadingIndicator];
+    }
     _loadingIndicator.center = self.view.center;
     [self.view bringSubviewToFront:_loadingIndicator];
     
     [_loadingIndicator startAnimating];
-    [_loadingIndicator setHidesWhenStopped:YES];
     [_loadingIndicator setTag:INDICATOR_TAG];
 }
 
@@ -588,8 +596,11 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     
     NSArray *friendsIds = [[DataManager shared].myFriendsAsDictionary allKeys];
-                                  
-    UserAnnotation *currentAnnotation = [[DataManager shared].chatPoints objectAtIndex:[indexPath row]];
+    
+    UserAnnotation *currentAnnotation = nil;
+    if ([DataManager shared].chatPoints.count > [indexPath row]) {
+        currentAnnotation = [[DataManager shared].chatPoints objectAtIndex:[indexPath row]];
+    }
     
     if ([currentAnnotation isKindOfClass:[UITableViewCell class]]){
 		return (UITableViewCell*)currentAnnotation;
@@ -1004,6 +1015,7 @@
 
 #pragma mark -
 #pragma mark Notifications Reaction
+
 -(void)doWillSetAllFriendsSwitchEnabled:(NSNotification*)notification{
     BOOL enabled = [[[notification userInfo] objectForKey:@"switchEnabled"] boolValue];
     [allFriendsSwitch setEnabled:enabled];
@@ -1028,7 +1040,7 @@
     isDataRetrieved = YES;
             
     [allFriendsSwitch setEnabled:YES];
-    [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) stopAnimating];
+    [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
     
     [self refresh];
 }
@@ -1107,7 +1119,10 @@
 }
 
 -(void)doRemoveLastChatPoint{
-    [[DataManager shared].chatPoints removeLastObject];
+    if ([DataManager shared].chatPoints.count != 0) {
+        [[DataManager shared].chatPoints removeLastObject];
+
+    }
 }
 
 -(void)doReceiveError:(NSNotification*)notification{
@@ -1119,6 +1134,10 @@
                                           otherButtonTitles:nil];
     [alert show];
     [alert release];
+                        // remove loading indicator 
+    if ([self.view viewWithTag:INDICATOR_TAG]) {
+        [[self.view viewWithTag:INDICATOR_TAG] removeFromSuperview];
+    }
 }
 
 -(void)doNotReceiveNewChatPoints{
