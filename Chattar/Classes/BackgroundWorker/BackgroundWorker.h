@@ -27,22 +27,20 @@
 -(void)willSetEnabledMessageField:(BOOL)enabled;
 -(void)willSetAllFriendsSwitchEnabled:(BOOL)switchEnabled;
 -(void)chatEndOfRetrievingInitialData;
+
+-(void)chatDidReceiveAllCachedData:(NSDictionary*)cachedData;
+
 @end
 
 @protocol DataDelegate <NSObject>
 
 @optional
 -(void)didReceiveError:(NSString*)errorMessage;
-
--(void) didReceiveCachedMapPoints:(NSArray*)cachedMapPoints;
--(void) didReceiveCachedMapPointsIDs:(NSArray*)cachedMapIDs;
 -(void) willAddNewPoint:(UserAnnotation*)point isFBCheckin:(BOOL)isFBCheckin;
 -(void) willSaveMapARPoints:(NSArray*)newMapPoints;
 -(void)didNotReceiveNewChatPoints;
 -(void)willRemoveLastChatPoint;
 -(void)didReceiveErrorLoadingNewChatPoints;
--(void)didReceiveCachedChatPoints:(NSArray*)cachedChatPoints;
--(void)didReceiveCachedChatMessagesIDs:(NSArray*)cachedChatMessagesIDs;
 -(void)willShowAllFriends;
 
 @end
@@ -65,6 +63,7 @@
 -(void) willUpdatePointStatus:(UserAnnotation*)newPoint;
 -(void)willSetAllFriendsSwitchEnabled:(BOOL)switchEnabled;
 -(void)mapEndOfRetrievingInitialData;
+-(void)mapDidReceiveAllCachedData:(NSDictionary*)allMapData;
 @end
 
 @protocol ARControllerDelegate <NSObject>
@@ -95,7 +94,6 @@
 @property (nonatomic, assign) id<FBDataDelegate,DataDelegate,MapControllerDelegate,ChatControllerDelegate,ARControllerDelegate> tabBarDelegate;
 
 @property (nonatomic, retain) NSMutableArray* FBfriends;
-@property (assign) short initState;                 // 2 if all data(map/chat) was retrieved
 @property (assign) short chatInitState;
 @property (assign) short mapInitState;
 @property (assign) short numberOfCheckinsRetrieved;
@@ -112,4 +110,5 @@
 -(void)requestFriendWithFacebookID:(NSString*)fbID andMessageText:(NSString*)message;
 -(void)postGeoData:(QBLGeoData*)geoData;
 - (void)retrieveCachedFBCheckinsAndRequestNewCheckins;
+
 @end

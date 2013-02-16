@@ -19,7 +19,6 @@
 @implementation BackgroundWorker
 @synthesize tabBarDelegate;
 @synthesize FBfriends;
-@synthesize initState;
 @synthesize chatInitState;
 @synthesize mapInitState;
 
@@ -39,7 +38,6 @@ static BackgroundWorker* instance = nil;
 
 -(id)init{
     if (self = [super init]) {
-        self.initState = 0;
         self.chatInitState = 0;
         self.mapInitState = 0;
         
@@ -126,35 +124,16 @@ static BackgroundWorker* instance = nil;
             [mapPointsIds addObject:[NSString stringWithFormat:@"%d", ((UserAnnotation *)mapARCashedPoint.body).geoDataID]];
         }
     }
+        
+    NSMutableDictionary* allMapData = [[[NSMutableDictionary alloc] init] autorelease];
+    [allMapData setObject:mapPoints forKey:@"allMapPoints"];
+    [allMapData setObject:mapPointsIds forKey:@"mapPointsIDs"];
     
-    NSLog(@"%@",mapPoints);
-    
-    if ([tabBarDelegate respondsToSelector:@selector(didReceiveCachedMapPoints:)]) {
-        [tabBarDelegate didReceiveCachedMapPoints:mapPoints];
+    if ([tabBarDelegate respondsToSelector:@selector(mapDidReceiveAllCachedData:)]) {
+        [tabBarDelegate mapDidReceiveAllCachedData:allMapData];
     }
-    
     [mapPoints release];
-
-    if ([DataManager shared].allmapPoints.count > 0) {
-        
-        if ([tabBarDelegate respondsToSelector:@selector(willShowAllFriends)]) {
-            [tabBarDelegate willShowAllFriends];
-        }
-        
-        [self retrieveNewQBData];
-    }
-    else{
-        if ([tabBarDelegate respondsToSelector:@selector(willSetAllFriendsSwitchEnabled:)]) {
-            [tabBarDelegate willSetAllFriendsSwitchEnabled:NO];
-        }
-    }
-
-    
-    if ([tabBarDelegate respondsToSelector:@selector(didReceiveCachedMapPointsIDs:)]) {
-        [tabBarDelegate didReceiveCachedMapPointsIDs:mapPointsIds];
-    }
-    
-    [mapPointsIds release];
+    [mapPointsIds release];   
     
     // get points for map
 	QBLGeoDataGetRequest *searchMapARPointsRequest = [[QBLGeoDataGetRequest alloc] init];
@@ -164,6 +143,7 @@ static BackgroundWorker* instance = nil;
     if(lastPointDate){
         searchMapARPointsRequest.minCreatedAt = lastPointDate;
     }
+    
 	[QBLocation geoDataWithRequest:searchMapARPointsRequest delegate:self context:mapSearch];
 	[searchMapARPointsRequest release];    
 }
@@ -187,38 +167,18 @@ static BackgroundWorker* instance = nil;
             [chatMessagesIDs addObject:[NSString stringWithFormat:@"%d", ((UserAnnotation *)chatCashedMessage.body).geoDataID]];
         }
     }
+        
+    NSMutableDictionary* allChatData = [[[NSMutableDictionary alloc] init] autorelease];
+    [allChatData setObject:chatPoints forKey:@"allChatPoints"];
+    [allChatData setObject:chatMessagesIDs forKey:@"chatMessagesIDs"];
     
-    if ([tabBarDelegate respondsToSelector:@selector(didReceiveCachedChatPoints:)]) {
-        [tabBarDelegate didReceiveCachedChatPoints:chatPoints];
+    
+    if ([tabBarDelegate respondsToSelector:@selector(chatDidReceiveAllCachedData:)]) {
+        [tabBarDelegate chatDidReceiveAllCachedData:allChatData];
     }
+    
     [chatPoints release];
-    
-    if ([DataManager shared].allChatPoints.count > 0) {
-        if ([tabBarDelegate respondsToSelector:@selector(willShowAllFriends)]) {
-            [tabBarDelegate willShowAllFriends];
-        }
-    }
-    else{
-        if ([tabBarDelegate respondsToSelector:@selector(willSetEnabledMessageField:)]) {
-            [tabBarDelegate willSetEnabledMessageField:NO];
-        }
-        if ([tabBarDelegate respondsToSelector:@selector(willSetAllFriendsSwitchEnabled:)]) {
-            [tabBarDelegate willSetAllFriendsSwitchEnabled:NO];
-        }
-        
-        if ([tabBarDelegate respondsToSelector:@selector(willSetEnabledMessageField:)]) {
-            [tabBarDelegate willSetEnabledMessageField:NO];
-        }
-        if ([tabBarDelegate respondsToSelector:@selector(willSetEnabledDistanceSlider:)]) {
-            [tabBarDelegate willSetEnabledDistanceSlider:NO];
-        }
-    }
-    
-    if ([tabBarDelegate respondsToSelector:@selector(didReceiveCachedChatMessagesIDs:)]) {
-        [tabBarDelegate didReceiveCachedChatMessagesIDs:chatMessagesIDs];
-    }
-        
-    [chatMessagesIDs release];
+    [chatMessagesIDs release];    
     
     // get points for chat
 	QBLGeoDataGetRequest *searchChatMessagesRequest = [[QBLGeoDataGetRequest alloc] init];
@@ -648,6 +608,7 @@ static BackgroundWorker* instance = nil;
                 [tabBarDelegate chatEndOfRetrievingInitialData];
             }
         });
+        self.chatInitState = 0;
     }
 }
 
@@ -738,6 +699,7 @@ static BackgroundWorker* instance = nil;
             }
             
         });
+        self.mapInitState = 0;
     }
 }
 
@@ -918,6 +880,7 @@ static BackgroundWorker* instance = nil;
             if ([tabBarDelegate respondsToSelector:@selector(didReceiveError:)]) {
                 [tabBarDelegate didReceiveError:errorMessage];
             }
+            
         }
     }
 }
@@ -1044,6 +1007,7 @@ static BackgroundWorker* instance = nil;
 
                                 [tabBarDelegate mapEndOfRetrievingInitialData];
                             }
+                            self.mapInitState = 0;
                         }
                         return;
                     }
@@ -1071,7 +1035,7 @@ static BackgroundWorker* instance = nil;
                         if ([tabBarDelegate respondsToSelector:@selector(mapEndOfRetrievingInitialData)]) {
                             [tabBarDelegate mapEndOfRetrievingInitialData];
                         }
-                        
+                        self.mapInitState = 0;
                     }
                 }
                 
@@ -1092,6 +1056,7 @@ static BackgroundWorker* instance = nil;
                             if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialData)]) {
                                 [tabBarDelegate chatEndOfRetrievingInitialData];
                             }
+                            self.chatInitState = 0;
                         }
                         return;
                     }
@@ -1120,6 +1085,7 @@ static BackgroundWorker* instance = nil;
                         if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialData)]) {
                             [tabBarDelegate chatEndOfRetrievingInitialData];
                         }
+                        self.chatInitState = 0;
                     }
                 }
                 

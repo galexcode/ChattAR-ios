@@ -21,9 +21,9 @@
 
 #define kCachedMapPoints @"kCachedMapPoints"
 #define kCachedMapPointsIDs @"kCachedMapPoints"
-#define kCachedChatPoints @"kCachedChatPoints"
-#define kCachedChatPointsIDs @"kCachedChatPointsIDs"
 #define kCachedCheckins @"kCachedCheckins"
+
+
 
 #define kDidNotReceiveNewChatPoints @"kDidNotReceiveNewChatPoints"
 #define kDidReceiveError @"kDidReceiveError"
