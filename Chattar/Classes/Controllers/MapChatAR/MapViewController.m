@@ -45,8 +45,9 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveError:) name:kDidReceiveError object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doMapEndRetrievingData) name:kMapEndOfRetrievingInitialData object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetAllFriendsSwitchEnabled:) name:kWillSetAllFriendsSwitchEnabled object:nil ];
-        
-        isDataRetrieved = NO;
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doMapNotReceiveNewFBMapUsers) name:kMapDidNotReceiveNewFBMapUsers object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doClearCache) name:kDidClearCache object:nil];
+
         isViewLoaded = NO;
     }
     return self;
@@ -175,8 +176,6 @@
 -(void)viewDidAppear:(BOOL)animated{
     [self checkForShowingData];
 }
-
-
 
 #pragma mark -
 #pragma mark Interface based methods
@@ -624,13 +623,27 @@
 
 #pragma mark -
 #pragma mark Notifications Reaction
+
+-(void)doClearCache{
+    [self mapClear];
+    [self.allFriendsSwitch setValue:1.0f];
+}
+
 - (void)logoutDone{
     showAllUsers  = NO;
-    isDataRetrieved = NO;
     
     [self.allFriendsSwitch setValue:1.0f];
     
     [self clear];
+}
+
+-(void)doMapNotReceiveNewFBMapUsers{
+    [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
+    if ([allFriendsSwitch value] == friendsValue) {
+        [self showFriends];
+    }
+    else
+        [self showWorld];
 }
 
 -(void)doWillSetAllFriendsSwitchEnabled:(NSNotification*)notification{
@@ -641,7 +654,6 @@
 
 
 -(void)doMapEndRetrievingData{
-    isDataRetrieved = YES;
     [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
    
     

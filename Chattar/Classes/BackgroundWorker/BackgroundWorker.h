@@ -29,7 +29,7 @@
 -(void)chatEndOfRetrievingInitialData;
 
 -(void)chatDidReceiveAllCachedData:(NSDictionary*)cachedData;
-
+-(void)didNotReceiveNewFBChatUsers;
 @end
 
 @protocol DataDelegate <NSObject>
@@ -64,6 +64,7 @@
 -(void)willSetAllFriendsSwitchEnabled:(BOOL)switchEnabled;
 -(void)mapEndOfRetrievingInitialData;
 -(void)mapDidReceiveAllCachedData:(NSDictionary*)allMapData;
+-(void)didNotReceiveNewFBMapUsers;
 @end
 
 @protocol ARControllerDelegate <NSObject>

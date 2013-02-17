@@ -782,6 +782,9 @@ static BackgroundWorker* instance = nil;
                }
                 if([fbMapUsersIds count] == 0){
                     [fbMapUsersIds release];
+                    if ([tabBarDelegate respondsToSelector:@selector(didNotReceiveNewFBMapUsers)]) {
+                        [tabBarDelegate didNotReceiveNewFBMapUsers];
+                    }
                     return;
                 }
                 
@@ -825,6 +828,9 @@ static BackgroundWorker* instance = nil;
                     [geodataProcessed addObject:geodata];
                 }
                 if([fbChatUsersIds count] == 0){
+                    if ([tabBarDelegate respondsToSelector:@selector(didNotReceiveNewFBChatUsers)]) {
+                        [tabBarDelegate didNotReceiveNewFBChatUsers];
+                    }
                     [fbChatUsersIds release];
                     return;
                 }

@@ -55,6 +55,9 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetAllFriendsSwitchEnabled:) name:kWillSetAllFriendsSwitchEnabled object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetMessageFieldEnabled:) name:kWillSetMessageFieldEnabled object:nil ];
         
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChatNotReceiveNewFBChatUsers) name:kDidNotReceiveNewFBChatUsers object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doClearCache) name:kDidClearCache object:nil];
+        
     }
     return self;
 }
@@ -139,7 +142,9 @@
 }
 
 -(void)viewDidAppear:(BOOL)animated{
-    [self checkForShowingData];
+    if (![self presentedViewController]) {
+        [self checkForShowingData];
+    }
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation{
@@ -1016,6 +1021,28 @@
 #pragma mark -
 #pragma mark Notifications Reaction
 
+-(void)doClearCache{
+    showAllUsers  = NO;
+    
+    [self.allFriendsSwitch setValue:1.0f];
+    isDataRetrieved = NO;
+    
+    [self.messageField setText:nil];
+    [self.messagesTableView reloadData];
+}
+
+-(void)doChatNotReceiveNewFBChatUsers{
+    [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
+    [self refresh];
+    
+    if ([allFriendsSwitch value] == friendsValue) {
+        [self showFriends];
+    }
+    else
+        [self showWorld];
+
+}
+
 -(void)doWillSetAllFriendsSwitchEnabled:(NSNotification*)notification{
     BOOL enabled = [[[notification userInfo] objectForKey:@"switchEnabled"] boolValue];
     [allFriendsSwitch setEnabled:enabled];
@@ -1043,6 +1070,13 @@
     [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
     
     [self refresh];
+    
+    if ([allFriendsSwitch value] == friendsValue) {
+        [self showFriends];
+    }
+    else
+        [self showWorld];
+
 }
 
 -(void)doUpdate{

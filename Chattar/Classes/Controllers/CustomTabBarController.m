@@ -68,7 +68,7 @@
     }
     
     [BackgroundWorker instance].numberOfCheckinsRetrieved = ceil([[[DataManager shared].myPopularFriends allObjects] count]/fmaxRequestsInBatch);
-    [self requestControllerData];
+    //[self requestControllerData];
 }
 
 -(void)didReceiveInboxMessages:(NSDictionary *)inboxMessages andPopularFriends:(NSSet *)popFriends{
@@ -182,6 +182,9 @@
 
 #pragma mark -
 #pragma mark ChatControllerDelegate Methods
+-(void)didNotReceiveNewFBChatUsers{
+    [[NSNotificationCenter defaultCenter] postNotificationName:kDidNotReceiveNewFBChatUsers object:nil];
+}
 -(void)didSuccessfulMessageSending{
     [[NSNotificationCenter defaultCenter] postNotificationName:kDidSuccessfulMessageSending object:nil];
 }
@@ -256,6 +259,10 @@
 
 -(void)mapEndOfRetrievingInitialData{
     [[NSNotificationCenter defaultCenter] postNotificationName:kMapEndOfRetrievingInitialData object:nil];
+}
+
+-(void)didNotReceiveNewFBMapUsers{
+    [[NSNotificationCenter defaultCenter] postNotificationName:kMapDidNotReceiveNewFBMapUsers object:nil];
 }
 
 -(void)mapDidReceiveAllCachedData:(NSDictionary *)allMapData{

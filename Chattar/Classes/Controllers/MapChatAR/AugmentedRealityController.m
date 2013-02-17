@@ -88,8 +88,9 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveError:) name:kDidReceiveError object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAREndRetrievingData) name:kMapEndOfRetrievingInitialData object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetDistanceSliderEnabled:) name:kWillSetDistanceSliderEnabled object:nil ];
-        isDataRetrieved = NO;
-        
+
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doClearCache) name:kDidClearCache object:nil];
+       
         viewFrame = CGRectMake(0, 45, 320, 415);
     }
     return self;
@@ -1239,6 +1240,15 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 #pragma mark -
 #pragma mark Notifications reactions
+
+-(void)doClearCache{
+    [self.allFriendsSwitch setValue:1.0f];
+    
+    [self.distanceLabel setText:[NSString stringWithFormat:@"%d km", 10]];
+    [self.distanceSlider setValue:2];
+    
+    [self dissmisAR];
+}
 
 -(void)doWillSetAllFriendsSwitchEnabled:(NSNotification*)notification{
     BOOL enabled = [[[notification userInfo] objectForKey:@"switchEnabled"] boolValue];

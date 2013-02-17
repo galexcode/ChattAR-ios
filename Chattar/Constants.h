@@ -22,7 +22,7 @@
 #define kCachedMapPoints @"kCachedMapPoints"
 #define kCachedMapPointsIDs @"kCachedMapPoints"
 #define kCachedCheckins @"kCachedCheckins"
-
+#define kDidNotReceiveNewFBChatUsers @"kDidNotReceiveNewFBChatUsers"
 
 
 #define kDidNotReceiveNewChatPoints @"kDidNotReceiveNewChatPoints"
@@ -47,6 +47,8 @@
 
 #define kChatEndOfRetrievingInitialData @"kChatEndOfRetrievingInitialData"
 #define kMapEndOfRetrievingInitialData @"kMapEndOfRetrievingInitialData"
+#define kMapDidNotReceiveNewFBMapUsers @"kMapDidNotReceiveNewFBMapUsers"
+#define kDidClearCache @"kDidClearCache"
 
 #define INDICATOR_TAG 23458
 // Strings
