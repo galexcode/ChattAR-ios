@@ -197,6 +197,7 @@
         case isClearCasheAlert:
             if(buttonIndex == 1){
                 [[DataManager shared] clearCache];
+                [[NSNotificationCenter defaultCenter] postNotificationName:kDidClearCache object:nil];
             }
             break;
             
