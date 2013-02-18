@@ -163,7 +163,6 @@
     if ([DataManager shared].chatPoints.count == 0 && [DataManager shared].chatMessagesIDs.count == 0) {
         [messagesTableView reloadData];
         [[BackgroundWorker instance] retrieveCachedChatDataAndRequestNewData];
-        [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
         [self addSpinner];
     }
     else{
@@ -603,6 +602,7 @@
     NSArray *friendsIds = [[DataManager shared].myFriendsAsDictionary allKeys];
     
     UserAnnotation *currentAnnotation = nil;
+    
     if ([DataManager shared].chatPoints.count > [indexPath row]) {
         currentAnnotation = [[DataManager shared].chatPoints objectAtIndex:[indexPath row]];
     }
@@ -1192,6 +1192,11 @@
     
     [self.messageField setText:nil];
     
+    [self.messagesTableView reloadData];
+    [self clear];
+}
+
+-(void)clear{
     [[DataManager shared].allChatPoints removeAllObjects];
     [[DataManager shared].chatPoints removeAllObjects];
     [[DataManager shared].chatMessagesIDs removeAllObjects];
@@ -1200,10 +1205,7 @@
     [[DataManager shared].myPopularFriends removeAllObjects];
     [[DataManager shared].myFriendsAsDictionary removeAllObjects];
 
-
-    [self.messagesTableView reloadData];
 }
-
 
 #pragma mark -
 #pragma mark Helpers
