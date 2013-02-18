@@ -20,7 +20,7 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(requestFBInfo:) name:@"splashScreenDidHide" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(requestFBInfo) name:kRegisterPushNotificatons object:nil];
     }
     return self;
 }
@@ -44,7 +44,7 @@
 #pragma mark -
 #pragma mark Data requests
 
--(void)requestFBInfo:(NSNotification*) notification{
+-(void)requestFBInfo{
     [[BackgroundWorker instance] setTabBarDelegate:self];
     [[BackgroundWorker instance] requestFBHistory];
     [[BackgroundWorker instance] requestFriends];
@@ -68,7 +68,7 @@
     }
     
     [BackgroundWorker instance].numberOfCheckinsRetrieved = ceil([[[DataManager shared].myPopularFriends allObjects] count]/fmaxRequestsInBatch);
-    //[self requestControllerData];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kGeneralDataEndRetrieving object:nil];
 }
 
 -(void)didReceiveInboxMessages:(NSDictionary *)inboxMessages andPopularFriends:(NSSet *)popFriends{
@@ -103,37 +103,6 @@
 #pragma mark -
 #pragma mark DataDelegate methods
 
--(void) didReceiveCachedMapPoints:(NSArray*)cachedMapPoints{
-    if (![DataManager shared].allmapPoints) {
-        [DataManager shared].allmapPoints = cachedMapPoints.mutableCopy;
-    }
-    else
-        [[DataManager shared].allmapPoints addObjectsFromArray:cachedMapPoints];
-    
-    if (![DataManager shared].mapPoints) {
-        [DataManager shared].mapPoints = [[NSMutableArray alloc] init];
-    }
-    
-    if (![DataManager shared].coordinates) {
-        [DataManager shared].coordinates = [[NSMutableArray alloc] init];
-    }
-    
-    if (![DataManager shared].coordinateViews) {
-        [DataManager shared].coordinateViews = [[NSMutableArray alloc] init];
-    }
-    
-    if (![DataManager shared].allARMapPoints) {
-        [DataManager shared].allARMapPoints = cachedMapPoints.mutableCopy;
-    }
-    else{
-        [[DataManager shared].allARMapPoints addObjectsFromArray:cachedMapPoints];
-    }
-    
-    if (![DataManager shared].ARmapPoints) {
-        [DataManager shared].ARmapPoints = [[NSMutableArray alloc] init];
-    }
-}
-
 -(void)chatDidReceiveAllCachedData:(NSDictionary *)cachedData{
                     
     if (![[DataManager shared] allChatPoints]) {
@@ -154,6 +123,46 @@
         [DataManager shared].chatPoints = [[NSMutableArray alloc] init];
     }
 }
+
+-(void)mapDidReceiveAllCachedData:(NSDictionary *)allMapData{
+    if (![DataManager shared].allmapPoints) {
+        [DataManager shared].allmapPoints = [[allMapData objectForKey:@"allMapPoints"] mutableCopy];
+    }
+    else
+        [[DataManager shared].allmapPoints addObjectsFromArray:[allMapData objectForKey:@"allMapPoints"]];
+    
+    
+    if (![DataManager shared].mapPointsIDs) {
+        [DataManager shared].mapPointsIDs = [[allMapData objectForKey:@"mapPointsIDs"] mutableCopy];
+    }
+    else{
+        [[DataManager shared].mapPointsIDs addObjectsFromArray:[allMapData objectForKey:@"mapPointsIDs"]];
+    }
+    
+    if (![DataManager shared].mapPoints) {
+        [DataManager shared].mapPoints = [[NSMutableArray alloc] init];
+    }
+    
+    if (![DataManager shared].coordinates) {
+        [DataManager shared].coordinates = [[NSMutableArray alloc] init];
+    }
+    
+    if (![DataManager shared].coordinateViews) {
+        [DataManager shared].coordinateViews = [[NSMutableArray alloc] init];
+    }
+    
+    if (![DataManager shared].allARMapPoints) {
+        [DataManager shared].allARMapPoints = [[allMapData objectForKey:@"allMapPoints"] mutableCopy];
+    }
+    else{
+        [[DataManager shared].allARMapPoints addObjectsFromArray:[allMapData objectForKey:@"allMapPoints"]];
+    }
+    
+    if (![DataManager shared].ARmapPoints) {
+        [DataManager shared].ARmapPoints = [[NSMutableArray alloc] init];
+    }
+}
+
 
 -(void)didReceiveCachedCheckins:(NSArray *)cachedCheckins{
     if (![DataManager shared].allCheckins) {
@@ -235,7 +244,6 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:kChatEndOfRetrievingInitialData object:nil];
 }
 
-
 #pragma mark -
 #pragma mark MapControllerDelegate Methods
 
@@ -265,44 +273,6 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:kMapDidNotReceiveNewFBMapUsers object:nil];
 }
 
--(void)mapDidReceiveAllCachedData:(NSDictionary *)allMapData{
-    if (![DataManager shared].allmapPoints) {
-        [DataManager shared].allmapPoints = [[allMapData objectForKey:@"allMapPoints"] mutableCopy];
-    }
-    else
-        [[DataManager shared].allmapPoints addObjectsFromArray:[allMapData objectForKey:@"allMapPoints"]];
-    
-    
-    if (![DataManager shared].mapPointsIDs) {
-        [DataManager shared].mapPointsIDs = [[allMapData objectForKey:@"mapPointsIDs"] mutableCopy];
-    }
-    else{
-        [[DataManager shared].mapPointsIDs addObjectsFromArray:[allMapData objectForKey:@"mapPointsIDs"]];
-    }
-    
-    if (![DataManager shared].mapPoints) {
-        [DataManager shared].mapPoints = [[NSMutableArray alloc] init];
-    }
-    
-    if (![DataManager shared].coordinates) {
-        [DataManager shared].coordinates = [[NSMutableArray alloc] init];
-    }
-    
-    if (![DataManager shared].coordinateViews) {
-        [DataManager shared].coordinateViews = [[NSMutableArray alloc] init];
-    }
-    
-    if (![DataManager shared].allARMapPoints) {
-        [DataManager shared].allARMapPoints = [DataManager shared].allmapPoints.mutableCopy;
-    }
-    else{
-        [[DataManager shared].allARMapPoints addObjectsFromArray:[DataManager shared].allmapPoints];
-    }
-    
-    if (![DataManager shared].ARmapPoints) {
-        [DataManager shared].ARmapPoints = [[NSMutableArray alloc] init];
-    }    
-}
 
 #pragma mark -
 #pragma mark ARControllerDelegate Methods
@@ -316,5 +286,8 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:kWillSetDistanceSliderEnabled object:nil userInfo:data];
 }
 
+-(void)didNotReceiveNewARUsers{
+    [[NSNotificationCenter defaultCenter] postNotificationName:kARDidNotReceiveNewUsers object:nil userInfo:nil];
+}
 
 @end
