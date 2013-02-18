@@ -49,6 +49,9 @@
 #define kMapEndOfRetrievingInitialData @"kMapEndOfRetrievingInitialData"
 #define kMapDidNotReceiveNewFBMapUsers @"kMapDidNotReceiveNewFBMapUsers"
 #define kDidClearCache @"kDidClearCache"
+#define kGeneralDataEndRetrieving @"kGeneralDataEndRetrieving"
+#define kRegisterPushNotificatons @"kRegisterPushNotificatons"
+#define kARDidNotReceiveNewUsers @"kARDidNotReceiveNewUsers"
 
 #define INDICATOR_TAG 23458
 // Strings
