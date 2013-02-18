@@ -88,7 +88,7 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveError:) name:kDidReceiveError object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAREndRetrievingData) name:kMapEndOfRetrievingInitialData object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetDistanceSliderEnabled:) name:kWillSetDistanceSliderEnabled object:nil ];
-
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doARDidNotReceiveNewUsers) name:kARDidNotReceiveNewUsers object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doClearCache) name:kDidClearCache object:nil];
        
         viewFrame = CGRectMake(0, 45, 320, 415);
@@ -1005,11 +1005,20 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 -(void)checkForShowingData{
     // if all controllers data was cleared
-    if ([DataManager shared].mapPoints.count == 0 && [DataManager shared].mapPointsIDs.count == 0) {
+    if ([DataManager shared].ARmapPoints.count == 0) {
         // load data
         [[BackgroundWorker instance] retrieveCachedMapDataAndRequestNewData];                   // AR uses map controller data
         [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
+        [distanceSlider setEnabled:NO];
         [self addSpinner];
+        
+        // additional request for checkins
+        if ([DataManager shared].allCheckins.count == 0) {
+            [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
+        }
+        
+        [DataManager shared].currentRequestingDataControllerTitle = @"AR";
+
     }
     else{
         if ([allFriendsSwitch value] == friendsValue) {
@@ -1078,7 +1087,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [captureSession stopRunning];
     
     [displayView setImage:nil];
-    
+    NSLog(@"%@",self.view.subviews);
     for(UIView *view in self.view.subviews){
         if([view isKindOfClass:[CustomSwitch class]] || view == distanceSlider || view == distanceLabel){
 			continue;
@@ -1241,6 +1250,17 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 #pragma mark -
 #pragma mark Notifications reactions
 
+//-(void)doMapNotReceiveNewFBMapUsers{
+//    [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
+//    if ([allFriendsSwitch value] == friendsValue) {
+//        [self showFriends];
+//    }
+//    else
+//        [self showWorld];
+//    [distanceSlider setEnabled:YES];
+//}
+
+
 -(void)doClearCache{
     [self.allFriendsSwitch setValue:1.0f];
     
@@ -1267,7 +1287,10 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [allFriendsSwitch setEnabled:YES];
     isDataRetrieved = YES;
     
-    [self refreshWithNewPoints:[DataManager shared].mapPoints];
+    [self refreshWithNewPoints:[DataManager shared].ARmapPoints];
+    
+    [DataManager shared].currentRequestingDataControllerTitle = @"";
+
 }
 
 - (void)logoutDone{
@@ -1283,6 +1306,18 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [self dissmisAR];
     [self clear];
 }
+
+-(void)doARDidNotReceiveNewUsers{
+    [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
+    if ([allFriendsSwitch value] == friendsValue) {
+        [self showFriends];
+    }
+    else
+        [self showWorld];
+    [distanceSlider setEnabled:YES];
+    [DataManager shared].currentRequestingDataControllerTitle = @"";
+}
+
 
 -(void)doReceiveError:(NSNotification*)notification{
     NSString* errorMessage = [notification.userInfo objectForKey:@"errorMessage"];

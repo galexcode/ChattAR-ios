@@ -184,8 +184,14 @@
     if ([DataManager shared].mapPoints.count == 0 && [DataManager shared].mapPointsIDs.count == 0) {
         [self mapClear];
         [[BackgroundWorker instance] retrieveCachedMapDataAndRequestNewData];
-        [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
         [self addSpinner];
+        
+        // additional request for checkins
+        if ([DataManager shared].allCheckins.count == 0) {
+            [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
+        }
+        
+        [DataManager shared].currentRequestingDataControllerTitle = @"Map";
     }
     else{
         if ([allFriendsSwitch value] == friendsValue) {
@@ -644,6 +650,7 @@
     }
     else
         [self showWorld];
+    [DataManager shared].currentRequestingDataControllerTitle = @"";
 }
 
 -(void)doWillSetAllFriendsSwitchEnabled:(NSNotification*)notification{
@@ -660,6 +667,8 @@
     [self.allFriendsSwitch setEnabled:YES];
     
     [self refreshWithNewPoints:[DataManager shared].mapPoints];
+    
+    [DataManager shared].currentRequestingDataControllerTitle = @"";
 }
 
 -(void)doAddNewPoint:(NSNotification*)notification{
@@ -744,7 +753,8 @@
         BOOL addedToCurrentMapState = NO;
 
         
-        [[DataManager shared].mapPoints addObject:newPoint];
+        [[DataManager shared].allmapPoints addObject:newPoint];
+        [[DataManager shared].allARMapPoints addObject:newPoint];
         
         if(newPoint.geoDataID != -1){
             [[DataManager shared].mapPointsIDs addObject:[NSString stringWithFormat:@"%d", newPoint.geoDataID]];
@@ -753,6 +763,7 @@
         if([self isAllShowed] || [friendsIds containsObject:newPoint.fbUserId]){
             [[DataManager shared].mapPoints addObject:newPoint];
             [[DataManager shared].ARmapPoints addObject:newPoint];
+
             addedToCurrentMapState = YES;
         }
 
