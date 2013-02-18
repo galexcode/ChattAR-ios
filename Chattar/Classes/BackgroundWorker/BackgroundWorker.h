@@ -73,6 +73,7 @@
 -(void)willAddMarker;
 -(void)willSetEnabledDistanceSlider:(BOOL)sliderEnabled;
 -(void)willSetAllFriendsSwitchEnabled:(BOOL)switchEnabled;
+-(void)didNotReceiveNewARUsers;
 @end
 
 

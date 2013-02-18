@@ -226,6 +226,8 @@ static BackgroundWorker* instance = nil;
         }
     }
     
+    numberOfCheckinsRetrieved = ceil([[[DataManager shared].myPopularFriends allObjects] count]/fmaxRequestsInBatch);
+    
     // retrieve new
     if(numberOfCheckinsRetrieved != 0){
         [[FBService shared] performSelector:@selector(friendsCheckinsWithDelegate:) withObject:self afterDelay:1];
@@ -419,13 +421,7 @@ static BackgroundWorker* instance = nil;
                 previousPlaceID = [place objectForKey:kId];
                 previousFBUserID = fbUserID;
                 
-                if ([tabBarDelegate respondsToSelector:@selector(willAddFBCheckin:)]) {
-                    [tabBarDelegate willAddNewPoint:chatAnnotation isFBCheckin:NO];
-                }
-                
-                if ([tabBarDelegate respondsToSelector:@selector(willAddCheckin:)]) {
-                    [tabBarDelegate willAddCheckin:chatAnnotation];
-                }
+//                [[DataManager shared].allCheckins addObject:chatAnnotation];
                 [checkinAnnotation release];
                 [chatAnnotation release];
             }
@@ -782,8 +778,17 @@ static BackgroundWorker* instance = nil;
                }
                 if([fbMapUsersIds count] == 0){
                     [fbMapUsersIds release];
-                    if ([tabBarDelegate respondsToSelector:@selector(didNotReceiveNewFBMapUsers)]) {
-                        [tabBarDelegate didNotReceiveNewFBMapUsers];
+                    
+                    if ([[DataManager shared].currentRequestingDataControllerTitle isEqualToString:@"Map"]) {
+                        if ([tabBarDelegate respondsToSelector:@selector(didNotReceiveNewFBMapUsers)]) {
+                            [tabBarDelegate didNotReceiveNewFBMapUsers];
+                        }
+
+                    }
+                    else if ([[DataManager shared].currentRequestingDataControllerTitle isEqualToString:@"AR"]){
+                        if ([tabBarDelegate respondsToSelector:@selector(didNotReceiveNewARUsers)]) {
+                            [tabBarDelegate didNotReceiveNewARUsers];
+                        }
                     }
                     return;
                 }
@@ -1504,23 +1509,22 @@ static BackgroundWorker* instance = nil;
     if ([tabBarDelegate respondsToSelector:@selector(willAddNewMessageToChat:addToTop:withReloadTable:isFBCheckin:)]) {
         [tabBarDelegate willAddNewMessageToChat:newAnnotation addToTop:toTop withReloadTable:reloadTable isFBCheckin:NO];
     }
+       
     
-    
-    
-    if(newAnnotation.coordinate.latitude == 0.0f && newAnnotation.coordinate.longitude == 0.0f){
-        dispatch_async( dispatch_get_main_queue(), ^{
-            if ([tabBarDelegate respondsToSelector:@selector(willUpdatePointStatus:)]) {
-                [tabBarDelegate willUpdatePointStatus:newAnnotation];
-            }
-        });
-    }else{
-        // Add to Map
-        dispatch_async( dispatch_get_main_queue(), ^{
-            if ([tabBarDelegate respondsToSelector:@selector(willAddNewPoint:isFBCheckin:)]) {
-                [tabBarDelegate willAddNewPoint:[[newAnnotation copy] autorelease] isFBCheckin:NO];
-            }
-        });        
-    }
+//    if(newAnnotation.coordinate.latitude == 0.0f && newAnnotation.coordinate.longitude == 0.0f){
+//        dispatch_async( dispatch_get_main_queue(), ^{
+//            if ([tabBarDelegate respondsToSelector:@selector(willUpdatePointStatus:)]) {
+//                [tabBarDelegate willUpdatePointStatus:newAnnotation];
+//            }
+//        });
+//    }else{
+//        // Add to Map
+//        dispatch_async( dispatch_get_main_queue(), ^{
+//            if ([tabBarDelegate respondsToSelector:@selector(willAddNewPoint:isFBCheckin:)]) {
+//                [tabBarDelegate willAddNewPoint:[[newAnnotation copy] autorelease] isFBCheckin:NO];
+//            }
+//        });        
+//    }
     
 	[newAnnotation release];
 }
