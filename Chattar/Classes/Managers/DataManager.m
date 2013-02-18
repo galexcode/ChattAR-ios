@@ -57,6 +57,8 @@ static DataManager *instance = nil;
 @synthesize allARMapPoints;
 @synthesize ARmapPoints;
 
+@synthesize currentRequestingDataControllerTitle;
+
 + (DataManager *)shared {
 	@synchronized (self) {
 		if (instance == nil){ 
@@ -113,6 +115,7 @@ static DataManager *instance = nil;
     [allARMapPoints release];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kNotificationLogout object:nil];
+    [currentRequestingDataControllerTitle release];
 	
 	[super dealloc];
 }
@@ -452,14 +455,17 @@ static DataManager *instance = nil;
     
     [[DataManager shared].chatMessagesIDs removeAllObjects];
     [[DataManager shared].chatPoints removeAllObjects];
+    [[DataManager shared].allChatPoints removeAllObjects];
     
     [[DataManager shared].mapPoints removeAllObjects];
     [[DataManager shared].mapPointsIDs removeAllObjects];
+    [[DataManager shared].allmapPoints removeAllObjects];
     
     [[DataManager shared].allARMapPoints removeAllObjects];
     [[DataManager shared].ARmapPoints removeAllObjects];
     [[DataManager shared].coordinates removeAllObjects];
     [[DataManager shared].coordinateViews removeAllObjects];
+    
     [[DataManager shared].allCheckins removeAllObjects];
     
 }

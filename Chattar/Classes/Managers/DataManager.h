@@ -57,6 +57,7 @@
 @property (nonatomic, retain) NSMutableArray* ARmapPoints;
 @property (nonatomic, retain) NSMutableArray* allARMapPoints;
 
+@property (nonatomic, retain) NSString* currentRequestingDataControllerTitle;
 
 + (DataManager *) shared;
 
