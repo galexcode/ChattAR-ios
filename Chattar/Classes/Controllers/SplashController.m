@@ -39,7 +39,7 @@
         [self->activityIndicator setFrame:activityIndicatorFrame];
     }
     
-    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doGeneralDataEndRetrieving) name:kGeneralDataEndRetrieving object:nil];
 }
 
 - (void)startApplication{
@@ -147,6 +147,8 @@
 - (void)dealloc {
     [_backgroundImage release];
     [hud release];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
 }
 
@@ -339,16 +341,10 @@
         
         [Flurry logEvent:FLURRY_EVENT_USER_DID_LOGIN];
         
-        
-        // hide splash
-        [activityIndicator stopAnimating];
-        
-        [[NSNotificationCenter defaultCenter] removeObserver:self];
-        
         ((AppDelegate *)[[UIApplication sharedApplication] delegate]).tabBarController.selectedIndex = 0;
-                    // notify tabbar for request FB info
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"splashScreenDidHide" object:nil];
-        [self dismissModalViewControllerAnimated:YES];
+                    // notify tabbar to request FB info
+        [[NSNotificationCenter defaultCenter] postNotificationName:kRegisterPushNotificatons object:nil];
+        
         [[FBService shared].facebook setSessionDelegate:nil];
         
         
@@ -357,8 +353,16 @@
         NSArray *cookies = [cookiesStorage cookies];
         NSData *data = [NSKeyedArchiver archivedDataWithRootObject:cookies];
         [[NSUserDefaults standardUserDefaults] setObject:data forKey:FB_COOKIES];
-
     }
+}
+
+#pragma mark -
+#pragma mark Notifications Reaction
+-(void)doGeneralDataEndRetrieving{
+    // hide splash
+    [activityIndicator stopAnimating];
+
+    [self dismissModalViewControllerAnimated:YES];
 }
 
 @end
