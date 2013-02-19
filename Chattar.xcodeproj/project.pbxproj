@@ -191,7 +191,9 @@
 		ED4C900316C0F3F1000751D4 /* BackgroundWorker.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C900216C0F3F1000751D4 /* BackgroundWorker.m */; };
 		ED4C901716C1229F000751D4 /* CustomTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C901616C1229B000751D4 /* CustomTabBarController.m */; };
 		ED55672916D37102009C385A /* CommonViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED55672816D37102009C385A /* CommonViewController.m */; };
-		ED70277E168B3D4B003F6829 /* Quickblox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAD8E4E8164BB65700CBCB79 /* Quickblox.framework */; };
+		ED55672D16D3D831009C385A /* Quickblox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAD8E4E8164BB65700CBCB79 /* Quickblox.framework */; };
+		ED55672F16D3DE12009C385A /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED55672E16D3DE12009C385A /* Accelerate.framework */; };
+		ED55673716D3E0DF009C385A /* ChatRoomsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ED55673616D3E0DF009C385A /* ChatRoomsViewController.xib */; };
 		ED9FFE6B16CBFF730075B3EB /* chatTab.png in Resources */ = {isa = PBXBuildFile; fileRef = ED9FFE6716CBFF730075B3EB /* chatTab.png */; };
 		ED9FFE6C16CBFF730075B3EB /* dialogsTab.png in Resources */ = {isa = PBXBuildFile; fileRef = ED9FFE6816CBFF730075B3EB /* dialogsTab.png */; };
 		ED9FFE6D16CBFF730075B3EB /* mapTab.png in Resources */ = {isa = PBXBuildFile; fileRef = ED9FFE6916CBFF730075B3EB /* mapTab.png */; };
@@ -491,6 +493,8 @@
 		ED4C901616C1229B000751D4 /* CustomTabBarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomTabBarController.m; sourceTree = "<group>"; };
 		ED55672716D37102009C385A /* CommonViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonViewController.h; sourceTree = "<group>"; };
 		ED55672816D37102009C385A /* CommonViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommonViewController.m; sourceTree = "<group>"; };
+		ED55672E16D3DE12009C385A /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		ED55673616D3E0DF009C385A /* ChatRoomsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ChatRoomsViewController.xib; sourceTree = "<group>"; };
 		ED9FFE6716CBFF730075B3EB /* chatTab.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = chatTab.png; sourceTree = "<group>"; };
 		ED9FFE6816CBFF730075B3EB /* dialogsTab.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dialogsTab.png; sourceTree = "<group>"; };
 		ED9FFE6916CBFF730075B3EB /* mapTab.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mapTab.png; sourceTree = "<group>"; };
@@ -586,7 +590,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ED70277E168B3D4B003F6829 /* Quickblox.framework in Frameworks */,
+				ED55672F16D3DE12009C385A /* Accelerate.framework in Frameworks */,
+				ED55672D16D3D831009C385A /* Quickblox.framework in Frameworks */,
 				FA99E77F15C953410031F54F /* CoreData.framework in Frameworks */,
 				63891AF81573505300035EC2 /* libresolv.dylib in Frameworks */,
 				636735D31552CF590061BF75 /* UIKit.framework in Frameworks */,
@@ -671,6 +676,7 @@
 		636735D11552CF590061BF75 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				ED55672E16D3DE12009C385A /* Accelerate.framework */,
 				FAD8E4E8164BB65700CBCB79 /* Quickblox.framework */,
 				63891AF71573505300035EC2 /* libresolv.dylib */,
 				8A983A7F156A5D61003C303D /* AddressBookUI.framework */,
@@ -1063,6 +1069,7 @@
 		ED4C8F5516BFEB5D000751D4 /* xibs */ = {
 			isa = PBXGroup;
 			children = (
+				ED55673616D3E0DF009C385A /* ChatRoomsViewController.xib */,
 				ED4C8F5616BFEB5D000751D4 /* ContactsController.xib */,
 				ED4C8F5716BFEB5D000751D4 /* FBChatViewController.xib */,
 				ED4C8F5816BFEB5D000751D4 /* MapChatAR */,
@@ -1443,6 +1450,7 @@
 				ED9FFE6C16CBFF730075B3EB /* dialogsTab.png in Resources */,
 				ED9FFE6D16CBFF730075B3EB /* mapTab.png in Resources */,
 				ED9FFE6E16CBFF730075B3EB /* settingsTab.png in Resources */,
+				ED55673716D3E0DF009C385A /* ChatRoomsViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1586,6 +1594,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-lxml2",
+				);
 				PROVISIONING_PROFILE = "95F3EABD-F7E1-4D80-B351-CC221D213D51";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "95F3EABD-F7E1-4D80-B351-CC221D213D51";
 				SDKROOT = iphoneos;
@@ -1607,6 +1619,10 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-lxml2",
+				);
 				PROVISIONING_PROFILE = "2B219950-DF90-4E98-A1C7-7C2DFB3A1832";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "6811ABB8-7064-4FE0-B6D4-54C1AFA42A2A";
 				SDKROOT = iphoneos;
@@ -1634,7 +1650,11 @@
 					"\"$(SRCROOT)/Externals/XMPP_Framework\"",
 					"\"$(SRCROOT)/Externals/Flurry\"",
 				);
-				OTHER_LDFLAGS = "-lxml2";
+				OTHER_LDFLAGS = (
+					"-lxml2",
+					"-ObjC",
+					"-lstdc++",
+				);
 				PRODUCT_NAME = Chattar;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
@@ -1662,7 +1682,11 @@
 					"\"$(SRCROOT)/Externals/XMPP_Framework\"",
 					"\"$(SRCROOT)/Externals/Flurry\"",
 				);
-				OTHER_LDFLAGS = "-lxml2";
+				OTHER_LDFLAGS = (
+					"-lxml2",
+					"-ObjC",
+					"-lstdc++",
+				);
 				PRODUCT_NAME = Chattar;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "70814F24-7072-4BD7-878F-2F1394948909";
