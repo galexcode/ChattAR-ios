@@ -150,17 +150,6 @@
     if (![DataManager shared].coordinateViews) {
         [DataManager shared].coordinateViews = [[NSMutableArray alloc] init];
     }
-    
-    if (![DataManager shared].allARMapPoints) {
-        [DataManager shared].allARMapPoints = [[allMapData objectForKey:@"allMapPoints"] mutableCopy];
-    }
-    else{
-        [[DataManager shared].allARMapPoints addObjectsFromArray:[allMapData objectForKey:@"allMapPoints"]];
-    }
-    
-    if (![DataManager shared].ARmapPoints) {
-        [DataManager shared].ARmapPoints = [[NSMutableArray alloc] init];
-    }
 }
 
 

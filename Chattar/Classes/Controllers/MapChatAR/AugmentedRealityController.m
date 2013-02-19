@@ -86,6 +86,8 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetDistanceSliderEnabled:) name:kWillSetDistanceSliderEnabled object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doARDidNotReceiveNewUsers) name:kARDidNotReceiveNewUsers object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doClearCache) name:kDidClearCache object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doUpdatePointStatus:) name:kWillUpdatePointStatus object:nil];
+
        
         viewFrame = CGRectMake(0, 45, 320, 415);
     }
@@ -152,6 +154,7 @@
 -(void)viewWillAppear:(BOOL)animated{
     [self displayAR];
     if ([DataManager shared].isFirstStartApp) {
+        [[DataManager shared] setFirstStartApp:NO];
         NSString *alertBody = nil;
         if([ARManager deviceSupportsAR]){
             alertBody = NSLocalizedString(@"You can see and chat with all\nusers within 10km. Increase\nsearch radius using slider (left). \nSwitch to 'Facebook only' mode (bottom right) to see your friends and their check-ins only.", nil);
@@ -1127,6 +1130,9 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [DataManager shared].currentRequestingDataControllerTitle = @"";
 }
 
+-(void)doUpdatePointStatus{
+    
+}
 
 
 -(void)doUpdateMarkersForCenterLocation{

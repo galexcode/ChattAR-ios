@@ -293,20 +293,27 @@
     [self refreshWithNewPoints:[DataManager shared].mapPoints];
 }
 
-
-
 #pragma mark -
 #pragma mark Internal data methods
 - (void)addPoints:(NSArray *)newMapPoints{
     // add new
     for (UserAnnotation* ann in newMapPoints) {
+        // skip me
+        if([ann.fbUserId isEqualToString:[DataManager shared].currentFBUserId]){
+            continue;
+        }
+        
         [self.mapView addAnnotation:ann];
+        [annotationsForClustering addObject:ann];
     }
-    
-    [annotationsForClustering addObjectsFromArray:newMapPoints];
 }
 
 - (void)addPoint:(UserAnnotation *)newMapPoint{
+    
+    if ([newMapPoint.fbUserId isEqualToString:[DataManager shared].currentFBUserId]) {
+        return;
+    }
+    
     [self.mapView addAnnotation:newMapPoint];
 }
 
@@ -346,6 +353,42 @@
         }
     }
     [currentMapAnnotations release];
+    
+    // Check for AR
+    if(isExistPoint){
+        
+        NSArray *currentARMarkers = [[DataManager shared].coordinateViews copy];
+        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+                    // find AR controller
+        UITabBarController *tabBarController = appDelegate.tabBarController;
+        AugmentedRealityController* arViewController = nil;
+        for (UIViewController* viewController in tabBarController.viewControllers) {
+            UIViewController *vc = viewController;
+            if ([viewController isKindOfClass:[UINavigationController class]]) {
+                vc = [(UINavigationController*)viewController visibleViewController];
+            }
+            if ([vc isKindOfClass:[AugmentedRealityController class]]) {
+                arViewController = (AugmentedRealityController*)vc;
+            }
+        }
+        
+        for (ARMarkerView *marker in currentARMarkers)
+		{
+            // already exist, change status
+            if([point.fbUserId isEqualToString:marker.userAnnotation.fbUserId])
+			{
+                if ([point.userStatus length] < 6 || ([point.userStatus length] >= 6 && ![[point.userStatus substringToIndex:6] isEqualToString:fbidIdentifier])){
+                    ARMarkerView *marker = (ARMarkerView *)[arViewController viewForExistAnnotation:point];
+                    [marker updateStatus:point.userStatus];// update status
+                }
+                
+                break;
+            }
+        }
+        
+        [currentARMarkers release];
+    }
+
 }
 
 #pragma mark -

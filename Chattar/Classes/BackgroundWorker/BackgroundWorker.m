@@ -421,7 +421,7 @@ static BackgroundWorker* instance = nil;
                 previousPlaceID = [place objectForKey:kId];
                 previousFBUserID = fbUserID;
                 
-//                [[DataManager shared].allCheckins addObject:chatAnnotation];
+                [[DataManager shared].allCheckins addObject:chatAnnotation];
                 [checkinAnnotation release];
                 [chatAnnotation release];
             }
@@ -672,11 +672,7 @@ static BackgroundWorker* instance = nil;
         }
     });
     
-    //
-    // add to Storage
-    if ([tabBarDelegate respondsToSelector:@selector(willSaveMapARPoints:)]) {
-        [tabBarDelegate willSaveMapARPoints:mapPointsMutable];
-    }
+    [[DataManager shared] addMapARPointsToStorage:mapPointsMutable];
     
     [mapPointsMutable release];
     
@@ -727,7 +723,7 @@ static BackgroundWorker* instance = nil;
                     return;
                 }
                 
-                // process responce
+                // process response
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                     
                     // get fb users info
@@ -790,6 +786,7 @@ static BackgroundWorker* instance = nil;
                             [tabBarDelegate didNotReceiveNewARUsers];
                         }
                     }
+                    
                     return;
                 }
                 
