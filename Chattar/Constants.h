@@ -53,6 +53,8 @@
 #define kRegisterPushNotificatons @"kRegisterPushNotificatons"
 #define kARDidNotReceiveNewUsers @"kARDidNotReceiveNewUsers"
 
+#define kDidNotReceiveChatRooms @"kDidNotReceiveChatRooms"
+
 #define INDICATOR_TAG 23458
 // Strings
 #define appName @"ChattAR"

@@ -34,6 +34,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
 }
 
 - (void)didReceiveMemoryWarning
@@ -54,6 +55,7 @@
     [[BackgroundWorker instance] retrieveCachedChatDataAndRequestNewData];
     [[BackgroundWorker instance] retrieveCachedMapDataAndRequestNewData];
     [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
+    [[BackgroundWorker instance] requestAllChatRooms];
 }
 
 #pragma mark - 
@@ -69,6 +71,8 @@
     
     [BackgroundWorker instance].numberOfCheckinsRetrieved = ceil([[[DataManager shared].myPopularFriends allObjects] count]/fmaxRequestsInBatch);
     [[NSNotificationCenter defaultCenter] postNotificationName:kGeneralDataEndRetrieving object:nil];
+    
+    [self requestControllerData];
 }
 
 -(void)didReceiveInboxMessages:(NSDictionary *)inboxMessages andPopularFriends:(NSSet *)popFriends{
@@ -277,6 +281,20 @@
 
 -(void)didNotReceiveNewARUsers{
     [[NSNotificationCenter defaultCenter] postNotificationName:kARDidNotReceiveNewUsers object:nil userInfo:nil];
+}
+
+#pragma mark -
+#pragma mark ChatRoomsDataDelegate methods
+
+-(void)didReceiveChatRooms:(NSArray *)chatRooms{
+    
+    if (chatRooms.count) {
+                        // request additional rooms info from qbServer
+        [[BackgroundWorker instance] requestAdditionalChatRoomsInfo];
+    }
+    else
+        [[NSNotificationCenter defaultCenter] postNotificationName:kDidNotReceiveChatRooms object:nil];
+        
 }
 
 @end
