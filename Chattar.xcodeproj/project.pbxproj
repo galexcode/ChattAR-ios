@@ -190,6 +190,7 @@
 		ED4C8FF716BFEB5D000751D4 /* WebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ED4C8F5F16BFEB5D000751D4 /* WebViewController.xib */; };
 		ED4C900316C0F3F1000751D4 /* BackgroundWorker.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C900216C0F3F1000751D4 /* BackgroundWorker.m */; };
 		ED4C901716C1229F000751D4 /* CustomTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C901616C1229B000751D4 /* CustomTabBarController.m */; };
+		ED55672916D37102009C385A /* CommonViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED55672816D37102009C385A /* CommonViewController.m */; };
 		ED70277E168B3D4B003F6829 /* Quickblox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAD8E4E8164BB65700CBCB79 /* Quickblox.framework */; };
 		ED9FFE6B16CBFF730075B3EB /* chatTab.png in Resources */ = {isa = PBXBuildFile; fileRef = ED9FFE6716CBFF730075B3EB /* chatTab.png */; };
 		ED9FFE6C16CBFF730075B3EB /* dialogsTab.png in Resources */ = {isa = PBXBuildFile; fileRef = ED9FFE6816CBFF730075B3EB /* dialogsTab.png */; };
@@ -488,6 +489,8 @@
 		ED4C900216C0F3F1000751D4 /* BackgroundWorker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BackgroundWorker.m; sourceTree = "<group>"; };
 		ED4C901516C12298000751D4 /* CustomTabBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomTabBarController.h; sourceTree = "<group>"; };
 		ED4C901616C1229B000751D4 /* CustomTabBarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomTabBarController.m; sourceTree = "<group>"; };
+		ED55672716D37102009C385A /* CommonViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonViewController.h; sourceTree = "<group>"; };
+		ED55672816D37102009C385A /* CommonViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommonViewController.m; sourceTree = "<group>"; };
 		ED9FFE6716CBFF730075B3EB /* chatTab.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = chatTab.png; sourceTree = "<group>"; };
 		ED9FFE6816CBFF730075B3EB /* dialogsTab.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dialogsTab.png; sourceTree = "<group>"; };
 		ED9FFE6916CBFF730075B3EB /* mapTab.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mapTab.png; sourceTree = "<group>"; };
@@ -747,6 +750,7 @@
 		ED4C8E8916BFEB5D000751D4 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				ED55672516D370E8009C385A /* CommonViewController */,
 				ED4C8FF816BFEC6C000751D4 /* BackgroundWorker */,
 				ED4C8E8A16BFEB5D000751D4 /* ContactsController.h */,
 				ED4C8E8B16BFEB5D000751D4 /* ContactsController.m */,
@@ -1088,6 +1092,15 @@
 			);
 			name = BackgroundWorker;
 			path = ../BackgroundWorker;
+			sourceTree = "<group>";
+		};
+		ED55672516D370E8009C385A /* CommonViewController */ = {
+			isa = PBXGroup;
+			children = (
+				ED55672716D37102009C385A /* CommonViewController.h */,
+				ED55672816D37102009C385A /* CommonViewController.m */,
+			);
+			path = CommonViewController;
 			sourceTree = "<group>";
 		};
 		FA8E4E961580887B00476EF7 /* Externals */ = {
@@ -1534,6 +1547,7 @@
 				ED4C8F9516BFEB5D000751D4 /* ChattARModel.xcdatamodeld in Sources */,
 				ED4C900316C0F3F1000751D4 /* BackgroundWorker.m in Sources */,
 				ED4C901716C1229F000751D4 /* CustomTabBarController.m in Sources */,
+				ED55672916D37102009C385A /* CommonViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

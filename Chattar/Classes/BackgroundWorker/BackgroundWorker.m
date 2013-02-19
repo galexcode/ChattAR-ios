@@ -1511,20 +1511,20 @@ static BackgroundWorker* instance = nil;
     }
        
     
-//    if(newAnnotation.coordinate.latitude == 0.0f && newAnnotation.coordinate.longitude == 0.0f){
-//        dispatch_async( dispatch_get_main_queue(), ^{
-//            if ([tabBarDelegate respondsToSelector:@selector(willUpdatePointStatus:)]) {
-//                [tabBarDelegate willUpdatePointStatus:newAnnotation];
-//            }
-//        });
-//    }else{
-//        // Add to Map
-//        dispatch_async( dispatch_get_main_queue(), ^{
-//            if ([tabBarDelegate respondsToSelector:@selector(willAddNewPoint:isFBCheckin:)]) {
-//                [tabBarDelegate willAddNewPoint:[[newAnnotation copy] autorelease] isFBCheckin:NO];
-//            }
-//        });        
-//    }
+    if(newAnnotation.coordinate.latitude == 0.0f && newAnnotation.coordinate.longitude == 0.0f){
+        dispatch_async( dispatch_get_main_queue(), ^{
+            if ([tabBarDelegate respondsToSelector:@selector(willUpdatePointStatus:)]) {
+                [tabBarDelegate willUpdatePointStatus:newAnnotation];
+            }
+        });
+    }else{
+        // Add to Map
+        dispatch_async( dispatch_get_main_queue(), ^{
+            if ([tabBarDelegate respondsToSelector:@selector(willAddNewPoint:isFBCheckin:)]) {
+                [tabBarDelegate willAddNewPoint:[[newAnnotation copy] autorelease] isFBCheckin:NO];
+            }
+        });        
+    }
     
 	[newAnnotation release];
 }
