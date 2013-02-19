@@ -7,7 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CustomSwitch.h"
 
-@interface CommonViewController : UIViewController
+@interface CommonViewController : UIViewController{
+    BOOL showAllUsers;
+}
+@property (nonatomic, assign) CustomSwitch *allFriendsSwitch;
+@property (nonatomic,retain) UIActivityIndicatorView* loadingIndicator;
 
+-(void)addSpinner;
 @end
