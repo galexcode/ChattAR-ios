@@ -244,9 +244,6 @@
 - (void)clear{
     [[DataManager shared].coordinates removeAllObjects];
 	[[DataManager shared].coordinateViews removeAllObjects];
-    
-    [[DataManager shared].ARmapPoints removeAllObjects];
-    [[DataManager shared].allARMapPoints removeAllObjects];
 }
 
 /*
@@ -988,7 +985,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 -(void)checkForShowingData{
     // if all controllers data was cleared
-    if ([DataManager shared].ARmapPoints.count == 0) {
+    if ([DataManager shared].mapPoints.count == 0) {
         // load data
         [[BackgroundWorker instance] retrieveCachedMapDataAndRequestNewData];                   // AR uses map controller data
         [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
@@ -1096,13 +1093,13 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     
     dispatch_queue_t showWorldQueue = dispatch_queue_create("showWorldQueue", NULL);
     dispatch_async(showWorldQueue, ^{
-        [[DataManager shared].ARmapPoints removeAllObjects];
+        [[DataManager shared].mapPoints removeAllObjects];
         
         
         NSMutableArray *friendsIdsWhoAlreadyAdded = [NSMutableArray array];
         
-        for(UserAnnotation *mapAnnotation in [DataManager shared].allARMapPoints){
-            [[DataManager shared].ARmapPoints addObject:mapAnnotation];
+        for(UserAnnotation *mapAnnotation in [DataManager shared].allmapPoints){
+            [[DataManager shared].mapPoints addObject:mapAnnotation];
             [friendsIdsWhoAlreadyAdded addObject:mapAnnotation.fbUserId];
         }
         //
@@ -1111,24 +1108,24 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         
         for (UserAnnotation* checkin in allCheckinsCopy){
             if (![friendsIdsWhoAlreadyAdded containsObject:checkin.fbUserId]){
-                [[DataManager shared].ARmapPoints addObject:checkin];
+                [[DataManager shared].mapPoints addObject:checkin];
                 [friendsIdsWhoAlreadyAdded addObject:checkin.fbUserId];
             }else{
                 // compare datetimes - add newest
                 NSDate *newCreateDateTime = checkin.createdAt;
                 
                 int index = [friendsIdsWhoAlreadyAdded indexOfObject:checkin.fbUserId];
-                NSDate *currentCreateDateTime = ((UserAnnotation *)[[DataManager shared].ARmapPoints objectAtIndex:index]).createdAt;
+                NSDate *currentCreateDateTime = ((UserAnnotation *)[[DataManager shared].mapPoints objectAtIndex:index]).createdAt;
                 
                 if([newCreateDateTime compare:currentCreateDateTime] == NSOrderedDescending){ //The receiver(newCreateDateTime) is later in time than anotherDate, NSOrderedDescending
-                    [[DataManager shared].ARmapPoints replaceObjectAtIndex:index withObject:checkin];
+                    [[DataManager shared].mapPoints replaceObjectAtIndex:index withObject:checkin];
                     [friendsIdsWhoAlreadyAdded replaceObjectAtIndex:index withObject:checkin.fbUserId];
                 }
             }
         }
         [allCheckinsCopy release];
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self refreshWithNewPoints:[DataManager shared].ARmapPoints];
+            [self refreshWithNewPoints:[DataManager shared].mapPoints];
         });
     });
     dispatch_release(showWorldQueue);
@@ -1138,7 +1135,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     dispatch_queue_t showFriendsQueue = dispatch_queue_create("showFriendsQueue", NULL);
     
     dispatch_async(showFriendsQueue, ^{
-        [[DataManager shared].ARmapPoints removeAllObjects];
+        [[DataManager shared].mapPoints removeAllObjects];
         
         NSMutableArray *friendsIds = [[[DataManager shared].myFriendsAsDictionary allKeys] mutableCopy];
         [friendsIds addObject:[DataManager shared].currentFBUserId];// add me
@@ -1146,9 +1143,9 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         // add only friends QB points
         NSMutableArray *friendsIdsWhoAlreadyAdded = [NSMutableArray array];
         
-        for(UserAnnotation *mapAnnotation in [DataManager shared].allARMapPoints){
+        for(UserAnnotation *mapAnnotation in [DataManager shared].allmapPoints){
             if([friendsIds containsObject:[mapAnnotation.fbUser objectForKey:kId]]){
-                [[DataManager shared].ARmapPoints addObject:mapAnnotation];
+                [[DataManager shared].mapPoints addObject:mapAnnotation];
                 
                 [friendsIdsWhoAlreadyAdded addObject:[mapAnnotation.fbUser objectForKey:kId]];
             }
@@ -1161,17 +1158,17 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         
         for (UserAnnotation* checkin in allCheckinsCopy){
             if (![friendsIdsWhoAlreadyAdded containsObject:checkin.fbUserId]){
-                [[DataManager shared].ARmapPoints addObject:checkin];
+                [[DataManager shared].mapPoints addObject:checkin];
                 [friendsIdsWhoAlreadyAdded addObject:checkin.fbUserId];
             }else{
                 // compare datetimes - add newest
                 NSDate *newCreateDateTime = checkin.createdAt;
                 
                 int index = [friendsIdsWhoAlreadyAdded indexOfObject:checkin.fbUserId];
-                NSDate *currentCreateDateTime = ((UserAnnotation *)[[DataManager shared].ARmapPoints objectAtIndex:index]).createdAt;
+                NSDate *currentCreateDateTime = ((UserAnnotation *)[[DataManager shared].mapPoints objectAtIndex:index]).createdAt;
                 
                 if([newCreateDateTime compare:currentCreateDateTime] == NSOrderedDescending){ //The receiver(newCreateDateTime) is later in time than anotherDate, NSOrderedDescending
-                    [[DataManager shared].ARmapPoints replaceObjectAtIndex:index withObject:checkin];
+                    [[DataManager shared].mapPoints replaceObjectAtIndex:index withObject:checkin];
                     [friendsIdsWhoAlreadyAdded replaceObjectAtIndex:index withObject:checkin.fbUserId];
                 }
             }
@@ -1179,7 +1176,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         [allCheckinsCopy release];
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self refreshWithNewPoints:[DataManager shared].ARmapPoints];
+            [self refreshWithNewPoints:[DataManager shared].mapPoints];
         });
 
     });
@@ -1226,7 +1223,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [allFriendsSwitch setEnabled:YES];
     isDataRetrieved = YES;
     
-    [self refreshWithNewPoints:[DataManager shared].ARmapPoints];
+    [self refreshWithNewPoints:[DataManager shared].mapPoints];
     
     [DataManager shared].currentRequestingDataControllerTitle = @"";
 

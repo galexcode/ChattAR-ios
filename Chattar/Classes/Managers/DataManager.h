@@ -54,8 +54,6 @@
 
 @property (nonatomic, retain) NSMutableArray *coordinateViews;
 @property (nonatomic, retain) NSMutableArray* coordinates;
-@property (nonatomic, retain) NSMutableArray* ARmapPoints;
-@property (nonatomic, retain) NSMutableArray* allARMapPoints;
 
 @property (nonatomic, retain) NSString* currentRequestingDataControllerTitle;
 

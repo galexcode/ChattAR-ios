@@ -54,8 +54,6 @@ static DataManager *instance = nil;
 @synthesize coordinates;
 @synthesize chatMessagesIDs;
 @synthesize mapPointsIDs;
-@synthesize allARMapPoints;
-@synthesize ARmapPoints;
 
 @synthesize currentRequestingDataControllerTitle;
 
@@ -111,8 +109,6 @@ static DataManager *instance = nil;
     [allmapPoints release];
     [mapPointsIDs release];
     [chatMessagesIDs release];
-    [ARmapPoints release];
-    [allARMapPoints release];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kNotificationLogout object:nil];
     [currentRequestingDataControllerTitle release];
@@ -461,8 +457,6 @@ static DataManager *instance = nil;
     [[DataManager shared].mapPointsIDs removeAllObjects];
     [[DataManager shared].allmapPoints removeAllObjects];
     
-    [[DataManager shared].allARMapPoints removeAllObjects];
-    [[DataManager shared].ARmapPoints removeAllObjects];
     [[DataManager shared].coordinates removeAllObjects];
     [[DataManager shared].coordinateViews removeAllObjects];
     
