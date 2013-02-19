@@ -23,11 +23,6 @@
 @synthesize mapView;
 @synthesize delegate;
 @synthesize compass;
-@synthesize mapPoints = _mapPoints;
-@synthesize mapPointsIDs;
-@synthesize allFriendsSwitch;
-@synthesize allCheckins;
-@synthesize userActionSheet;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -42,7 +37,6 @@
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAddNewPoint:) name:kWillAddPointIsFBCheckin object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doUpdatePointStatus:) name:kWillUpdatePointStatus object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveError:) name:kDidReceiveError object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doMapEndRetrievingData) name:kMapEndOfRetrievingInitialData object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetAllFriendsSwitchEnabled:) name:kWillSetAllFriendsSwitchEnabled object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doMapNotReceiveNewFBMapUsers) name:kMapDidNotReceiveNewFBMapUsers object:nil];
@@ -177,7 +171,7 @@
         [DataManager shared].currentRequestingDataControllerTitle = @"Map";
     }
     else{
-        if ([allFriendsSwitch value] == friendsValue) {
+        if ([[self allFriendsSwitch] value] == friendsValue) {
             [self showFriends];
         }
         else
@@ -217,36 +211,6 @@
     // add new
 	[self addPoints:newMapPoints];
     [mapView doClustering];
-}
-
-- (void)allFriendsSwitchValueDidChanged:(id)sender{
-    float origValue = [(CustomSwitch *)sender value];
-    int stateValue;
-    if(origValue >= worldValue){
-        stateValue = 1;
-    }else if(origValue <= friendsValue){
-        stateValue = 0;
-    }
-    
-    switch (stateValue) {
-            // show Friends
-        case 0:{
-            if(!showAllUsers){
-                [self showFriends];
-                showAllUsers = YES;
-            }
-        }
-            break;
-            
-            // show World
-        case 1:{
-            if(showAllUsers){
-                [self showWorld];
-                showAllUsers = NO;
-            }
-        }
-            break;
-    }
 }
 
 - (void) showWorld{
@@ -612,7 +576,7 @@
 
 -(void)doMapNotReceiveNewFBMapUsers{
     [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
-    if ([allFriendsSwitch value] == friendsValue) {
+    if ([self.allFriendsSwitch value] == friendsValue) {
         [self showFriends];
     }
     else
@@ -622,7 +586,7 @@
 
 -(void)doWillSetAllFriendsSwitchEnabled:(NSNotification*)notification{
     BOOL enabled = [[[notification userInfo] objectForKey:@"switchEnabled"] boolValue];
-    [allFriendsSwitch setEnabled:enabled];
+    [self.allFriendsSwitch setEnabled:enabled];
 }
 
 
@@ -721,7 +685,6 @@
 
         
         [[DataManager shared].allmapPoints addObject:newPoint];
-        [[DataManager shared].allARMapPoints addObject:newPoint];
         
         if(newPoint.geoDataID != -1){
             [[DataManager shared].mapPointsIDs addObject:[NSString stringWithFormat:@"%d", newPoint.geoDataID]];
@@ -729,7 +692,6 @@
 
         if([self isAllShowed] || [friendsIds containsObject:newPoint.fbUserId]){
             [[DataManager shared].mapPoints addObject:newPoint];
-            [[DataManager shared].ARmapPoints addObject:newPoint];
 
             addedToCurrentMapState = YES;
         }
@@ -765,30 +727,12 @@
 }
 
 - (BOOL)isAllShowed{
-    if(allFriendsSwitch.value >= worldValue){
+    if(self.allFriendsSwitch.value >= worldValue){
         return YES;
     }
     
     return NO;
 }
-
--(void)doReceiveError:(NSNotification*)notification{
-    NSString* errorMessage = [notification.userInfo objectForKey:@"errorMessage"];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Errors", nil)
-                                                    message:errorMessage
-                                                   delegate:self
-                                          cancelButtonTitle:NSLocalizedString(@"Ok", nil)
-                                          otherButtonTitles:nil];
-    [alert show];
-    [alert release];
-    
-    // remove loading indicator
-    if ([self.view viewWithTag:INDICATOR_TAG]) {
-        [[self.view viewWithTag:INDICATOR_TAG] removeFromSuperview];
-    }
-
-}
-
 
 #pragma mark -
 #pragma mark UIActionSheetDelegate
@@ -799,7 +743,7 @@
     switch (buttonIndex) {
         case 0:{
             
-            [self.view bringSubviewToFront:allFriendsSwitch];
+            [self.view bringSubviewToFront:self.allFriendsSwitch];
             AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
             
 
@@ -848,57 +792,10 @@
             break;
     }
     
-    [userActionSheet release];
-    userActionSheet = nil;
-    
-    self.selectedUserAnnotation = nil;
+    [super actionSheet:actionSheet clickedButtonAtIndex:buttonIndex];
 }
 
-- (void)actionSheetViewFBProfile{
-    // View personal FB page
-    
-    NSString *url = [NSString stringWithFormat:@"http://www.facebook.com/profile.php?id=%@",self.selectedUserAnnotation.fbUserId];
-    
-    WebViewController *webViewControleler = [[WebViewController alloc] init];
-    webViewControleler.urlAdress = url;
-    [self.navigationController pushViewController:webViewControleler animated:YES];
-    [webViewControleler autorelease];
-}
 
-- (void) actionSheetSendPrivateFBMessage{
-    NSString *selectedFriendId = self.selectedUserAnnotation.fbUserId;
-    
-    // get conversation
-    Conversation *conversation = [[DataManager shared].historyConversation objectForKey:selectedFriendId];
-    if(conversation == nil){
-        // 1st message -> create conversation
-        
-        Conversation *newConversation = [[Conversation alloc] init];
-        
-        // add to
-        NSMutableDictionary *to = [NSMutableDictionary dictionary];
-        [to setObject:selectedFriendId forKey:kId];
-        [to setObject:[self.selectedUserAnnotation.fbUser objectForKey:kName] forKey:kName];
-        newConversation.to = to;
-        
-        // add messages
-        NSMutableArray *emptryArray = [[NSMutableArray alloc] init];
-        newConversation.messages = emptryArray;
-        [emptryArray release];
-        
-        [[DataManager shared].historyConversation setObject:newConversation forKey:selectedFriendId];
-        [newConversation release];
-        
-        conversation = newConversation;
-    }
-    
-    // show Chat
-    FBChatViewController *chatController = [[FBChatViewController alloc] initWithNibName:@"FBChatViewController" bundle:nil];
-    chatController.chatHistory = conversation;
-    [self.navigationController pushViewController:chatController animated:YES];
-    [chatController release];
-    
-}
 
 #pragma mark - 
 #pragma mark Markers
@@ -913,7 +810,7 @@
 	NSString* subTitle;
 	
 	title = userName;
-	if ([_selectedUserAnnotation.userStatus length] >=6)
+	if ([self.selectedUserAnnotation.userStatus length] >=6)
 	{
 		if ([[self.selectedUserAnnotation.userStatus substringToIndex:6] isEqualToString:fbidIdentifier])
 		{
@@ -934,80 +831,5 @@
     // show action sheet
     [self showActionSheetWithTitle:title andSubtitle:subTitle];
 }
-
-- (void)showActionSheetWithTitle:(NSString *)title andSubtitle:(NSString *)subtitle
-{
-    // check yourself
-    if([_selectedUserAnnotation.fbUserId isEqualToString:[DataManager shared].currentFBUserId]){
-        return;
-    }
-    
-    // is this friend?
-    BOOL isThisFriend = YES;
-    if(![[[DataManager shared].myFriendsAsDictionary allKeys] containsObject:_selectedUserAnnotation.fbUserId]){
-        isThisFriend = NO;
-    }
-    
-    
-    // show Action Sheet
-    //
-    // add "Quote" item only in Chat
-    if(isThisFriend){
-        userActionSheet = [[UIActionSheet alloc] initWithTitle:title
-                                                      delegate:self
-                                             cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
-                                        destructiveButtonTitle:nil
-                                             otherButtonTitles:NSLocalizedString(@"Reply with quote", nil), NSLocalizedString(@"Send private FB message", nil), NSLocalizedString(@"View FB profile", nil), nil];
-    }else{
-        userActionSheet = [[UIActionSheet alloc] initWithTitle:title
-                                                      delegate:self
-                                             cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
-                                        destructiveButtonTitle:nil
-                                             otherButtonTitles:NSLocalizedString(@"Reply with quote", nil), NSLocalizedString(@"View FB profile", nil), nil];
-    }
-    
-	UILabel* titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 5, 280, 15)];
-	titleLabel.font = [UIFont boldSystemFontOfSize:14.0];
-	titleLabel.textAlignment = UITextAlignmentCenter;
-	titleLabel.backgroundColor = [UIColor clearColor];
-	titleLabel.textColor = [UIColor whiteColor];
-	titleLabel.text = title;
-	titleLabel.numberOfLines = 0;
-	[userActionSheet addSubview:titleLabel];
-	
-	UILabel* subTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 20, 280, 55)];
-	subTitleLabel.font = [UIFont boldSystemFontOfSize:12.0];
-	subTitleLabel.textAlignment = UITextAlignmentCenter;
-	subTitleLabel.backgroundColor = [UIColor clearColor];
-	subTitleLabel.textColor = [UIColor whiteColor];
-	subTitleLabel.text = subtitle;
-	subTitleLabel.numberOfLines = 0;
-	[userActionSheet addSubview:subTitleLabel];
-	
-	[subTitleLabel release];
-	[titleLabel release];
-	userActionSheet.title = @"";
-    
-	// Show
-	[userActionSheet showFromTabBar:self.tabBarController.tabBar];
-	
-	CGRect actionSheetRect = userActionSheet.frame;
-	actionSheetRect.origin.y -= 60.0;
-	actionSheetRect.size.height = 300.0;
-	[userActionSheet setFrame:actionSheetRect];
-	
-	for (int counter = 0; counter < [[userActionSheet subviews] count]; counter++)
-	{
-		UIView *object = [[userActionSheet subviews] objectAtIndex:counter];
-		if (![object isKindOfClass:[UILabel class]])
-		{
-			CGRect frame = object.frame;
-			frame.origin.y = frame.origin.y + 60.0;
-			object.frame = frame;
-		}
-	}
-}
-
-
 
 @end

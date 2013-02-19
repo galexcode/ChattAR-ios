@@ -37,10 +37,7 @@
 @synthesize captureSession;
 @synthesize delegate, distanceSlider, distanceLabel;
 
-@synthesize userActionSheet;
-@synthesize selectedUserAnnotation;
-@synthesize allFriendsSwitch;
-#pragma mark - 
+#pragma mark -
 #pragma mark Init & dealloc 
 
 -(id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil{
@@ -85,7 +82,6 @@
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(logoutDone) name:kNotificationLogout object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doUpdateMarkersForCenterLocation) name:kwillUpdateMarkersForCenterLocation object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveError:) name:kDidReceiveError object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAREndRetrievingData) name:kMapEndOfRetrievingInitialData object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetDistanceSliderEnabled:) name:kWillSetDistanceSliderEnabled object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doARDidNotReceiveNewUsers) name:kARDidNotReceiveNewUsers object:nil];
@@ -770,7 +766,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     
     switch (buttonIndex) {
         case 0:{
-            [self.view bringSubviewToFront:allFriendsSwitch];
+            [self.view bringSubviewToFront:self.allFriendsSwitch];
             
             AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
             
@@ -819,57 +815,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         default:
             break;
     }
-    
-    [userActionSheet release];
-    userActionSheet = nil;
-    
-    self.selectedUserAnnotation = nil;
-}
-
-- (void)actionSheetViewFBProfile{
-    // View personal FB page
-    
-    NSString *url = [NSString stringWithFormat:@"http://www.facebook.com/profile.php?id=%@",self.selectedUserAnnotation.fbUserId];
-    
-    WebViewController *webViewControleler = [[WebViewController alloc] init];
-    webViewControleler.urlAdress = url;
-    [self.navigationController pushViewController:webViewControleler animated:YES];
-    [webViewControleler autorelease];
-}
-
-- (void) actionSheetSendPrivateFBMessage{
-    NSString *selectedFriendId = self.selectedUserAnnotation.fbUserId;
-    
-    // get conversation
-    Conversation *conversation = [[DataManager shared].historyConversation objectForKey:selectedFriendId];
-    if(conversation == nil){
-        // 1st message -> create conversation
         
-        Conversation *newConversation = [[Conversation alloc] init];
-        
-        // add to
-        NSMutableDictionary *to = [NSMutableDictionary dictionary];
-        [to setObject:selectedFriendId forKey:kId];
-        [to setObject:[self.selectedUserAnnotation.fbUser objectForKey:kName] forKey:kName];
-        newConversation.to = to;
-        
-        // add messages
-        NSMutableArray *emptryArray = [[NSMutableArray alloc] init];
-        newConversation.messages = emptryArray;
-        [emptryArray release];
-        
-        [[DataManager shared].historyConversation setObject:newConversation forKey:selectedFriendId];
-        [newConversation release];
-        
-        conversation = newConversation;
-    }
-    
-    // show Chat
-    FBChatViewController *chatController = [[FBChatViewController alloc] initWithNibName:@"FBChatViewController" bundle:nil];
-    chatController.chatHistory = conversation;
-    [self.navigationController pushViewController:chatController animated:YES];
-    [chatController release];
-    
+    [super actionSheet:actionSheet clickedButtonAtIndex:buttonIndex];
 }
 
 #pragma mark -
@@ -885,7 +832,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 	NSString* subTitle;
 	
 	title = userName;
-	if ([selectedUserAnnotation.userStatus length] >=6)
+	if ([self.selectedUserAnnotation.userStatus length] >=6)
 	{
 		if ([[self.selectedUserAnnotation.userStatus substringToIndex:6] isEqualToString:fbidIdentifier])
 		{
@@ -905,79 +852,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     
     // show action sheet
     [self showActionSheetWithTitle:title andSubtitle:subTitle];
-}
-
-- (void)showActionSheetWithTitle:(NSString *)title andSubtitle:(NSString *)subtitle
-{
-    // check yourself
-    if([selectedUserAnnotation.fbUserId isEqualToString:[DataManager shared].currentFBUserId]){
-        return;
-    }
-    
-    // is this friend?
-    BOOL isThisFriend = YES;
-    if(![[[DataManager shared].myFriendsAsDictionary allKeys] containsObject:selectedUserAnnotation.fbUserId]){
-        isThisFriend = NO;
-    }
-    
-    
-    // show Action Sheet
-    //
-    // add "Quote" item only in Chat
-    if(isThisFriend){
-        userActionSheet = [[UIActionSheet alloc] initWithTitle:title
-                                                      delegate:self
-                                             cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
-                                        destructiveButtonTitle:nil
-                                             otherButtonTitles:NSLocalizedString(@"Reply with quote", nil), NSLocalizedString(@"Send private FB message", nil), NSLocalizedString(@"View FB profile", nil), nil];
-    }else{
-        userActionSheet = [[UIActionSheet alloc] initWithTitle:title
-                                                      delegate:self
-                                             cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
-                                        destructiveButtonTitle:nil
-                                             otherButtonTitles:NSLocalizedString(@"Reply with quote", nil), NSLocalizedString(@"View FB profile", nil), nil];
-    }
-    
-	UILabel* titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 5, 280, 15)];
-	titleLabel.font = [UIFont boldSystemFontOfSize:14.0];
-	titleLabel.textAlignment = UITextAlignmentCenter;
-	titleLabel.backgroundColor = [UIColor clearColor];
-	titleLabel.textColor = [UIColor whiteColor];
-	titleLabel.text = title;
-	titleLabel.numberOfLines = 0;
-	[userActionSheet addSubview:titleLabel];
-	
-	UILabel* subTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 20, 280, 55)];
-	subTitleLabel.font = [UIFont boldSystemFontOfSize:12.0];
-	subTitleLabel.textAlignment = UITextAlignmentCenter;
-	subTitleLabel.backgroundColor = [UIColor clearColor];
-	subTitleLabel.textColor = [UIColor whiteColor];
-	subTitleLabel.text = subtitle;
-	subTitleLabel.numberOfLines = 0;
-	[userActionSheet addSubview:subTitleLabel];
-	
-	[subTitleLabel release];
-	[titleLabel release];
-	userActionSheet.title = @"";
-    
-	// Show
-	[userActionSheet showFromTabBar:self.tabBarController.tabBar];
-	
-	CGRect actionSheetRect = userActionSheet.frame;
-	actionSheetRect.origin.y -= 60.0;
-	actionSheetRect.size.height = 300.0;
-	[userActionSheet setFrame:actionSheetRect];
-	
-	for (int counter = 0; counter < [[userActionSheet subviews] count]; counter++)
-	{
-		UIView *object = [[userActionSheet subviews] objectAtIndex:counter];
-		if (![object isKindOfClass:[UILabel class]])
-		{
-			CGRect frame = object.frame;
-			frame.origin.y = frame.origin.y + 60.0;
-			object.frame = frame;
-		}
-	}
 }
 
 #pragma mark -
@@ -1001,7 +875,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
     }
     else{
-        if ([allFriendsSwitch value] == friendsValue) {
+        if ([self.allFriendsSwitch value] == friendsValue) {
             [self showFriends];
         }
         else
@@ -1208,7 +1082,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 -(void)doWillSetAllFriendsSwitchEnabled:(NSNotification*)notification{
     BOOL enabled = [[[notification userInfo] objectForKey:@"switchEnabled"] boolValue];
-    [allFriendsSwitch setEnabled:enabled];
+    [self.allFriendsSwitch setEnabled:enabled];
 }
 
 -(void)doWillSetDistanceSliderEnabled:(NSNotification*)notification{
@@ -1220,7 +1094,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
     
     [self.distanceSlider setEnabled:YES];
-    [allFriendsSwitch setEnabled:YES];
+    [self.allFriendsSwitch setEnabled:YES];
     isDataRetrieved = YES;
     
     [self refreshWithNewPoints:[DataManager shared].mapPoints];
@@ -1232,7 +1106,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 - (void)logoutDone{
     showAllUsers  = NO;
     isDataRetrieved = NO;
-    isDataShowed = NO;
     
     [self.allFriendsSwitch setValue:1.0f];
     
@@ -1245,7 +1118,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 -(void)doARDidNotReceiveNewUsers{
     [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
-    if ([allFriendsSwitch value] == friendsValue) {
+    if ([self.allFriendsSwitch value] == friendsValue) {
         [self showFriends];
     }
     else
@@ -1255,22 +1128,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 }
 
 
--(void)doReceiveError:(NSNotification*)notification{
-    NSString* errorMessage = [notification.userInfo objectForKey:@"errorMessage"];
-    
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Errors", nil)
-                                                    message:errorMessage
-                                                   delegate:self
-                                          cancelButtonTitle:NSLocalizedString(@"Ok", nil)
-                                          otherButtonTitles:nil];
-    [alert show];
-    [alert release];
-    
-    // remove loading indicator
-    if ([self.view viewWithTag:INDICATOR_TAG]) {
-        [[self.view viewWithTag:INDICATOR_TAG] removeFromSuperview];
-    }
-}
 
 -(void)doUpdateMarkersForCenterLocation{
     [self updateMarkersPositionsForCenterLocation:self.centerLocation];

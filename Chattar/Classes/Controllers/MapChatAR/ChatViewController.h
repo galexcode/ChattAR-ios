@@ -41,8 +41,6 @@
 @property (nonatomic, retain) NSString* quoteMark;
 @property (nonatomic, retain) AsyncImageView* quotePhotoTop;
 
-@property (nonatomic, retain) UIActionSheet *userActionSheet;
-@property (retain) UserAnnotation *selectedUserAnnotation;
 @property (nonatomic, assign) CustomSwitch *allFriendsSwitch;
 
 - (IBAction)sendMessageDidPress:(id)sender;

@@ -26,8 +26,6 @@
     NSMutableArray *sliderNumbers;
     
     BOOL isDataRetrieved;
-    
-    BOOL isDataShowed;
 }
 
 @property (nonatomic, assign) BOOL scaleViewsBasedOnDistance;
@@ -53,9 +51,6 @@
 @property (nonatomic, assign) UISlider* distanceSlider;
 @property (retain, nonatomic) UIActivityIndicatorView *loadingIndicator;
 @property (nonatomic, assign) UILabel* distanceLabel;
-@property (nonatomic, retain) UIActionSheet* userActionSheet;
-@property (retain) UserAnnotation *selectedUserAnnotation;
-@property (nonatomic, assign) CustomSwitch *allFriendsSwitch;
 
 /*!
  @brief	The capture session takes the input from the camera and capture it

@@ -42,12 +42,6 @@
                                         // add custom map view with clusterization
 @property (nonatomic, assign) OCMapView *mapView;
 @property (nonatomic, retain) UIImageView *compass;
-@property (assign) NSMutableArray *mapPoints;
-@property (assign) NSMutableArray *mapPointsIDs;
-@property (nonatomic, assign) CustomSwitch *allFriendsSwitch;
-@property (nonatomic, retain) NSMutableArray* allCheckins;
-@property (nonatomic, retain) UIActionSheet *userActionSheet;
-@property (retain) UserAnnotation *selectedUserAnnotation;
 
 - (void)refreshWithNewPoints:(NSArray *)mapPoints;
 - (void)addPoints:(NSArray *)mapPoints;
