@@ -83,23 +83,7 @@
     page = 1;
 	
     // YES when is getting new messages
-	isLoadingMoreMessages = NO;
-    
-    allFriendsSwitch = [CustomSwitch customSwitch];
-    [allFriendsSwitch setAutoresizingMask:(UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin)];
-    
-    if(IS_HEIGHT_GTE_568){
-        [allFriendsSwitch setCenter:CGPointMake(280, 448)];
-    }else{
-        [allFriendsSwitch setCenter:CGPointMake(280, 360)];
-    }
-    
-    [allFriendsSwitch setValue:worldValue];
-    [allFriendsSwitch scaleSwitch:0.9];
-    [allFriendsSwitch addTarget:self action:@selector(allFriendsSwitchValueDidChanged:) forControlEvents:UIControlEventValueChanged];
-	[allFriendsSwitch setBackgroundColor:[UIColor clearColor]];
-	[self.view addSubview:allFriendsSwitch];
-    
+	isLoadingMoreMessages = NO;    
 }
 
 - (void)removeQuote
@@ -134,11 +118,7 @@
 
 
 -(void)viewWillAppear:(BOOL)animated{   
-    if ([DataManager shared].isFirstStartApp) {
-        [[DataManager shared] setFirstStartApp:NO];
-        
-        [self addSpinner];
-    }
+    [super viewWillAppear:animated];
 }
 
 -(void)viewDidAppear:(BOOL)animated{
@@ -152,7 +132,6 @@
 }
 
 - (void)dealloc {
-    [_loadingIndicator release];
     [super dealloc];
 }
 
@@ -163,7 +142,7 @@
     if ([DataManager shared].chatPoints.count == 0 && [DataManager shared].chatMessagesIDs.count == 0) {
         [messagesTableView reloadData];
         [[BackgroundWorker instance] retrieveCachedChatDataAndRequestNewData];
-        [self addSpinner];
+        [super addSpinner];
     }
     else{
         if ([allFriendsSwitch value] == friendsValue) {
@@ -172,21 +151,6 @@
         else
             [self showWorld];
     }
-}
-
--(void)addSpinner{
-    if (!_loadingIndicator) {
-        _loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    }
-    
-    if (![self.view viewWithTag:INDICATOR_TAG]) {
-        [self.view addSubview:_loadingIndicator];
-    }
-    _loadingIndicator.center = self.view.center;
-    [self.view bringSubviewToFront:_loadingIndicator];
-    
-    [_loadingIndicator startAnimating];
-    [_loadingIndicator setTag:INDICATOR_TAG];
 }
 
 - (IBAction)sendMessageDidPress:(id)sender{

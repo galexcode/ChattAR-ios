@@ -13,11 +13,11 @@
 #import "OCAnnotation.h"
 #import "ClusterMarkerView.h"
 #import "PhotoMarkerView.h"
-
+#import "CommonViewController.h"
 #import "BackgroundWorker.h"
 
 @protocol FBDataDelegate;
-@interface MapViewController : UIViewController <MKMapViewDelegate, UIGestureRecognizerDelegate,PhotoMarkerProtocol,
+@interface MapViewController : CommonViewController <MKMapViewDelegate, UIGestureRecognizerDelegate,PhotoMarkerProtocol,
                                                  FBDataDelegate, MapControllerDelegate,  DataDelegate,UIActionSheetDelegate>{
     CGFloat count;
     CGFloat lastCount;
@@ -32,7 +32,6 @@
     
     NSMutableArray* annotationsForClustering;
     MKMapRect previousRect;
-    BOOL showAllUsers;
                                                      
     BOOL isDataRetrieved;
                                                      
@@ -40,7 +39,6 @@
 }
 
 @property (nonatomic, assign) id delegate;
-@property (retain, nonatomic) UIActivityIndicatorView *loadingIndicator;
                                         // add custom map view with clusterization
 @property (nonatomic, assign) OCMapView *mapView;
 @property (nonatomic, retain) UIImageView *compass;

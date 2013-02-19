@@ -197,22 +197,6 @@
     
 	[self.view bringSubviewToFront:distanceSlider];
     [self.view bringSubviewToFront:distanceLabel];
-    
-    allFriendsSwitch = [CustomSwitch customSwitch];
-    [allFriendsSwitch setAutoresizingMask:(UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin)];
-    
-    if(IS_HEIGHT_GTE_568){
-        [allFriendsSwitch setCenter:CGPointMake(280, 448)];
-    }else{
-        [allFriendsSwitch setCenter:CGPointMake(280, 360)];
-    }
-    
-    [allFriendsSwitch setValue:worldValue];
-    [allFriendsSwitch scaleSwitch:0.9];
-    [allFriendsSwitch addTarget:self action:@selector(allFriendsSwitchValueDidChanged:) forControlEvents:UIControlEventValueChanged];
-	[allFriendsSwitch setBackgroundColor:[UIColor clearColor]];
-	[self.view addSubview:allFriendsSwitch];
-
 	
 	[displayView setBackgroundColor:[UIColor clearColor]];
 }
@@ -232,7 +216,6 @@
 	self.locationManager = nil;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	
-    [_loadingIndicator release];
     [super dealloc];
 }
 
@@ -1010,7 +993,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         [[BackgroundWorker instance] retrieveCachedMapDataAndRequestNewData];                   // AR uses map controller data
         [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
         [distanceSlider setEnabled:NO];
-        [self addSpinner];
+        [super addSpinner];
         
         // additional request for checkins
         if ([DataManager shared].allCheckins.count == 0) {
@@ -1028,18 +1011,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
             [self showWorld];
     }
 }
-
--(void)addSpinner{
-    _loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    [self.view addSubview:_loadingIndicator];
-    _loadingIndicator.center = self.view.center;
-    [self.view bringSubviewToFront:_loadingIndicator];
-    
-    [_loadingIndicator startAnimating];
-    [_loadingIndicator setHidesWhenStopped:YES];
-    [_loadingIndicator setTag:INDICATOR_TAG];
-}
-
 
 // touch on marker
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event{
@@ -1119,38 +1090,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 	
 	if (!self.centerCoordinate)
 		self.centerCoordinate = [ARCoordinate coordinateWithRadialDistance:1.0 inclination:0 azimuth:0];
-}
-
-- (void)allFriendsSwitchValueDidChanged:(id)sender{
-    
-    // switch All/Friends
-    float origValue = [(CustomSwitch *)sender value];
-    int stateValue;
-    if(origValue >= worldValue){
-        stateValue = 1;
-    }else if(origValue <= friendsValue){
-        stateValue = 0;
-    }
-    
-    switch (stateValue) {
-            // show Friends
-        case 0:{
-            if(!showAllUsers){
-                [self showFriends];
-                showAllUsers = YES;
-            }
-        }
-            break;
-            
-            // show World
-        case 1:{
-            if(showAllUsers){
-                [self showWorld];
-                showAllUsers = NO;
-            }
-        }
-            break;
-    }
 }
 
 - (void) showWorld{

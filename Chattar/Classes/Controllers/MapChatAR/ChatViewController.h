@@ -13,13 +13,13 @@
 #import "WebViewController.h"
 #import "MessagesViewController.h"
 #import "CustomSwitch.h"
-
+#import "CommonViewController.h"
 #import "BackgroundWorker.h"
 
 #define tableIsUpdating 1011
 
 
-@interface ChatViewController : UIViewController <UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate, QBActionStatusDelegate, UIScrollViewDelegate, FBServiceResultDelegate, UIWebViewDelegate,FBDataDelegate,ChatControllerDelegate, DataDelegate>{
+@interface ChatViewController : CommonViewController <UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate, QBActionStatusDelegate, UIScrollViewDelegate, FBServiceResultDelegate, UIWebViewDelegate,FBDataDelegate,ChatControllerDelegate, DataDelegate>{
     UIImage *messageBGImage;
     UIImage *messageBGImage2;
     UIImage *distanceImage;
@@ -29,9 +29,7 @@
 	int page;
 
 	BOOL isLoadingMoreMessages;
-    
-    BOOL showAllUsers;
-    
+       
     BOOL isDataRetrieved;
 }
 
@@ -46,7 +44,6 @@
 @property (nonatomic, retain) UIActionSheet *userActionSheet;
 @property (retain) UserAnnotation *selectedUserAnnotation;
 @property (nonatomic, assign) CustomSwitch *allFriendsSwitch;
-@property (retain, nonatomic) IBOutlet UIActivityIndicatorView *loadingIndicator;
 
 - (IBAction)sendMessageDidPress:(id)sender;
 

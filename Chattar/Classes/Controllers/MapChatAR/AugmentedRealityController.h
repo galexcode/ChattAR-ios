@@ -11,10 +11,10 @@
 #import <CoreVideo/CoreVideo.h>
 #import "UserAnnotation.h"
 #import "CustomSwitch.h"
-
+#import "CommonViewController.h"
 @class ARCoordinate;
 
-@interface AugmentedRealityController : UIViewController   <UIAccelerometerDelegate,
+@interface AugmentedRealityController : CommonViewController<UIAccelerometerDelegate,
                                                             CLLocationManagerDelegate,
                                                             AVCaptureVideoDataOutputSampleBufferDelegate,
                                                         	UIActionSheetDelegate>
@@ -24,7 +24,6 @@
 	int switchedDistance;
     
     NSMutableArray *sliderNumbers;
-    BOOL showAllUsers;
     
     BOOL isDataRetrieved;
     

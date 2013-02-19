@@ -55,13 +55,13 @@
 
 -(void)dealloc{
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [_loadingIndicator release];
     [super dealloc];
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
     [mapView setUserInteractionEnabled:NO];
 	mapView.userInteractionEnabled = YES;
     
@@ -134,22 +134,7 @@
     
     annotationsForClustering = [[NSMutableArray alloc] init];
     
-    previousRect = mapView.visibleMapRect;
-    
-    allFriendsSwitch = [CustomSwitch customSwitch];
-    [allFriendsSwitch setAutoresizingMask:(UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin)];
-    
-    if(IS_HEIGHT_GTE_568){
-        [allFriendsSwitch setCenter:CGPointMake(280, 448)];
-    }else{
-        [allFriendsSwitch setCenter:CGPointMake(280, 360)];
-    }
-    
-    [allFriendsSwitch setValue:worldValue];
-    [allFriendsSwitch scaleSwitch:0.9];
-    [allFriendsSwitch addTarget:self action:@selector(allFriendsSwitchValueDidChanged:) forControlEvents:UIControlEventValueChanged];
-	[allFriendsSwitch setBackgroundColor:[UIColor clearColor]];
-	[self.view addSubview:allFriendsSwitch];    
+    previousRect = mapView.visibleMapRect;    
 }
 
 - (void)viewDidUnload
@@ -168,9 +153,7 @@
 }
 
 -(void)viewWillAppear:(BOOL)animated{
-    if ([DataManager shared].isFirstStartApp) {
-        [self addSpinner];
-    }
+    [super viewWillAppear:animated];
 }
 
 -(void)viewDidAppear:(BOOL)animated{
@@ -184,7 +167,7 @@
     if ([DataManager shared].mapPoints.count == 0 && [DataManager shared].mapPointsIDs.count == 0) {
         [self mapClear];
         [[BackgroundWorker instance] retrieveCachedMapDataAndRequestNewData];
-        [self addSpinner];
+        [super addSpinner];
         
         // additional request for checkins
         if ([DataManager shared].allCheckins.count == 0) {
@@ -200,22 +183,6 @@
         else
             [self showWorld];
     }
-}
-
--(void)addSpinner{
-    if (!_loadingIndicator) {
-        _loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    }
-    
-    if (![self.view viewWithTag:INDICATOR_TAG]) {
-        [self.view addSubview:_loadingIndicator];
-        [_loadingIndicator startAnimating];
-    }
-    
-    _loadingIndicator.center = self.view.center;
-    [self.view bringSubviewToFront:_loadingIndicator];
-    
-    [_loadingIndicator setTag:INDICATOR_TAG];
 }
 
 - (void)spin:(UIRotationGestureRecognizer *)gestureRecognizer {
