@@ -220,6 +220,8 @@
     if([result isKindOfClass:[QBAAuthSessionCreationResult class]]){
         // Success result
 		if(result.success){
+            QBAAuthSessionCreationResult* res = (QBAAuthSessionCreationResult*)result;
+            qbToken = res.token;
             
             NSLog(@"%@",[[[DataManager shared] fbUserTokenAndDate] objectForKey:FBAccessTokenKey]);
             // FB auth
@@ -249,6 +251,7 @@
                         [cookiesStorage setCookie:cook];
                     }
                 }
+                
             }
             
         // Errors
@@ -276,7 +279,15 @@
             
 			// register as subscribers for receiving push notifications
             [QBMessages TRegisterSubscriptionWithDelegate:self];
-
+            QBUUser* user = [QBUUser user];
+            user.ID = res.user.ID;
+            user.login = res.user.login;
+            user.password = qbToken;
+            // log in QBChat
+            [[QBChat instance] setDelegate:self];
+            [[QBChat instance] loginWithUser:user];
+            
+            
         // Errors
 		}else if(401 == result.status){
             
@@ -365,4 +376,13 @@
     [self dismissModalViewControllerAnimated:YES];
 }
 
+#pragma mark -
+#pragma mark QBChat login
+-(void)chatDidLogin{
+    NSLog(@"SUCCESS LOGIN QBCHAT!");
+}
+
+-(void)chatDidNotLogin{
+    NSLog(@"FAILED TO LOGIN QBCHAT!");
+}
 @end

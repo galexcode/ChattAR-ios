@@ -76,10 +76,15 @@
 -(void)didNotReceiveNewARUsers;
 @end
 
+@protocol ChatRoomDataDelegate <NSObject>
+
+@optional
+-(void)didReceiveChatRooms:(NSArray*)chatRooms;
+
+@end
 
 
-
-@interface BackgroundWorker : NSObject<QBActionStatusDelegate,FBRequestDelegate,FBServiceResultDelegate>{
+@interface BackgroundWorker : NSObject<QBActionStatusDelegate,FBRequestDelegate,FBServiceResultDelegate, QBChatDelegate>{
     NSTimer* updateTimer;
     
     
@@ -93,7 +98,7 @@
     
 }
 
-@property (nonatomic, assign) id<FBDataDelegate,DataDelegate,MapControllerDelegate,ChatControllerDelegate,ARControllerDelegate> tabBarDelegate;
+@property (nonatomic, assign) id<FBDataDelegate,DataDelegate,MapControllerDelegate,ChatControllerDelegate,ARControllerDelegate,ChatRoomDataDelegate> tabBarDelegate;
 
 @property (nonatomic, retain) NSMutableArray* FBfriends;
 @property (assign) short chatInitState;
@@ -112,5 +117,6 @@
 -(void)requestFriendWithFacebookID:(NSString*)fbID andMessageText:(NSString*)message;
 -(void)postGeoData:(QBLGeoData*)geoData;
 - (void)retrieveCachedFBCheckinsAndRequestNewCheckins;
-
+-(void)requestAllChatRooms;
+-(void)requestAdditionalChatRoomsInfo;
 @end

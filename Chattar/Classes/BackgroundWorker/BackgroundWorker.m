@@ -47,6 +47,8 @@ static BackgroundWorker* instance = nil;
         [locationManager stopMonitoringSignificantLocationChanges];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(stopRequestingNewData) name:kNotificationLogout object:nil];
+        
+        [[QBChat instance] setDelegate:self];
     }
     return self;
 }
@@ -68,6 +70,10 @@ static BackgroundWorker* instance = nil;
 
 #pragma mark -
 #pragma mark Data Requests
+
+-(void)requestAllChatRooms{
+    [[QBChat instance] requestAllRooms];
+}
 
 -(void)requestFriendWithFacebookID:(NSString*)fbUserID andMessageText:(NSString*)message{
     [QBUsers userWithFacebookID:fbUserID delegate:self context:message];
@@ -876,7 +882,6 @@ static BackgroundWorker* instance = nil;
                     // Send push
                     [QBMessages TSendPush:message
                                   toUsers:[NSString stringWithFormat:@"%d",  qbUser.ID]
-                 isDevelopmentEnvironment:[ProvisionManager isDevelopmentProvision]
                                  delegate:self];
                     
                     [message release];
@@ -1527,6 +1532,16 @@ static BackgroundWorker* instance = nil;
 }
 
 #pragma mark -
+#pragma mark QBChatDelegate methods
+-(void)chatDidReceiveListOfRooms:(NSArray *)rooms{
+            // retain rooms
+    [rooms retain];
+    if ([tabBarDelegate respondsToSelector:@selector(didReceiveChatRooms:)]) {
+        [tabBarDelegate didReceiveChatRooms:rooms];
+    }
+}
+
+#pragma mark -
 #pragma mark Helpers
 - (UserAnnotation *)lastChatMessage:(BOOL)ignoreOwn{
     if(ignoreOwn){
@@ -1551,4 +1566,6 @@ static BackgroundWorker* instance = nil;
         updateTimer = nil;
     }
 }
+
+
 @end

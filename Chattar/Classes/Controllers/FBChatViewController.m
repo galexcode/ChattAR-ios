@@ -668,7 +668,6 @@ static CGFloat const kChatBarHeight4    = 94.0f;
 			// Send push
 			[QBMessages TSendPush:message
 								 toUsers:[NSString stringWithFormat:@"%d", _result.user.ID]
-				  isDevelopmentEnvironment:[ProvisionManager isDevelopmentProvision]
 								delegate:nil];
             
             [message release];

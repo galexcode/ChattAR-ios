@@ -12,6 +12,9 @@
 
 #define QBToken @"Qb-Token"
 
+#define qbhttp @"http"
+#define qbhttps @"https"
+
 extern NSString* const kBaseServiceErrorDomain;
 extern NSString* const kBaseServiceErrorKeyDescription;
 extern NSString* const kBaseServiceErrorKeyInner;
@@ -41,6 +44,8 @@ extern NSString* const QuickbloxSocialAuthTwitterCallback;
 extern NSString* const QuickbloxSocialAuthFacebookCallback;
 extern NSString* const QuickbloxSocialAuthFailure;
 
+// Notifications
+extern NSString* const QuickbloxSocialDialogDidCloseNotification;
 
 #define kBaseServiceDateNotSet [NSDate dateWithTimeIntervalSince1970:0] 
 #define kBaseServiceObjectNotSet nil

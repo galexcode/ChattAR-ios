@@ -10,10 +10,11 @@
 #import "FBServiceResultDelegate.h"
 #import "MBProgressHUD.h"
 
-@interface SplashController : UIViewController <QBActionStatusDelegate, FBServiceResultDelegate, FBSessionDelegate>{
+@interface SplashController : UIViewController <QBActionStatusDelegate, FBServiceResultDelegate, FBSessionDelegate,QBChatDelegate>{
     IBOutlet UIActivityIndicatorView *activityIndicator;
     IBOutlet UIButton *loginButton;
     MBProgressHUD* hud;
+    NSString* qbToken;
 }
 
 @property (nonatomic) BOOL openedAtStartApp;
