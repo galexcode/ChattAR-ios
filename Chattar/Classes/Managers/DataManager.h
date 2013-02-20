@@ -57,6 +57,10 @@
 
 @property (nonatomic, retain) NSString* currentRequestingDataControllerTitle;
 
+@property (nonatomic, retain) NSMutableArray* allChatRooms;
+@property (nonatomic, retain) NSMutableArray* trendingChatRooms;
+@property (nonatomic, retain) NSMutableArray* nearbyChatRooms;
+
 + (DataManager *) shared;
 
 - (void)sortMessagesArray;

@@ -57,6 +57,10 @@ static DataManager *instance = nil;
 
 @synthesize currentRequestingDataControllerTitle;
 
+@synthesize nearbyChatRooms;
+@synthesize trendingChatRooms;
+@synthesize allChatRooms;
+
 + (DataManager *)shared {
 	@synchronized (self) {
 		if (instance == nil){ 
@@ -109,6 +113,10 @@ static DataManager *instance = nil;
     [allmapPoints release];
     [mapPointsIDs release];
     [chatMessagesIDs release];
+    
+    [trendingChatRooms release];
+    [nearbyChatRooms release];
+    [allChatRooms release];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kNotificationLogout object:nil];
     [currentRequestingDataControllerTitle release];
