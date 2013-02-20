@@ -117,6 +117,8 @@
 -(void)requestFriendWithFacebookID:(NSString*)fbID andMessageText:(NSString*)message;
 -(void)postGeoData:(QBLGeoData*)geoData;
 - (void)retrieveCachedFBCheckinsAndRequestNewCheckins;
+
 -(void)requestAllChatRooms;
 -(void)requestAdditionalChatRoomsInfo;
+-(void)createChatRoom:(NSString*)chatRoomName;
 @end

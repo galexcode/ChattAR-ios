@@ -62,6 +62,12 @@ static BackgroundWorker* instance = nil;
 }
 
 #pragma mark -
+#pragma mark Creation methods
+-(void)createChatRoom:(NSString*)chatRoomName{
+    [[QBChat instance] createOrJoinRoomWithName:chatRoomName membersOnly:NO persistent:YES];
+}
+
+#pragma mark -
 #pragma mark Posting methods
 -(void)postGeoData:(QBLGeoData*)geoData{
     // post geodata
@@ -70,6 +76,16 @@ static BackgroundWorker* instance = nil;
 
 #pragma mark -
 #pragma mark Data Requests
+
+-(void)requestAdditionalChatRoomsInfo{
+    NSMutableDictionary *getRequest = [NSMutableDictionary dictionary];
+    for (NSString* roomName in [DataManager shared].allChatRooms) {
+        [getRequest setObject:roomName forKey:@"xmppName"];
+        [getRequest setObject:@"xmppName" forKey:@"sort_asc"];
+    }
+    
+    [QBCustomObjects objectsWithClassName:@"Room" extendedRequest:getRequest delegate:self];
+}
 
 -(void)requestAllChatRooms{
     [[QBChat instance] requestAllRooms];
@@ -1539,6 +1555,14 @@ static BackgroundWorker* instance = nil;
     if ([tabBarDelegate respondsToSelector:@selector(didReceiveChatRooms:)]) {
         [tabBarDelegate didReceiveChatRooms:rooms];
     }
+}
+
+-(void)chatRoomDidEnter:(QBChatRoom *)room{
+    [room retain];
+
+//    if (![[DataManager shared].allChatRooms containsObject:room.roomName]) {
+//        [[DataManager shared].allChatRooms addObject:room.roomName];
+//    }
 }
 
 #pragma mark -
