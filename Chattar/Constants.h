@@ -53,7 +53,7 @@
 #define kRegisterPushNotificatons @"kRegisterPushNotificatons"
 #define kARDidNotReceiveNewUsers @"kARDidNotReceiveNewUsers"
 
-#define kDidNotReceiveChatRooms @"kDidNotReceiveChatRooms"
+#define kDidReceiveChatRooms @"kDidReceiveChatRooms"
 
 #define INDICATOR_TAG 23458
 // Strings
