@@ -22,6 +22,8 @@
 #import "ProvisionManager.h"
 #import "ChatViewController.h"
 #import "MapViewController.h"
+#import "ChatRoomsViewController.h"
+
 @implementation AppDelegate
 
 @synthesize window = _window;
@@ -98,6 +100,11 @@
     UINavigationController* mapNavigationController = [[UINavigationController alloc] initWithRootViewController:mapViewController];
     [mapViewController release];
     
+    // Chat Rooms
+    ChatRoomsViewController* chatRoomsController = [[ChatRoomsViewController alloc] initWithNibName:@"ChatRoomsViewController" bundle:nil];
+    UINavigationController* chatRoomsNavigationController = [[UINavigationController alloc] initWithRootViewController:chatRoomsController];
+    [chatRoomsController release];
+    
 	// Tab Bar
 	_tabBarController = [[CustomTabBarController alloc] init];
     NSArray* viewControllers;
@@ -107,17 +114,18 @@
         UINavigationController* arNavigationController = [[UINavigationController alloc] initWithRootViewController:arController];
         [arController release];
 
-        viewControllers = [NSArray arrayWithObjects: chatNavigationController,mapNavigationController,arNavigationController,messagesNavigationController, settingsNavigationController, nil];
+        viewControllers = [NSArray arrayWithObjects: chatNavigationController,mapNavigationController,arNavigationController,chatRoomsController, settingsNavigationController, nil];
         [arNavigationController release];
     }
     else
-        viewControllers = [NSArray arrayWithObjects: chatNavigationController,mapNavigationController,messagesNavigationController, settingsNavigationController, nil];
+        viewControllers = [NSArray arrayWithObjects: chatNavigationController,mapNavigationController,chatRoomsNavigationController, settingsNavigationController, nil];
 	_tabBarController.viewControllers = viewControllers;
 	
 	// release controllers
 	[settingsNavigationController release];
     [messagesNavigationController release];
 	[chatNavigationController release];
+    [chatRoomsNavigationController release];
     [mapNavigationController release];
     // show window
 	self.window.rootViewController = self.tabBarController;
