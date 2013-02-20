@@ -18,6 +18,9 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        self.title = NSLocalizedString(@"Chat Rooms", @"Chat Rooms");
+        self.tabBarItem.image = [UIImage imageNamed:@"dialogsTab.png"];
+
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveChatRooms) name:kDidReceiveChatRooms object:nil];
     }
     return self;
@@ -25,8 +28,10 @@
 
 - (void)viewDidLoad
 {
+
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    [_newConversationTextField setDelegate:self];
 }
 
 - (void)didReceiveMemoryWarning
@@ -48,7 +53,7 @@
 - (IBAction)startButtonTap:(UIButton *)sender {
     NSString* roomName = _newConversationTextField.text;
     if ([Helper isStringCorrect:roomName]) {
-        
+        [[BackgroundWorker instance] createChatRoom:roomName];
     }
 }
 
@@ -74,16 +79,29 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    #warning unimplemented method
-    return nil;
+    static NSString* identifier = @"CellIdentifier";
+    UITableViewCell* cell = [_roomsTableView dequeueReusableCellWithIdentifier:identifier];
+    if (!cell) {
+        cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
+    }
+    return cell;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
-    #warning unimplemented method
+    switch (section) {
+        case mainChatSection:
+            return @"Main Chat";
+        case trendingSection:
+            return @"Trending";
+        case nearbySection:
+            return @"Nearby";
+        default:
+            break;
+    }
     return nil;
 }
 
-#pragma mark - 
+#pragma mark -
 #pragma mark UITableViewDelegate
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
     #warning unimplemented
@@ -96,5 +114,14 @@
 
 #pragma mark -
 #pragma mark Notifications Reactions
+-(void)doReceiveChatRooms{
+    [_roomsTableView reloadData];
+}
 
+#pragma mark -
+#pragma mark UITextField Delegate
+- (BOOL)textFieldShouldReturn:(UITextField *)textField{
+    [textField resignFirstResponder];
+    return YES;
+}
 @end
