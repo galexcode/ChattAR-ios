@@ -289,11 +289,17 @@
 -(void)didReceiveChatRooms:(NSArray *)chatRooms{
     
     if (chatRooms.count) {
+        if (![DataManager shared].allChatRooms) {
+            [DataManager shared].allChatRooms = chatRooms.mutableCopy;
+        }
+        else
+            [[DataManager shared].allChatRooms addObjectsFromArray:chatRooms];
+        
                         // request additional rooms info from qbServer
         [[BackgroundWorker instance] requestAdditionalChatRoomsInfo];
     }
-    else
-        [[NSNotificationCenter defaultCenter] postNotificationName:kDidNotReceiveChatRooms object:nil];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kDidReceiveChatRooms object:nil];
         
 }
 

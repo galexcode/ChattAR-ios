@@ -193,11 +193,15 @@
 		ED55672916D37102009C385A /* CommonViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED55672816D37102009C385A /* CommonViewController.m */; };
 		ED55672D16D3D831009C385A /* Quickblox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAD8E4E8164BB65700CBCB79 /* Quickblox.framework */; };
 		ED55672F16D3DE12009C385A /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED55672E16D3DE12009C385A /* Accelerate.framework */; };
+		ED55673B16D4C8ED009C385A /* ChatRoomsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED55673916D4C8EA009C385A /* ChatRoomsViewController.m */; };
+		ED55673E16D4C921009C385A /* ChatRoomsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ED55673D16D4C921009C385A /* ChatRoomsViewController.xib */; };
+		ED55674116D4D7A1009C385A /* ChatRoom.m in Sources */ = {isa = PBXBuildFile; fileRef = ED55674016D4D7A1009C385A /* ChatRoom.m */; };
 		ED9FFE6B16CBFF730075B3EB /* chatTab.png in Resources */ = {isa = PBXBuildFile; fileRef = ED9FFE6716CBFF730075B3EB /* chatTab.png */; };
 		ED9FFE6C16CBFF730075B3EB /* dialogsTab.png in Resources */ = {isa = PBXBuildFile; fileRef = ED9FFE6816CBFF730075B3EB /* dialogsTab.png */; };
 		ED9FFE6D16CBFF730075B3EB /* mapTab.png in Resources */ = {isa = PBXBuildFile; fileRef = ED9FFE6916CBFF730075B3EB /* mapTab.png */; };
 		ED9FFE6E16CBFF730075B3EB /* settingsTab.png in Resources */ = {isa = PBXBuildFile; fileRef = ED9FFE6A16CBFF730075B3EB /* settingsTab.png */; };
 		EDDDD39616C50F9000942F6F /* ARViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = EDDDD39516C50F8F00942F6F /* ARViewController.xib */; };
+		EDF3C00416D504C100FF563E /* Helper.m in Sources */ = {isa = PBXBuildFile; fileRef = EDF3C00316D504C000FF563E /* Helper.m */; };
 		FA8E4EF11580887B00476EF7 /* Facebook.m in Sources */ = {isa = PBXBuildFile; fileRef = FA8E4E991580887B00476EF7 /* Facebook.m */; };
 		FA8E4EF31580887B00476EF7 /* FBDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = FA8E4E9D1580887B00476EF7 /* FBDialog.m */; };
 		FA8E4EF41580887B00476EF7 /* FBFrictionlessRequestSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = FA8E4E9F1580887B00476EF7 /* FBFrictionlessRequestSettings.m */; };
@@ -493,11 +497,18 @@
 		ED55672716D37102009C385A /* CommonViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonViewController.h; sourceTree = "<group>"; };
 		ED55672816D37102009C385A /* CommonViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommonViewController.m; sourceTree = "<group>"; };
 		ED55672E16D3DE12009C385A /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		ED55673816D4C8E9009C385A /* ChatRoomsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatRoomsViewController.h; sourceTree = "<group>"; };
+		ED55673916D4C8EA009C385A /* ChatRoomsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatRoomsViewController.m; sourceTree = "<group>"; };
+		ED55673D16D4C921009C385A /* ChatRoomsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ChatRoomsViewController.xib; sourceTree = "<group>"; };
+		ED55673F16D4D7A1009C385A /* ChatRoom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatRoom.h; sourceTree = "<group>"; };
+		ED55674016D4D7A1009C385A /* ChatRoom.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatRoom.m; sourceTree = "<group>"; };
 		ED9FFE6716CBFF730075B3EB /* chatTab.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = chatTab.png; sourceTree = "<group>"; };
 		ED9FFE6816CBFF730075B3EB /* dialogsTab.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dialogsTab.png; sourceTree = "<group>"; };
 		ED9FFE6916CBFF730075B3EB /* mapTab.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mapTab.png; sourceTree = "<group>"; };
 		ED9FFE6A16CBFF730075B3EB /* settingsTab.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = settingsTab.png; sourceTree = "<group>"; };
 		EDDDD39516C50F8F00942F6F /* ARViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ARViewController.xib; sourceTree = "<group>"; };
+		EDF3C00216D504C000FF563E /* Helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Helper.h; sourceTree = "<group>"; };
+		EDF3C00316D504C000FF563E /* Helper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Helper.m; sourceTree = "<group>"; };
 		FA8E4E981580887B00476EF7 /* Facebook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Facebook.h; sourceTree = "<group>"; };
 		FA8E4E991580887B00476EF7 /* Facebook.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Facebook.m; sourceTree = "<group>"; };
 		FA8E4E9A1580887B00476EF7 /* FBConnect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FBConnect.h; sourceTree = "<group>"; };
@@ -771,6 +782,8 @@
 				ED4C8E9E16BFEB5D000751D4 /* WebViewController.m */,
 				ED4C901516C12298000751D4 /* CustomTabBarController.h */,
 				ED4C901616C1229B000751D4 /* CustomTabBarController.m */,
+				ED55673816D4C8E9009C385A /* ChatRoomsViewController.h */,
+				ED55673916D4C8EA009C385A /* ChatRoomsViewController.m */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -816,6 +829,8 @@
 				ED4C8EA916BFEB5D000751D4 /* DatetimeConverter.m */,
 				ED4C8EAA16BFEB5D000751D4 /* NumberToLetterConverter.h */,
 				ED4C8EAB16BFEB5D000751D4 /* NumberToLetterConverter.m */,
+				EDF3C00216D504C000FF563E /* Helper.h */,
+				EDF3C00316D504C000FF563E /* Helper.m */,
 			);
 			path = Converters;
 			sourceTree = "<group>";
@@ -862,6 +877,8 @@
 				ED4C8EC916BFEB5D000751D4 /* Conversation.m */,
 				ED4C8ECA16BFEB5D000751D4 /* UserAnnotation.h */,
 				ED4C8ECB16BFEB5D000751D4 /* UserAnnotation.m */,
+				ED55673F16D4D7A1009C385A /* ChatRoom.h */,
+				ED55674016D4D7A1009C385A /* ChatRoom.m */,
 			);
 			path = Objects;
 			sourceTree = "<group>";
@@ -1067,6 +1084,7 @@
 		ED4C8F5516BFEB5D000751D4 /* xibs */ = {
 			isa = PBXGroup;
 			children = (
+				ED55673D16D4C921009C385A /* ChatRoomsViewController.xib */,
 				ED4C8F5616BFEB5D000751D4 /* ContactsController.xib */,
 				ED4C8F5716BFEB5D000751D4 /* FBChatViewController.xib */,
 				ED4C8F5816BFEB5D000751D4 /* MapChatAR */,
@@ -1447,6 +1465,7 @@
 				ED9FFE6C16CBFF730075B3EB /* dialogsTab.png in Resources */,
 				ED9FFE6D16CBFF730075B3EB /* mapTab.png in Resources */,
 				ED9FFE6E16CBFF730075B3EB /* settingsTab.png in Resources */,
+				ED55673E16D4C921009C385A /* ChatRoomsViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1552,6 +1571,9 @@
 				ED4C900316C0F3F1000751D4 /* BackgroundWorker.m in Sources */,
 				ED4C901716C1229F000751D4 /* CustomTabBarController.m in Sources */,
 				ED55672916D37102009C385A /* CommonViewController.m in Sources */,
+				ED55673B16D4C8ED009C385A /* ChatRoomsViewController.m in Sources */,
+				ED55674116D4D7A1009C385A /* ChatRoom.m in Sources */,
+				EDF3C00416D504C100FF563E /* Helper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
