@@ -64,11 +64,10 @@
 					</object>
 					<object class="IBUIButton" id="34081293">
 						<reference key="NSNextResponder" ref="191373211"/>
-						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{236, 396}, {73, 31}}</string>
+						<int key="NSvFlags">293</int>
+						<string key="NSFrame">{{239, 353}, {73, 31}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<bool key="IBUIOpaque">NO</bool>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
@@ -100,7 +99,7 @@
 					</object>
 					<object class="IBUITextField" id="278164163">
 						<reference key="NSNextResponder" ref="191373211"/>
-						<int key="NSvFlags">292</int>
+						<int key="NSvFlags">293</int>
 						<string key="NSFrame">{{20, 354}, {206, 30}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
@@ -136,7 +135,7 @@
 					</object>
 					<object class="IBUILabel" id="58098949">
 						<reference key="NSNextResponder" ref="191373211"/>
-						<int key="NSvFlags">292</int>
+						<int key="NSvFlags">293</int>
 						<string key="NSFrame">{{32, 325}, {148, 21}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
@@ -262,9 +261,9 @@
 						<reference key="object" ref="191373211"/>
 						<array class="NSMutableArray" key="children">
 							<reference ref="776002512"/>
-							<reference ref="34081293"/>
 							<reference ref="58098949"/>
 							<reference ref="278164163"/>
+							<reference ref="34081293"/>
 						</array>
 						<reference key="parent" ref="0"/>
 					</object>

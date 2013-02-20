@@ -49,6 +49,8 @@ static BackgroundWorker* instance = nil;
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(stopRequestingNewData) name:kNotificationLogout object:nil];
         
         [[QBChat instance] setDelegate:self];
+        
+        
     }
     return self;
 }
@@ -77,10 +79,10 @@ static BackgroundWorker* instance = nil;
 #pragma mark -
 #pragma mark Data Requests
 
--(void)requestAdditionalChatRoomsInfo{
+-(void)requestAdditionalChatRoomsInfo:(NSArray*)chatRooms{
     NSMutableDictionary *getRequest = [NSMutableDictionary dictionary];
-    for (NSString* roomName in [DataManager shared].allChatRooms) {
-        [getRequest setObject:roomName forKey:@"xmppName"];
+    for (QBChatRoom* room in chatRooms) {
+        [getRequest setObject:room.roomName forKey:@"xmppName"];
         [getRequest setObject:@"xmppName" forKey:@"sort_asc"];
     }
     
@@ -982,13 +984,22 @@ static BackgroundWorker* instance = nil;
     else if ([result isKindOfClass:QBMSendPushTaskResult.class]){
         NSLog(@"Send Push success");
     }
+    else if ([result isKindOfClass:[QBCOCustomObjectResult class]]){
+        if (result.success) {
+            NSLog(@"SUCCESSFUL CREATION OF OBJECT %@",((QBCOCustomObjectResult*)result).object);
+        }
+    }
+    else if ([result isKindOfClass:[QBCOCustomObjectPagedResult class]]){
+        QBCOCustomObjectPagedResult *getObjectsResult = (QBCOCustomObjectPagedResult *)result;
+        if ([tabBarDelegate respondsToSelector:@selector(didReceiveAdditionalServerInfo:)]) {
+            [tabBarDelegate didReceiveAdditionalServerInfo:getObjectsResult.objects];
+        }
+    }
     else{
         NSString *message = [result.errors stringValue];
         if ([tabBarDelegate respondsToSelector:@selector(didReceiveError:)]) {
             [tabBarDelegate didReceiveError:message];
         }
-        
-        
     }
 }
 
@@ -1559,10 +1570,24 @@ static BackgroundWorker* instance = nil;
 
 -(void)chatRoomDidEnter:(QBChatRoom *)room{
     [room retain];
-
-//    if (![[DataManager shared].allChatRooms containsObject:room.roomName]) {
-//        [[DataManager shared].allChatRooms addObject:room.roomName];
-//    }
+    NSLog(@"%@",@"ROOM ENTER OR CREATE!");
+    
+    if (![[DataManager shared].allChatRooms containsObject:room.roomName]) {
+        QBCOCustomObject* roomRecord = [QBCOCustomObject customObject];
+        roomRecord.className = @"Room";
+                                            // get owner location
+        CLLocationManager* locationManager = [[[CLLocationManager alloc] init] autorelease];
+        [locationManager startUpdatingLocation];
+        CLLocationCoordinate2D userLocation = locationManager.location.coordinate;
+        [locationManager stopUpdatingLocation];
+        
+        [roomRecord.fields setObject:room.roomName forKey:@"xmppName"];
+        [roomRecord.fields setObject:[NSNumber numberWithDouble:userLocation.latitude] forKey:@"latitude"];
+        [roomRecord.fields setObject:[NSNumber numberWithDouble:userLocation.longitude] forKey:@"longitude"];
+        
+        [QBCustomObjects createObject:roomRecord delegate:self];
+    }
+    
 }
 
 #pragma mark -

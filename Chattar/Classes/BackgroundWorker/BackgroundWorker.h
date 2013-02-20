@@ -80,7 +80,7 @@
 
 @optional
 -(void)didReceiveChatRooms:(NSArray*)chatRooms;
-
+-(void)didReceiveAdditionalServerInfo:(NSArray*)additionalInfo;
 @end
 
 
@@ -119,6 +119,6 @@
 - (void)retrieveCachedFBCheckinsAndRequestNewCheckins;
 
 -(void)requestAllChatRooms;
--(void)requestAdditionalChatRoomsInfo;
+-(void)requestAdditionalChatRoomsInfo:(NSArray*)chatRooms;
 -(void)createChatRoom:(NSString*)chatRoomName;
 @end

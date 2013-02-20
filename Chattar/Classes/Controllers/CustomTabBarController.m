@@ -289,18 +289,34 @@
 -(void)didReceiveChatRooms:(NSArray *)chatRooms{
     
     if (chatRooms.count) {
-        if (![DataManager shared].allChatRooms) {
-            [DataManager shared].allChatRooms = chatRooms.mutableCopy;
-        }
-        else
-            [[DataManager shared].allChatRooms addObjectsFromArray:chatRooms];
-        
-                        // request additional rooms info from qbServer
-        [[BackgroundWorker instance] requestAdditionalChatRoomsInfo];
+       
+        [[BackgroundWorker instance] requestAdditionalChatRoomsInfo:chatRooms];
     }
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:kDidReceiveChatRooms object:nil];
+}
+
+-(void)didReceiveAdditionalServerInfo:(NSArray *)additionalInfo{
+    for (QBCOCustomObject* object in additionalInfo) {
+        NSLog(@"%@",object);
         
+        ChatRoom* roomObject = [[[ChatRoom alloc] init] autorelease];
+        roomObject.createdAt = object.createdAt;
+        
+        double latitude = [[object.fields objectForKey:@"latitude"] doubleValue];
+        double longitude = [[object.fields objectForKey:@"longitude"] doubleValue];
+        
+        roomObject.ownerLocation = CLLocationCoordinate2DMake(latitude, longitude);
+        
+        roomObject.roomID = object.ID;
+        roomObject.xmppName = [object.fields objectForKey:@"xmppName"];
+        
+        if (![DataManager shared].allChatRooms) {
+            [DataManager shared].allChatRooms = [[NSMutableArray alloc] init];
+        }
+        [[DataManager shared].allChatRooms addObject:roomObject];
+    }
+    
+//    [[NSNotificationCenter defaultCenter] postNotificationName:kDidReceiveChatRooms object:nil];
 }
 
 @end

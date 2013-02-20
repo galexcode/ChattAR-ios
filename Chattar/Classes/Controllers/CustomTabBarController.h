@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "BackgroundWorker.h"
+#import "ChatRoom.h"
 @interface CustomTabBarController : UITabBarController<FBDataDelegate,DataDelegate,ChatControllerDelegate,
                                     MapControllerDelegate,ARControllerDelegate, QBChatDelegate,ChatRoomDataDelegate>
 @end
