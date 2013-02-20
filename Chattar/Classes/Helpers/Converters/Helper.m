@@ -10,4 +10,13 @@
 
 @implementation Helper
 
++(BOOL)isStringCorrect:(NSString*)stringToCheck{
+    NSCharacterSet *whitespace = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+    NSString *trimmed = [stringToCheck stringByTrimmingCharactersInSet:whitespace];
+    if ([trimmed length] == 0) {
+        return NO;
+    }
+    return YES;
+}
+
 @end

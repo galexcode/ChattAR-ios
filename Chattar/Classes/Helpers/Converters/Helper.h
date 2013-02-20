@@ -9,5 +9,5 @@
 #import <Foundation/Foundation.h>
 
 @interface Helper : NSObject
-
++(BOOL)isStringCorrect:(NSString*)stringToCheck;
 @end
