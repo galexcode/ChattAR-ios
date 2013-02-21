@@ -9,5 +9,15 @@
 #import "ChatRoom.h"
 
 @implementation ChatRoom
+@synthesize createdAt;
+@synthesize ownerLocation;
+@synthesize roomID;
+@synthesize xmppName;
 
+-(void)dealloc{
+    [roomID release];
+    [xmppName release];
+    [createdAt release];
+    [super dealloc];
+}
 @end

@@ -52,14 +52,13 @@ static DataManager *instance = nil;
 @synthesize chatPoints;
 @synthesize mapPoints;
 @synthesize coordinates;
+@synthesize coordinateViews;
 @synthesize chatMessagesIDs;
 @synthesize mapPointsIDs;
 
 @synthesize currentRequestingDataControllerTitle;
-
-@synthesize nearbyChatRooms;
-@synthesize trendingChatRooms;
-@synthesize allChatRooms;
+@synthesize qbChatRooms;
+@synthesize roomsWithAdditionalInfo;
 
 + (DataManager *)shared {
 	@synchronized (self) {
@@ -114,9 +113,8 @@ static DataManager *instance = nil;
     [mapPointsIDs release];
     [chatMessagesIDs release];
     
-    [trendingChatRooms release];
-    [nearbyChatRooms release];
-    [allChatRooms release];
+    [qbChatRooms release];
+    [roomsWithAdditionalInfo release];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kNotificationLogout object:nil];
     [currentRequestingDataControllerTitle release];
@@ -846,6 +844,13 @@ static DataManager *instance = nil;
     for (UserAnnotation* photo in photos) {
         NSLog(@"%d",[self addPhotoWithLocationsToStorage:photo]);
     }
+}
+
+#pragma mark -
+#pragma mark ChatRooms methods
+-(BOOL)containsChatRoom:(QBChatRoom *)newRoom{
+    
+    return NO;
 }
 
 #pragma mark -

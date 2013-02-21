@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "UserAnnotation.h"
+#import "ChatRoom.h"
 #define maxPopularFriends 40
 
 @interface DataManager : NSObject{
@@ -57,10 +58,8 @@
 
 @property (nonatomic, retain) NSString* currentRequestingDataControllerTitle;
 
-@property (nonatomic, retain) NSMutableArray* allChatRooms;
-@property (nonatomic, retain) NSMutableArray* trendingChatRooms;
-@property (nonatomic, retain) NSMutableArray* nearbyChatRooms;
-
+@property (nonatomic, retain) NSMutableArray* qbChatRooms;
+@property (nonatomic, retain) NSMutableArray* roomsWithAdditionalInfo;
 + (DataManager *) shared;
 
 - (void)sortMessagesArray;
@@ -127,4 +126,5 @@
 
 -(NSArray*)photosWithLocationsFromStorageFromUserWithId:(NSDecimalNumber*)userId;
 
+-(BOOL)containsChatRoom:(QBChatRoom*)room;
 @end
