@@ -60,18 +60,19 @@
 #pragma mark -
 #pragma mark UITableViewDataSource 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    switch (section) {
-        case trendingSection:
-            return [DataManager shared].trendingChatRooms.count;
-            break;
-            
-        case nearbySection:
-            return [DataManager shared].nearbyChatRooms.count;
-            break;
-        default:
-            return 1;
-            break;
-    }
+//    switch (section) {
+//        case trendingSection:
+//            return [DataManager shared].trendingChatRooms.count;
+//            break;
+//            
+//        case nearbySection:
+//            return [DataManager shared].nearbyChatRooms.count;
+//            break;
+//        default:
+//            return 1;
+//            break;
+//    }
+    return 2;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
@@ -84,6 +85,8 @@
     if (!cell) {
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
     }
+    
+    
     return cell;
 }
 

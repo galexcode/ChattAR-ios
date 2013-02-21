@@ -40,7 +40,6 @@
 		8A983A7E156A5D5C003C303D /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A983A7D156A5D5C003C303D /* AddressBook.framework */; };
 		8A983A80156A5D61003C303D /* AddressBookUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A983A7F156A5D61003C303D /* AddressBookUI.framework */; };
 		ED4C8F6016BFEB5D000751D4 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C8E7816BFEB5D000751D4 /* AppDelegate.m */; };
-		ED4C8F6116BFEB5D000751D4 /* Chattar-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = ED4C8E7916BFEB5D000751D4 /* Chattar-Info.plist */; };
 		ED4C8F6216BFEB5D000751D4 /* ChattARApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C8E7C16BFEB5D000751D4 /* ChattARApplication.m */; };
 		ED4C8F6316BFEB5D000751D4 /* NSArray+convert.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C8E8016BFEB5D000751D4 /* NSArray+convert.m */; };
 		ED4C8F6416BFEB5D000751D4 /* NSObject+performer.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C8E8216BFEB5D000751D4 /* NSObject+performer.m */; };
@@ -200,6 +199,7 @@
 		ED9FFE6C16CBFF730075B3EB /* dialogsTab.png in Resources */ = {isa = PBXBuildFile; fileRef = ED9FFE6816CBFF730075B3EB /* dialogsTab.png */; };
 		ED9FFE6D16CBFF730075B3EB /* mapTab.png in Resources */ = {isa = PBXBuildFile; fileRef = ED9FFE6916CBFF730075B3EB /* mapTab.png */; };
 		ED9FFE6E16CBFF730075B3EB /* settingsTab.png in Resources */ = {isa = PBXBuildFile; fileRef = ED9FFE6A16CBFF730075B3EB /* settingsTab.png */; };
+		EDAC141616D692EA0041FBD4 /* Chattar-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = ED4C8E7916BFEB5D000751D4 /* Chattar-Info.plist */; };
 		EDDDD39616C50F9000942F6F /* ARViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = EDDDD39516C50F8F00942F6F /* ARViewController.xib */; };
 		EDF3C00416D504C100FF563E /* Helper.m in Sources */ = {isa = PBXBuildFile; fileRef = EDF3C00316D504C000FF563E /* Helper.m */; };
 		FA8E4EF11580887B00476EF7 /* Facebook.m in Sources */ = {isa = PBXBuildFile; fileRef = FA8E4E991580887B00476EF7 /* Facebook.m */; };
@@ -1362,7 +1362,6 @@
 				43B8CC7616494C9F005FFDB8 /* Default-568h@2x.png in Resources */,
 				FAD8E4E6164BB61300CBCB79 /* Icon~ipad.png in Resources */,
 				FAD8E4E7164BB61300CBCB79 /* Icon~ipad@2x.png in Resources */,
-				ED4C8F6116BFEB5D000751D4 /* Chattar-Info.plist in Resources */,
 				ED4C8F9316BFEB5D000751D4 /* InfoPlist.strings in Resources */,
 				ED4C8F9616BFEB5D000751D4 /* 3item.png in Resources */,
 				ED4C8F9716BFEB5D000751D4 /* 3item@2x.png in Resources */,
@@ -1466,6 +1465,7 @@
 				ED9FFE6D16CBFF730075B3EB /* mapTab.png in Resources */,
 				ED9FFE6E16CBFF730075B3EB /* settingsTab.png in Resources */,
 				ED55673E16D4C921009C385A /* ChatRoomsViewController.xib in Resources */,
+				EDAC141616D692EA0041FBD4 /* Chattar-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
