@@ -287,10 +287,16 @@
 #pragma mark ChatRoomsDataDelegate methods
 
 -(void)didReceiveChatRooms:(NSArray *)chatRooms{
-    
     if (chatRooms.count) {
-       
-        [[BackgroundWorker instance] requestAdditionalChatRoomsInfo:chatRooms];
+                                // save QB chat rooms
+        if (![DataManager shared].qbChatRooms) {
+            [DataManager shared].qbChatRooms = chatRooms.mutableCopy;
+        }
+        else
+            [[DataManager shared].qbChatRooms addObject:chatRooms];
+        
+        [[BackgroundWorker instance] joinAllRooms];
+        [[BackgroundWorker instance] requestAdditionalChatRoomsInfo];
     }
     
 }
@@ -310,13 +316,14 @@
         roomObject.roomID = object.ID;
         roomObject.xmppName = [object.fields objectForKey:@"xmppName"];
         
-        if (![DataManager shared].allChatRooms) {
-            [DataManager shared].allChatRooms = [[NSMutableArray alloc] init];
+        if (![DataManager shared].roomsWithAdditionalInfo) {
+            [DataManager shared].roomsWithAdditionalInfo = [[NSMutableArray alloc] init];
         }
-        [[DataManager shared].allChatRooms addObject:roomObject];
+        
+        [[DataManager shared].roomsWithAdditionalInfo addObject:roomObject];
     }
     
-//    [[NSNotificationCenter defaultCenter] postNotificationName:kDidReceiveChatRooms object:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kDidReceiveChatRooms object:nil];
 }
 
 @end

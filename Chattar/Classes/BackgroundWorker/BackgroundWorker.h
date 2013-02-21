@@ -119,6 +119,7 @@
 - (void)retrieveCachedFBCheckinsAndRequestNewCheckins;
 
 -(void)requestAllChatRooms;
--(void)requestAdditionalChatRoomsInfo:(NSArray*)chatRooms;
+-(void)requestAdditionalChatRoomsInfo;
 -(void)createChatRoom:(NSString*)chatRoomName;
+-(void)joinAllRooms;
 @end

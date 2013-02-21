@@ -7,6 +7,7 @@
 //
 
 #import "BackgroundWorker.h"
+#import "ChatRoom.h"
 
 #define mapSearch @"mapSearch"
 #define chatSearch @"chatSearch"
@@ -64,10 +65,17 @@ static BackgroundWorker* instance = nil;
 }
 
 #pragma mark -
-#pragma mark Creation methods
+#pragma mark ChatRooms methods
 -(void)createChatRoom:(NSString*)chatRoomName{
     [[QBChat instance] createOrJoinRoomWithName:chatRoomName membersOnly:NO persistent:YES];
 }
+
+-(void)joinAllRooms{
+    for (QBChatRoom* room in [DataManager shared].qbChatRooms) {
+        [[QBChat instance] joinRoom:room];
+    }
+}
+
 
 #pragma mark -
 #pragma mark Posting methods
@@ -79,9 +87,9 @@ static BackgroundWorker* instance = nil;
 #pragma mark -
 #pragma mark Data Requests
 
--(void)requestAdditionalChatRoomsInfo:(NSArray*)chatRooms{
+-(void)requestAdditionalChatRoomsInfo{
     NSMutableDictionary *getRequest = [NSMutableDictionary dictionary];
-    for (QBChatRoom* room in chatRooms) {
+    for (QBChatRoom* room in [DataManager shared].qbChatRooms) {
         [getRequest setObject:room.roomName forKey:@"xmppName"];
         [getRequest setObject:@"xmppName" forKey:@"sort_asc"];
     }
@@ -96,7 +104,6 @@ static BackgroundWorker* instance = nil;
 -(void)requestFriendWithFacebookID:(NSString*)fbUserID andMessageText:(NSString*)message{
     [QBUsers userWithFacebookID:fbUserID delegate:self context:message];
 }
-
 
 -(void)retrieveMoreChatMessages:(NSInteger)page{
     // get points for chat
@@ -195,7 +202,6 @@ static BackgroundWorker* instance = nil;
     NSMutableDictionary* allChatData = [[[NSMutableDictionary alloc] init] autorelease];
     [allChatData setObject:chatPoints forKey:@"allChatPoints"];
     [allChatData setObject:chatMessagesIDs forKey:@"chatMessagesIDs"];
-    
     
     if ([tabBarDelegate respondsToSelector:@selector(chatDidReceiveAllCachedData:)]) {
         [tabBarDelegate chatDidReceiveAllCachedData:allChatData];
@@ -995,6 +1001,13 @@ static BackgroundWorker* instance = nil;
             [tabBarDelegate didReceiveAdditionalServerInfo:getObjectsResult.objects];
         }
     }
+    
+    else if ([result isKindOfClass:[QBCOCustomObjectResult class]]){
+        QBCOCustomObjectResult* getObjectResult = (QBCOCustomObjectResult*)result;
+        if ([tabBarDelegate respondsToSelector:@selector(didReceiveAdditionalServerInfo:)]) {
+            [tabBarDelegate didReceiveAdditionalServerInfo:[NSArray arrayWithObject:getObjectResult.object]];
+        }
+    }
     else{
         NSString *message = [result.errors stringValue];
         if ([tabBarDelegate respondsToSelector:@selector(didReceiveError:)]) {
@@ -1569,26 +1582,28 @@ static BackgroundWorker* instance = nil;
 }
 
 -(void)chatRoomDidEnter:(QBChatRoom *)room{
-    [room retain];
     NSLog(@"%@",@"ROOM ENTER OR CREATE!");
     
-    if (![[DataManager shared].allChatRooms containsObject:room.roomName]) {
+                        // if this is new room
+    if (! [[DataManager shared].qbChatRooms containsObject:room] ) {
         QBCOCustomObject* roomRecord = [QBCOCustomObject customObject];
         roomRecord.className = @"Room";
-                                            // get owner location
+        
+        // get owner location
         CLLocationManager* locationManager = [[[CLLocationManager alloc] init] autorelease];
         [locationManager startUpdatingLocation];
         CLLocationCoordinate2D userLocation = locationManager.location.coordinate;
         [locationManager stopUpdatingLocation];
-        
+        // create object for storing room on server
         [roomRecord.fields setObject:room.roomName forKey:@"xmppName"];
         [roomRecord.fields setObject:[NSNumber numberWithDouble:userLocation.latitude] forKey:@"latitude"];
         [roomRecord.fields setObject:[NSNumber numberWithDouble:userLocation.longitude] forKey:@"longitude"];
         
         [QBCustomObjects createObject:roomRecord delegate:self];
     }
-    
+        
 }
+
 
 #pragma mark -
 #pragma mark Helpers
