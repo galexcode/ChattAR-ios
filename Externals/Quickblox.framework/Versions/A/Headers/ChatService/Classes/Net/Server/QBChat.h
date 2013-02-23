@@ -29,7 +29,7 @@ typedef enum QBChatServiceError {
     QBUUser *qbUser;
 }
 
-
+-(void)retrieveActiveUsersForRoom:(NSString*)roomName;
 #pragma mark -
 #pragma mark Base Messaging
 

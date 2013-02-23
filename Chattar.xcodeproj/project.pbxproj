@@ -39,6 +39,7 @@
 		8A983A7C156A5D45003C303D /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A983A7B156A5D45003C303D /* CoreVideo.framework */; };
 		8A983A7E156A5D5C003C303D /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A983A7D156A5D5C003C303D /* AddressBook.framework */; };
 		8A983A80156A5D61003C303D /* AddressBookUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A983A7F156A5D61003C303D /* AddressBookUI.framework */; };
+		ED37A6EF16D7C6CE00E3B294 /* Quickblox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAD8E4E8164BB65700CBCB79 /* Quickblox.framework */; };
 		ED4C8F6016BFEB5D000751D4 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C8E7816BFEB5D000751D4 /* AppDelegate.m */; };
 		ED4C8F6216BFEB5D000751D4 /* ChattARApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C8E7C16BFEB5D000751D4 /* ChattARApplication.m */; };
 		ED4C8F6316BFEB5D000751D4 /* NSArray+convert.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C8E8016BFEB5D000751D4 /* NSArray+convert.m */; };
@@ -190,7 +191,6 @@
 		ED4C900316C0F3F1000751D4 /* BackgroundWorker.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C900216C0F3F1000751D4 /* BackgroundWorker.m */; };
 		ED4C901716C1229F000751D4 /* CustomTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED4C901616C1229B000751D4 /* CustomTabBarController.m */; };
 		ED55672916D37102009C385A /* CommonViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED55672816D37102009C385A /* CommonViewController.m */; };
-		ED55672D16D3D831009C385A /* Quickblox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAD8E4E8164BB65700CBCB79 /* Quickblox.framework */; };
 		ED55672F16D3DE12009C385A /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED55672E16D3DE12009C385A /* Accelerate.framework */; };
 		ED55673B16D4C8ED009C385A /* ChatRoomsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED55673916D4C8EA009C385A /* ChatRoomsViewController.m */; };
 		ED55673E16D4C921009C385A /* ChatRoomsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ED55673D16D4C921009C385A /* ChatRoomsViewController.xib */; };
@@ -599,8 +599,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ED37A6EF16D7C6CE00E3B294 /* Quickblox.framework in Frameworks */,
 				ED55672F16D3DE12009C385A /* Accelerate.framework in Frameworks */,
-				ED55672D16D3D831009C385A /* Quickblox.framework in Frameworks */,
 				FA99E77F15C953410031F54F /* CoreData.framework in Frameworks */,
 				63891AF81573505300035EC2 /* libresolv.dylib in Frameworks */,
 				636735D31552CF590061BF75 /* UIKit.framework in Frameworks */,
@@ -1657,6 +1657,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/Externals\"",
 					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/../SDK/SDK-ios/Framework/build/Framework\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Chattar/Chattar-Prefix.pch";
@@ -1689,6 +1690,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/Externals\"",
 					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/../SDK/SDK-ios/Framework/build/Framework\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Chattar/Chattar-Prefix.pch";
