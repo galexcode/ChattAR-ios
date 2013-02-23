@@ -60,6 +60,10 @@
 
 @property (nonatomic, retain) NSMutableArray* qbChatRooms;
 @property (nonatomic, retain) NSMutableArray* roomsWithAdditionalInfo;
+
+@property (nonatomic, retain) NSMutableArray* nearbyRooms;
+@property (nonatomic, retain) NSMutableArray* trendingRooms;
+
 + (DataManager *) shared;
 
 - (void)sortMessagesArray;
@@ -102,6 +106,9 @@
 - (NSString *)originMessageFromQuote:(NSString *)quote;
 - (NSString *)messageFromQuote:(NSString *)quote;
 
+#pragma mark -
+#pragma mark Chat rooms 
+-(BOOL)roomWithNameHasAdditionalInfo:(NSString*)roomName;
 
 #pragma mark -
 #pragma mark Core Data api

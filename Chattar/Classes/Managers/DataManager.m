@@ -59,6 +59,8 @@ static DataManager *instance = nil;
 @synthesize currentRequestingDataControllerTitle;
 @synthesize qbChatRooms;
 @synthesize roomsWithAdditionalInfo;
+@synthesize nearbyRooms;
+@synthesize trendingRooms;
 
 + (DataManager *)shared {
 	@synchronized (self) {
@@ -850,6 +852,15 @@ static DataManager *instance = nil;
 #pragma mark ChatRooms methods
 -(BOOL)containsChatRoom:(QBChatRoom *)newRoom{
     
+    return NO;
+}
+
+-(BOOL)roomWithNameHasAdditionalInfo:(NSString*)roomName{
+    for (ChatRoom* room in [DataManager shared].roomsWithAdditionalInfo) {
+        if ([room.xmppName isEqualToString:roomName]) {
+            return YES;
+        }
+    }
     return NO;
 }
 
