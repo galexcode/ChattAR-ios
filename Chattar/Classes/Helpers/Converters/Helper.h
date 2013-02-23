@@ -10,4 +10,5 @@
 
 @interface Helper : NSObject
 +(BOOL)isStringCorrect:(NSString*)stringToCheck;
++(NSArray*)sortArray:(NSArray*) array dependingOnField:(NSString*)fieldName inAscendingOrder:(BOOL)ascending;
 @end

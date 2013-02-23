@@ -19,4 +19,11 @@
     return YES;
 }
 
++(NSArray*)sortArray:(NSArray*) array dependingOnField:(NSString*)fieldName inAscendingOrder:(BOOL)ascending{
+    
+    NSSortDescriptor* sortOrder = [NSSortDescriptor sortDescriptorWithKey:fieldName ascending:ascending];
+    [array sortedArrayUsingDescriptors:[NSArray arrayWithObject:sortOrder]];
+    
+    return array;
+}
 @end
