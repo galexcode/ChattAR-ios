@@ -55,6 +55,8 @@
 
 #define kDidReceiveChatRooms @"kDidReceiveChatRooms"
 
+#define kDataIsReadyForDisplaying @"kDataIsReadyForDisplaying"
+
 #define INDICATOR_TAG 23458
 // Strings
 #define appName @"ChattAR"
