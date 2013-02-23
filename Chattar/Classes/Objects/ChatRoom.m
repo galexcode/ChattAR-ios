@@ -13,6 +13,8 @@
 @synthesize ownerLocation;
 @synthesize roomID;
 @synthesize xmppName;
+@synthesize roomRating;
+@synthesize distanceFromUser;
 
 -(void)dealloc{
     [roomID release];
@@ -20,4 +22,5 @@
     [createdAt release];
     [super dealloc];
 }
+
 @end

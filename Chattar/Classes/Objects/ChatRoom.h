@@ -13,4 +13,7 @@
 @property (nonatomic, assign) CLLocationCoordinate2D ownerLocation;
 @property (nonatomic,retain) NSString* roomID;
 @property (nonatomic, retain) NSDate* createdAt;
+@property (nonatomic, assign) double roomRating;
+@property (nonatomic, assign) double distanceFromUser;
+@property (nonatomic, assign) NSInteger numberOfUsersInRoom;
 @end
