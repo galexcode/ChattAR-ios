@@ -9,10 +9,12 @@
 
 #import "CustomTabBarController.h"
 #import "AppDelegate.h"
+#import "DataManager.h"
+
 @interface CustomTabBarController ()
 
 @end
-
+#define INITIAL_CHATROOM_RATING 20
 
 @implementation CustomTabBarController
 
@@ -55,7 +57,8 @@
     [[BackgroundWorker instance] retrieveCachedChatDataAndRequestNewData];
     [[BackgroundWorker instance] retrieveCachedMapDataAndRequestNewData];
     [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
-    [[BackgroundWorker instance] requestAllChatRooms];
+    
+    [[BackgroundWorker instance] requestAdditionalChatRoomsInfo];
 }
 
 #pragma mark - 
@@ -288,20 +291,49 @@
 
 -(void)didReceiveChatRooms:(NSArray *)chatRooms{
     if (chatRooms.count) {
-                                // save QB chat rooms
         if (![DataManager shared].qbChatRooms) {
-            [DataManager shared].qbChatRooms = chatRooms.mutableCopy;
+            [DataManager shared].qbChatRooms = [[NSMutableArray alloc] init];
         }
-        else
-            [[DataManager shared].qbChatRooms addObject:chatRooms];
-        
-        [[BackgroundWorker instance] joinAllRooms];
-        [[BackgroundWorker instance] requestAdditionalChatRoomsInfo];
+                            // if we have additional info about this room save it
+        for (QBChatRoom* room in chatRooms) {
+            if ([[DataManager shared] roomWithNameHasAdditionalInfo:room.roomName]) {
+                [[DataManager shared].qbChatRooms addObject:room];
+            }
+        }
+
+        [self prepareDataForDisplaying];
     }
+}
+
+-(void)prepareDataForDisplaying{
+    // get number of users for all rooms
+    [[BackgroundWorker instance] retrieveNumberOfUsersInEachRoom];
+    
+    // get distances from rooms to current user location
+    [[BackgroundWorker instance] calculateDistancesForEachRoom];
+    
+    [self retrieveNearbyRoomsStorage];
+    
+    // sort depending on rating value
+    
+    #warning TODO:implement calculating rooms ratings
+    
+    [self retrieveTrendingRoomsStorage];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kDataIsReadyForDisplaying object:nil];
+}
+
+-(void)didReceiveRoomsOccupantsNumber{
     
 }
 
+
 -(void)didReceiveAdditionalServerInfo:(NSArray *)additionalInfo{
+                // initialise storage
+    if (![DataManager shared].roomsWithAdditionalInfo) {
+        [DataManager shared].roomsWithAdditionalInfo = [[NSMutableArray alloc] init];
+    }
+
     for (QBCOCustomObject* object in additionalInfo) {
         NSLog(@"%@",object);
         
@@ -315,15 +347,32 @@
         
         roomObject.roomID = object.ID;
         roomObject.xmppName = [object.fields objectForKey:@"xmppName"];
-        
-        if (![DataManager shared].roomsWithAdditionalInfo) {
-            [DataManager shared].roomsWithAdditionalInfo = [[NSMutableArray alloc] init];
-        }
+        roomObject.roomRating = INITIAL_CHATROOM_RATING;
         
         [[DataManager shared].roomsWithAdditionalInfo addObject:roomObject];
     }
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:kDidReceiveChatRooms object:nil];
+    [[BackgroundWorker instance] requestAllChatRooms];
 }
+
+-(void)retrieveNearbyRoomsStorage{
+    if(![DataManager shared].nearbyRooms){
+        [DataManager shared].nearbyRooms = [[NSMutableArray alloc] init];
+    }
+    
+    NSArray* sortedRooms = [Helper sortArray:[DataManager shared].roomsWithAdditionalInfo dependingOnField:@"distanceFromUser" inAscendingOrder:NO];
+    
+    [[DataManager shared].nearbyRooms addObjectsFromArray:sortedRooms];
+}
+
+-(void)retrieveTrendingRoomsStorage{
+    if (![DataManager shared].trendingRooms) {
+        [DataManager shared].trendingRooms = [[NSMutableArray alloc] init];
+    }
+    
+    NSArray* sortedRooms = [Helper sortArray:[DataManager shared].roomsWithAdditionalInfo dependingOnField:@"roomRating" inAscendingOrder:NO];
+    [[DataManager shared].trendingRooms addObjectsFromArray:sortedRooms];
+}
+
 
 @end
