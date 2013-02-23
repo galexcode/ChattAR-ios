@@ -7,6 +7,8 @@
 //
 
 #import "ChatRoomsViewController.h"
+#import "ChatRoom.h"
+#import "DataManager.h"
 
 @interface ChatRoomsViewController ()
 
@@ -21,7 +23,7 @@
         self.title = NSLocalizedString(@"Chat Rooms", @"Chat Rooms");
         self.tabBarItem.image = [UIImage imageNamed:@"dialogsTab.png"];
 
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveChatRooms) name:kDidReceiveChatRooms object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveChatRooms) name:kDataIsReadyForDisplaying object:nil];
     }
     return self;
 }
@@ -60,18 +62,6 @@
 #pragma mark -
 #pragma mark UITableViewDataSource 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-//    switch (section) {
-//        case trendingSection:
-//            return [DataManager shared].trendingChatRooms.count;
-//            break;
-//            
-//        case nearbySection:
-//            return [DataManager shared].nearbyChatRooms.count;
-//            break;
-//        default:
-//            return 1;
-//            break;
-//    }
     return 2;
 }
 
@@ -82,10 +72,31 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     static NSString* identifier = @"CellIdentifier";
     UITableViewCell* cell = [_roomsTableView dequeueReusableCellWithIdentifier:identifier];
+    
     if (!cell) {
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
     }
     
+    switch (indexPath.section) {
+        case trendingSection:{
+            if (indexPath.row < [DataManager shared].trendingRooms.count) {
+                ChatRoom* room = [[DataManager shared].trendingRooms objectAtIndex:indexPath.row];
+                NSString* cellText = [NSString stringWithFormat:@"%f %d",room.roomRating,room.numberOfUsersInRoom];
+                [cell.textLabel setText:cellText];
+            }
+            break;
+        }
+        case nearbySection:{
+            if (indexPath.row < [DataManager shared].nearbyRooms.count) {
+                ChatRoom* room = [[DataManager shared].nearbyRooms objectAtIndex:indexPath.row];
+                NSString* cellText = [NSString stringWithFormat:@"%f %d %f",room.roomRating,room.numberOfUsersInRoom,room.distanceFromUser];
+                [cell.textLabel setText:cellText];
+            }
+            break;
+        }
+        default:
+            break;
+    }
     
     return cell;
 }
