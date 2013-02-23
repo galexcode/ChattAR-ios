@@ -42,10 +42,10 @@ static BackgroundWorker* instance = nil;
         self.chatInitState = 0;
         self.mapInitState = 0;
         
-        CLLocationManager* locationManager = [[[CLLocationManager alloc] init] autorelease];
+        locationManager = [[CLLocationManager alloc] init];
         [locationManager startMonitoringSignificantLocationChanges];
-        currentLocation = [[CLLocation alloc] initWithLatitude:locationManager.location.coordinate.latitude longitude:locationManager.location.coordinate.longitude];
-        [locationManager stopMonitoringSignificantLocationChanges];
+        
+        [locationManager setDelegate:self];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(stopRequestingNewData) name:kNotificationLogout object:nil];
         
@@ -60,7 +60,7 @@ static BackgroundWorker* instance = nil;
 -(void)dealloc{
     [FBfriends release];
     dispatch_release(getMoreMessagesWorkQueue);
-    [currentLocation release];
+    [locationManager release];
     [super dealloc];
 }
 
@@ -71,9 +71,11 @@ static BackgroundWorker* instance = nil;
 }
 
 -(void)joinAllRooms{
+    
     for (QBChatRoom* room in [DataManager shared].qbChatRooms) {
         [[QBChat instance] joinRoom:room];
     }
+
 }
 
 
@@ -88,13 +90,19 @@ static BackgroundWorker* instance = nil;
 #pragma mark Data Requests
 
 -(void)requestAdditionalChatRoomsInfo{
-    NSMutableDictionary *getRequest = [NSMutableDictionary dictionary];
-    for (QBChatRoom* room in [DataManager shared].qbChatRooms) {
-        [getRequest setObject:room.roomName forKey:@"xmppName"];
-        [getRequest setObject:@"xmppName" forKey:@"sort_asc"];
-    }
-    
-    [QBCustomObjects objectsWithClassName:@"Room" extendedRequest:getRequest delegate:self];
+//    NSMutableDictionary *getRequest = [NSMutableDictionary dictionary];
+//    for (QBChatRoom* room in [DataManager shared].qbChatRooms) {
+//        [getRequest setObject:room.roomName forKey:@"xmppName"];
+//        [getRequest setObject:@"xmppName" forKey:@"sort_asc"];
+//    }
+//    
+//    [QBCustomObjects objectsWithClassName:@"Room" extendedRequest:getRequest delegate:self];
+//    
+    [QBCustomObjects objectsWithClassName:@"Room" delegate:self];
+}
+
+-(void)requestRoomOccupants:(NSString*)roomName{
+    [[QBChat instance] retrieveActiveUsersForRoom:@"daroom2@muc.chat.quickblox.com"];
 }
 
 -(void)requestAllChatRooms{
@@ -663,8 +671,8 @@ static BackgroundWorker* instance = nil;
         
         if ([geodata.user.facebookID isEqualToString:[DataManager shared].currentFBUserId])
         {
-            coordinate.latitude = currentLocation.coordinate.latitude;
-            coordinate.longitude = currentLocation.coordinate.longitude;
+            coordinate.latitude = locationManager.location.coordinate.latitude;
+            coordinate.longitude = locationManager.location.coordinate.longitude;
         }
         else
         {
@@ -1541,7 +1549,7 @@ static BackgroundWorker* instance = nil;
     }
 	newAnnotation.createdAt = geoData.createdAt;
     
-    newAnnotation.distance  = [geoData.location distanceFromLocation:currentLocation];
+    newAnnotation.distance  = [geoData.location distanceFromLocation:locationManager.location];
     
     if(newAnnotation.coordinate.latitude == 0.0f && newAnnotation.coordinate.longitude == 0.0f)
     {
@@ -1585,25 +1593,69 @@ static BackgroundWorker* instance = nil;
     NSLog(@"%@",@"ROOM ENTER OR CREATE!");
     
                         // if this is new room
-    if (! [[DataManager shared].qbChatRooms containsObject:room] ) {
+    if (! [[DataManager shared] roomWithNameHasAdditionalInfo:room.roomName] ) {
         QBCOCustomObject* roomRecord = [QBCOCustomObject customObject];
         roomRecord.className = @"Room";
         
-        // get owner location
-        CLLocationManager* locationManager = [[[CLLocationManager alloc] init] autorelease];
-        [locationManager startUpdatingLocation];
-        CLLocationCoordinate2D userLocation = locationManager.location.coordinate;
-        [locationManager stopUpdatingLocation];
         // create object for storing room on server
         [roomRecord.fields setObject:room.roomName forKey:@"xmppName"];
-        [roomRecord.fields setObject:[NSNumber numberWithDouble:userLocation.latitude] forKey:@"latitude"];
-        [roomRecord.fields setObject:[NSNumber numberWithDouble:userLocation.longitude] forKey:@"longitude"];
+        [roomRecord.fields setObject:[NSNumber numberWithDouble:locationManager.location.coordinate.latitude] forKey:@"latitude"];
+        [roomRecord.fields setObject:[NSNumber numberWithDouble:locationManager.location.coordinate.longitude] forKey:@"longitude"];
         
         [QBCustomObjects createObject:roomRecord delegate:self];
-    }
         
+            // add room to storage
+        [[DataManager shared].qbChatRooms addObject:room];
+    }
+    else{
+        static NSInteger joinedRoomsCounter = 0;
+        
+        joinedRoomsCounter++;
+        if (joinedRoomsCounter == [DataManager shared].qbChatRooms.count) {
+            joinedRoomsCounter = 0;     // set initial value
+            
+            
+            [self retrieveNumberOfUsersInEachRoom];
+        }
+    }
 }
 
+-(void)chatRoomDidReceiveListOfUsers:(NSArray *)users room:(NSString *)roomName{
+    ChatRoom* room = [self findRoomWithAdditionalInfoWithName:roomName];
+    if (room) {
+        static NSInteger roomsWithRetrievedUsersNumberCounter = 0;
+        roomsWithRetrievedUsersNumberCounter++;
+        [room setNumberOfUsersInRoom:users.count];
+        
+        if (roomsWithRetrievedUsersNumberCounter == [DataManager shared].qbChatRooms.count) {
+            roomsWithRetrievedUsersNumberCounter = 0;
+            
+            if ([tabBarDelegate respondsToSelector:@selector(didReceiveRoomsOccupantsNumber)]) {
+                [tabBarDelegate didReceiveRoomsOccupantsNumber];
+            }
+        }
+    
+    }
+}
+
+#pragma mark -
+#pragma mark ChatRooms helper methods
+
+-(void)retrieveNumberOfUsersInEachRoom{
+    for (QBChatRoom* room in [DataManager shared].qbChatRooms) {
+        [room requestUsers];
+    }
+}
+
+-(void)calculateDistancesForEachRoom{
+    CLLocationCoordinate2D currentLocation = locationManager.location.coordinate;
+    for (ChatRoom* room in [DataManager shared].roomsWithAdditionalInfo) {
+        CLLocation* firstLocation = [[[CLLocation alloc] initWithLatitude:room.ownerLocation.latitude longitude:room.ownerLocation.longitude] autorelease];
+        CLLocation* secondLocation = [[[CLLocation alloc] initWithLatitude:currentLocation.latitude longitude:currentLocation.longitude] autorelease];
+        CLLocationDistance distance = [firstLocation distanceFromLocation:secondLocation];
+        [room setDistanceFromUser:distance];
+    }
+}
 
 #pragma mark -
 #pragma mark Helpers
@@ -1618,6 +1670,15 @@ static BackgroundWorker* instance = nil;
         return ((UserAnnotation *)[[DataManager shared].chatPoints objectAtIndex:0]);
     }
     
+    return nil;
+}
+
+-(ChatRoom*)findRoomWithAdditionalInfoWithName:(NSString*)roomName{
+    for (ChatRoom* room in [DataManager shared].roomsWithAdditionalInfo) {
+        if ([room.xmppName isEqualToString:roomName]) {
+            return room;
+        }
+    }
     return nil;
 }
 

@@ -14,6 +14,7 @@
 #import "UserAnnotation.h"
 #import "JSON.h"
 #import "ProvisionManager.h"
+#import "ChatRoom.h"
 
                         // delegates
 @protocol ChatControllerDelegate <NSObject>
@@ -81,10 +82,11 @@
 @optional
 -(void)didReceiveChatRooms:(NSArray*)chatRooms;
 -(void)didReceiveAdditionalServerInfo:(NSArray*)additionalInfo;
+-(void)didReceiveRoomsOccupantsNumber;
 @end
 
 
-@interface BackgroundWorker : NSObject<QBActionStatusDelegate,FBRequestDelegate,FBServiceResultDelegate, QBChatDelegate>{
+@interface BackgroundWorker : NSObject<QBActionStatusDelegate,FBRequestDelegate,FBServiceResultDelegate, QBChatDelegate, CLLocationManagerDelegate>{
     NSTimer* updateTimer;
     
     
@@ -93,8 +95,8 @@
     dispatch_queue_t processPhotosWithLocationsQueue;
     
     dispatch_queue_t getMoreMessagesWorkQueue;
-    
-    CLLocation* currentLocation;
+        
+    CLLocationManager* locationManager;
     
 }
 
@@ -122,4 +124,11 @@
 -(void)requestAdditionalChatRoomsInfo;
 -(void)createChatRoom:(NSString*)chatRoomName;
 -(void)joinAllRooms;
+-(void)requestNumberOfUsersInRoom:(QBChatRoom*)room;
+
+-(void)requestRoomOccupants:(NSString*)roomName;
+
+-(void)retrieveNumberOfUsersInEachRoom;
+
+-(void)calculateDistancesForEachRoom;
 @end
