@@ -10,12 +10,14 @@
 #import "BackgroundWorker.h"
 #import "CustomTabBarController.h"
 #import "Helper.h"
+#import "MessagesViewController.h"
 
 @interface ChatRoomsViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate>
 @property (retain, nonatomic) IBOutlet UITableView *roomsTableView;
 @property (retain, nonatomic) IBOutlet UITextField *newConversationTextField;
 - (IBAction)startButtonTap:(UIButton *)sender;
 
+@property (nonatomic, retain) MessagesViewController* dialogsController;
 
 @end
 enum TableSections {

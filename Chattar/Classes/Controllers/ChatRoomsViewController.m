@@ -10,11 +10,13 @@
 #import "ChatRoom.h"
 #import "DataManager.h"
 
+
 @interface ChatRoomsViewController ()
 
 @end
 
 @implementation ChatRoomsViewController
+@synthesize dialogsController;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -34,6 +36,18 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     [_newConversationTextField setDelegate:self];
+    
+    UISegmentedControl* segmentedControl = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:
+                                                                                      NSLocalizedString(@"Pick your chat",nil),
+                                                                                      NSLocalizedString(@"My Dialogs",nil),
+                                                                                      nil]];
+    [segmentedControl setSegmentedControlStyle:UISegmentedControlStyleBar];
+    [segmentedControl setFrame:CGRectMake(20, 7, 280, 30)];
+    [segmentedControl addTarget:self action:@selector(segmentValueDidChanged:) forControlEvents:UIControlEventValueChanged];
+    self.navigationItem.titleView = segmentedControl;
+    [segmentedControl release];
+    
+    dialogsController = [[MessagesViewController alloc] initWithNibName:@"MessagesViewController" bundle:nil];
 }
 
 - (void)didReceiveMemoryWarning
@@ -45,6 +59,7 @@
 - (void)dealloc {
     [_roomsTableView release];
     [_newConversationTextField release];
+    [dialogsController release];
     [super dealloc];
 }
 - (void)viewDidUnload {
@@ -87,10 +102,12 @@
     }
     
     titleViewSize = [header.text sizeWithFont:header.font];
-    [header setFrame:CGRectMake(10, 0, titleViewSize.width, titleViewSize.height)];
+    [header setFrame:CGRectMake(10, 5, titleViewSize.width, titleViewSize.height)];
     UIView* sectionTitleView = [[[UIView alloc] initWithFrame:CGRectMake(20, 0, titleViewSize.width + 20, 30)] autorelease];
-
+    
+    
     [sectionTitleView setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"headerBGColor"]]];
+    [sectionTitleView.layer setCornerRadius:5];
 
     [sectionTitleView addSubview:header];
     
@@ -101,19 +118,43 @@
     [seeAllText setBackgroundColor:[UIColor clearColor]];
     CGSize seeAllTextSize = [@"See All" sizeWithFont:seeAllText.font];
     
-    [seeAllText setFrame:CGRectMake(_roomsTableView.bounds.size.width-95, 0, seeAllTextSize.width, seeAllTextSize.height)];
+    [seeAllText setFrame:CGRectMake(_roomsTableView.bounds.size.width-95, 5, seeAllTextSize.width, seeAllTextSize.height)];
     [seeAllText setTextColor:[UIColor grayColor]];
     [seeAllText setText:@"See All"];
     [viewForHeaderInSection addSubview:seeAllText];
     
     UIButton* seeAllButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [seeAllButton setFrame:CGRectMake(_roomsTableView.bounds.size.width-40, 0, 20, 20)];
+    [seeAllButton setFrame:CGRectMake(_roomsTableView.bounds.size.width-40, 5, 20, 20)];
     [seeAllButton setImage:[UIImage imageNamed:@"seeAllButton.png"] forState:UIControlStateNormal];
     
     [viewForHeaderInSection addSubview:seeAllButton];
     
     return viewForHeaderInSection;
+}
 
+-(void)segmentValueDidChanged:(UISegmentedControl*)sender{
+    switch (sender.selectedSegmentIndex) {
+        case 0:
+            [self showChats];
+            break;
+            
+        case 1:
+            [self showDialogs];
+            break;
+            
+        default:
+            break;
+    }
+}
+
+-(void)showChats{
+    [dialogsController.view removeFromSuperview];
+}
+
+-(void)showDialogs{
+    if ([dialogsController.view superview] == nil) {
+        [self.view addSubview:dialogsController.view];
+    }
 }
 
 #pragma mark -
