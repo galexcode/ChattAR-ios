@@ -29,7 +29,7 @@ typedef enum QBChatServiceError {
     QBUUser *qbUser;
 }
 
--(void)retrieveActiveUsersForRoom:(NSString*)roomName;
+
 #pragma mark -
 #pragma mark Base Messaging
 
@@ -92,7 +92,8 @@ typedef enum QBChatServiceError {
 #pragma mark Rooms
 
 /**
- Create room or join if room with this name already exist. QBChatDelegate's method 'chatRoomDidEnter:' will be called
+ Create room or join if room with this name already exist. QBChatDelegate's method 'chatRoomDidEnter:' will be called.
+ If room name contains " " or "-" characters - they will replaceed with "".
  
  @param name Room name
  @param isMembersOnly YES if you want to create room that users cannot enter without being on the member list. If set NO - room will be opened for all users
@@ -128,6 +129,11 @@ typedef enum QBChatServiceError {
 - (void)requestAllRooms;
 
 /**
+ Send request for getting room information. QBChatDelegate's method 'chatRoomDidReceiveInformation:room:' will be called
+ */
+- (void)requestRoomInformation:(QBChatRoom *)room;
+
+/**
  Send request to adding users to room.
  
  @param usersIDs Array of users' IDs 
@@ -139,6 +145,11 @@ typedef enum QBChatServiceError {
  Request users who are able to join a room. QBChatDelegate's method 'chatRoomDidReceiveListOfUsers:room:' will be called
  */
 - (void)requestRoomUsers:(QBChatRoom *)room;
+
+/**
+ Request users who are joined a room. QBChatDelegate's method 'chatRoomDidReceiveListOfOnlineUsers:room:' will be called
+ */
+- (void)requestRoomOnlineUsers:(QBChatRoom *)room;
 
 /**
  Send request to remove users from room
