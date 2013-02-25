@@ -42,7 +42,7 @@
 					<object class="IBUITableView" id="776002512">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">274</int>
-						<string key="NSFrameSize">{320, 308.5}</string>
+						<string key="NSFrameSize">{320, 309}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="545774062"/>

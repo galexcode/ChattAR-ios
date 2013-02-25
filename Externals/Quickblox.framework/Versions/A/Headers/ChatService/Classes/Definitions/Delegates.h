@@ -81,6 +81,14 @@
 - (void)chatRoomDidReceiveMessage:(QBChatMessage *)message fromRoom:(NSString *)roomName;
 
 /**
+ Called when received room information. 
+ 
+ @param information Room information
+ @param roomName Name of room 
+ */
+- (void)chatRoomDidReceiveInformation:(NSDictionary *)information room:(NSString *)roomName;
+
+/**
  Fired when you did enter to room
  
  @param room which you have joined
@@ -117,6 +125,14 @@
  @param roomName Name of room which provides access to join
  */
 - (void)chatRoomDidReceiveListOfUsers:(NSArray *)users room:(NSString *)roomName;
+
+/**
+ Called in case receiving list of active users (joined)
+ 
+ @param users Array of joined users
+ @param roomName Name of room
+ */
+- (void)chatRoomDidReceiveListOfOnlineUsers:(NSArray *)users room:(NSString *)roomName;
 
 
 #pragma mark -

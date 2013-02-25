@@ -62,7 +62,6 @@
 #pragma mark -
 #pragma mark Interface based methods
 -(UIView*)createHeaderForSection:(NSInteger)section{
-    UIView* sectionTitleView = [[[UIView alloc] initWithFrame:CGRectMake(20, 0, 70, 30)] autorelease];
     UILabel* header = [[[UILabel alloc] initWithFrame:CGRectZero] autorelease];
     [header setBackgroundColor:[UIColor clearColor]];
     [header setTextColor:[UIColor whiteColor]];
@@ -89,8 +88,10 @@
     
     titleViewSize = [header.text sizeWithFont:header.font];
     [header setFrame:CGRectMake(10, 0, titleViewSize.width, titleViewSize.height)];
-    
+    UIView* sectionTitleView = [[[UIView alloc] initWithFrame:CGRectMake(20, 0, titleViewSize.width + 20, 30)] autorelease];
+
     [sectionTitleView setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"headerBGColor"]]];
+
     [sectionTitleView addSubview:header];
     
     UIImageView* viewForHeaderInSection = [[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.roomsTableView.bounds.size.width, 30)] autorelease];
@@ -100,8 +101,8 @@
     [seeAllText setBackgroundColor:[UIColor clearColor]];
     CGSize seeAllTextSize = [@"See All" sizeWithFont:seeAllText.font];
     
-    [seeAllText setFrame:CGRectMake(_roomsTableView.bounds.size.width-950, 0, seeAllTextSize.width, seeAllTextSize.height)];
-    
+    [seeAllText setFrame:CGRectMake(_roomsTableView.bounds.size.width-95, 0, seeAllTextSize.width, seeAllTextSize.height)];
+    [seeAllText setTextColor:[UIColor grayColor]];
     [seeAllText setText:@"See All"];
     [viewForHeaderInSection addSubview:seeAllText];
     
@@ -118,7 +119,10 @@
 #pragma mark -
 #pragma mark UITableViewDataSource 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return 2;
+    if (section != mainChatSection) {
+        return 2;
+    }
+    return 1;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
@@ -140,8 +144,10 @@
                 ChatRoom* room = [[DataManager shared].trendingRooms objectAtIndex:indexPath.row];
                 NSString* cellText = [NSString stringWithFormat:@"%@",room.xmppName];
                 UIImageView* accessoryView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"occupantsCounter.png"]] autorelease];
-                UILabel* counter = [[[UILabel alloc] initWithFrame:CGRectMake(50, 20, 20, 20)] autorelease];
+                UILabel* counter = [[[UILabel alloc] initWithFrame:CGRectMake(20, -1, 20, 20)] autorelease];
                 [counter setText:[NSString stringWithFormat:@"%d",room.roomUsers.count]];
+                [counter setBackgroundColor:[UIColor clearColor]];
+                [accessoryView addSubview:counter];
                 [cell setAccessoryView:accessoryView];
                 [cell.textLabel setText:cellText];
                 
@@ -153,8 +159,10 @@
                 ChatRoom* room = [[DataManager shared].nearbyRooms objectAtIndex:indexPath.row];
                 NSString* cellText = [NSString stringWithFormat:@"%f",room.distanceFromUser];
                 UIImageView* accessoryView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"occupantsCounter.png"]] autorelease];
-                UILabel* counter = [[[UILabel alloc] initWithFrame:CGRectMake(50, 20, 20, 20)] autorelease];
+                UILabel* counter = [[[UILabel alloc] initWithFrame:CGRectMake(20, -1, 20, 20)] autorelease];
+                [counter setBackgroundColor:[UIColor clearColor]];
                 [counter setText:[NSString stringWithFormat:@"%d",room.roomUsers.count]];
+                [accessoryView addSubview:counter];
                 [cell setAccessoryView:accessoryView];
                 [cell.textLabel setText:cellText];
             }
