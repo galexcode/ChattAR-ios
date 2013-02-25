@@ -15,5 +15,5 @@
 @property (nonatomic, retain) NSDate* createdAt;
 @property (nonatomic, assign) double roomRating;
 @property (nonatomic, assign) double distanceFromUser;
-@property (nonatomic, assign) NSInteger numberOfUsersInRoom;
+@property (nonatomic, retain) NSMutableArray* roomUsers;
 @end

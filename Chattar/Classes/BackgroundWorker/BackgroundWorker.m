@@ -70,14 +70,6 @@ static BackgroundWorker* instance = nil;
     [[QBChat instance] createOrJoinRoomWithName:chatRoomName membersOnly:NO persistent:YES];
 }
 
--(void)joinAllRooms{
-    
-    for (QBChatRoom* room in [DataManager shared].qbChatRooms) {
-        [[QBChat instance] joinRoom:room];
-    }
-
-}
-
 
 #pragma mark -
 #pragma mark Posting methods
@@ -99,10 +91,6 @@ static BackgroundWorker* instance = nil;
 //    [QBCustomObjects objectsWithClassName:@"Room" extendedRequest:getRequest delegate:self];
 //    
     [QBCustomObjects objectsWithClassName:@"Room" delegate:self];
-}
-
--(void)requestRoomOccupants:(NSString*)roomName{
-    [[QBChat instance] retrieveActiveUsersForRoom:@"daroom2@muc.chat.quickblox.com"];
 }
 
 -(void)requestAllChatRooms{
@@ -1608,34 +1596,49 @@ static BackgroundWorker* instance = nil;
         [[DataManager shared].qbChatRooms addObject:room];
     }
     else{
-        static NSInteger joinedRoomsCounter = 0;
+//        static NSInteger joinedRoomsCounter = 0;
+//        
+//        joinedRoomsCounter++;
+//        if (joinedRoomsCounter == [DataManager shared].qbChatRooms.count) {
+//            joinedRoomsCounter = 0;     // set initial value
+//            
+//            
+//            [self retrieveNumberOfUsersInEachRoom];
+//        }
         
-        joinedRoomsCounter++;
-        if (joinedRoomsCounter == [DataManager shared].qbChatRooms.count) {
-            joinedRoomsCounter = 0;     // set initial value
-            
-            
-            [self retrieveNumberOfUsersInEachRoom];
-        }
     }
 }
 
+//-(void)chatRoomDidReceiveListOfUsers:(NSArray *)users room:(NSString *)roomName{
+//    ChatRoom* room = [self findRoomWithAdditionalInfoWithName:roomName];
+//    if (room) {
+//        static NSInteger roomsWithRetrievedUsersNumberCounter = 0;
+//        roomsWithRetrievedUsersNumberCounter++;
+//        [room setNumberOfUsersInRoom:users.count];
+//        
+//        if (roomsWithRetrievedUsersNumberCounter == [DataManager shared].qbChatRooms.count) {
+//            roomsWithRetrievedUsersNumberCounter = 0;
+//            
+//            if ([tabBarDelegate respondsToSelector:@selector(didReceiveRoomsOccupantsNumber)]) {
+//                [tabBarDelegate didReceiveRoomsOccupantsNumber];
+//            }
+//        }
+//    
+//    }
+//}
+
 -(void)chatRoomDidReceiveListOfUsers:(NSArray *)users room:(NSString *)roomName{
-    ChatRoom* room = [self findRoomWithAdditionalInfoWithName:roomName];
-    if (room) {
-        static NSInteger roomsWithRetrievedUsersNumberCounter = 0;
-        roomsWithRetrievedUsersNumberCounter++;
-        [room setNumberOfUsersInRoom:users.count];
-        
-        if (roomsWithRetrievedUsersNumberCounter == [DataManager shared].qbChatRooms.count) {
-            roomsWithRetrievedUsersNumberCounter = 0;
-            
-            if ([tabBarDelegate respondsToSelector:@selector(didReceiveRoomsOccupantsNumber)]) {
-                [tabBarDelegate didReceiveRoomsOccupantsNumber];
-            }
-        }
+    ChatRoom* chatRoom = [self findRoomWithAdditionalInfoWithName:roomName];
     
+    if (chatRoom) {
+        static NSInteger roomsReceivedUsers = 0;
+        ++roomsReceivedUsers;
+        if (roomsReceivedUsers == [DataManager shared].qbChatRooms.count) {
+            [tabBarDelegate didReceiveRoomsOccupantsNumber];
+        }
+        [chatRoom setRoomUsers:users.mutableCopy];
     }
+    
 }
 
 #pragma mark -
@@ -1643,7 +1646,7 @@ static BackgroundWorker* instance = nil;
 
 -(void)retrieveNumberOfUsersInEachRoom{
     for (QBChatRoom* room in [DataManager shared].qbChatRooms) {
-        [room requestUsers];
+        [[QBChat instance] requestRoomOnlineUsers:room];
     }
 }
 

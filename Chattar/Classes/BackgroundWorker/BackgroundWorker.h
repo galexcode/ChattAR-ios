@@ -123,7 +123,6 @@
 -(void)requestAllChatRooms;
 -(void)requestAdditionalChatRoomsInfo;
 -(void)createChatRoom:(NSString*)chatRoomName;
--(void)joinAllRooms;
 -(void)requestNumberOfUsersInRoom:(QBChatRoom*)room;
 
 -(void)requestRoomOccupants:(NSString*)roomName;

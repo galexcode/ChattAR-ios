@@ -324,7 +324,6 @@
 }
 
 -(void)didReceiveRoomsOccupantsNumber{
-    
 }
 
 

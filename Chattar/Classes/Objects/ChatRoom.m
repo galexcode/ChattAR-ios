@@ -15,8 +15,18 @@
 @synthesize xmppName;
 @synthesize roomRating;
 @synthesize distanceFromUser;
+@synthesize roomUsers;
+
+-(void)setRoomUsers:(NSArray *)_roomUsers{
+    if (!roomUsers) {
+        roomUsers = [[NSMutableArray alloc] init];
+    }
+    
+    [roomUsers addObjectsFromArray:_roomUsers];
+}
 
 -(void)dealloc{
+    [roomUsers release];
     [roomID release];
     [xmppName release];
     [createdAt release];
