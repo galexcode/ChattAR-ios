@@ -16,4 +16,5 @@
 @property (nonatomic, assign) double roomRating;
 @property (nonatomic, assign) double distanceFromUser;
 @property (nonatomic, retain) NSMutableArray* roomUsers;
+@property (nonatomic, retain) NSMutableArray* messagesHistory;
 @end
