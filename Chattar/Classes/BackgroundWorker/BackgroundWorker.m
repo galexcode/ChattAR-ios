@@ -1595,37 +1595,7 @@ static BackgroundWorker* instance = nil;
             // add room to storage
         [[DataManager shared].qbChatRooms addObject:room];
     }
-    else{
-//        static NSInteger joinedRoomsCounter = 0;
-//        
-//        joinedRoomsCounter++;
-//        if (joinedRoomsCounter == [DataManager shared].qbChatRooms.count) {
-//            joinedRoomsCounter = 0;     // set initial value
-//            
-//            
-//            [self retrieveNumberOfUsersInEachRoom];
-//        }
-        
-    }
 }
-
-//-(void)chatRoomDidReceiveListOfUsers:(NSArray *)users room:(NSString *)roomName{
-//    ChatRoom* room = [self findRoomWithAdditionalInfoWithName:roomName];
-//    if (room) {
-//        static NSInteger roomsWithRetrievedUsersNumberCounter = 0;
-//        roomsWithRetrievedUsersNumberCounter++;
-//        [room setNumberOfUsersInRoom:users.count];
-//        
-//        if (roomsWithRetrievedUsersNumberCounter == [DataManager shared].qbChatRooms.count) {
-//            roomsWithRetrievedUsersNumberCounter = 0;
-//            
-//            if ([tabBarDelegate respondsToSelector:@selector(didReceiveRoomsOccupantsNumber)]) {
-//                [tabBarDelegate didReceiveRoomsOccupantsNumber];
-//            }
-//        }
-//    
-//    }
-//}
 
 -(void)chatRoomDidReceiveListOfUsers:(NSArray *)users room:(NSString *)roomName{
     ChatRoom* chatRoom = [self findRoomWithAdditionalInfoWithName:roomName];
