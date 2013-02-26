@@ -8,7 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import "Storage.h"
+#import "ChatRoom.h"
 
 @interface ChatRoomsStorage : Storage
+@property (nonatomic, retain) ChatRoom* currentChatRoom;
 
 @end
