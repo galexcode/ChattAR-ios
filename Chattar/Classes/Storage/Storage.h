@@ -23,7 +23,9 @@
 -(UserAnnotation*)retrieveDataFromStorageWithIndex:(NSInteger)index;
 
 -(NSInteger)storageCount;
+-(NSInteger)allDataCount;
 
 -(void)insertObjectToAllData:(UserAnnotation*)object atIndex:(NSInteger)index;
 -(void)insertObjectToPartialData:(UserAnnotation*)object atIndex:(NSInteger)index;
+-(void)removeAllPartialData;
 @end

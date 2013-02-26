@@ -64,6 +64,10 @@
     return [DataManager shared].chatPoints.count;
 }
 
+-(NSInteger)allDataCount{
+    return [DataManager shared].allChatPoints.count;
+}
+
 -(void)addDataToStorage:(UserAnnotation *)newData{
     [[DataManager shared].chatPoints addObject:newData];
 }
@@ -72,6 +76,10 @@
     if ([DataManager shared].chatPoints.count != 0) {
         [[DataManager shared].chatPoints removeLastObject];
     }
+}
+
+-(BOOL)isStorageEmpty{
+    return ([DataManager shared].chatPoints.count == 0);
 }
 
 -(void)clearStorage{
@@ -95,5 +103,11 @@
         [[DataManager shared].chatPoints insertObject:object atIndex:index];
     }
 }
+
+-(void)removeAllPartialData{
+    [[DataManager shared].chatPoints removeAllObjects];
+}
+
+
 
 @end
