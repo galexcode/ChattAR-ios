@@ -305,6 +305,10 @@
     }
 }
 
+-(void)didEnterExistingRoom{
+    [[NSNotificationCenter defaultCenter] postNotificationName:kNeedToDisplayChatRoomController object:nil];
+}
+
 -(void)prepareDataForDisplaying{
     // get number of users for all rooms
     [[BackgroundWorker instance] retrieveNumberOfUsersInEachRoom];
