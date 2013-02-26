@@ -16,6 +16,10 @@
 #import "CommonViewController.h"
 #import "BackgroundWorker.h"
 
+#import "Storage.h"
+#import "ChatPointsStorage.h"
+#import "ChatRoomsStorage.h"
+
 #define tableIsUpdating 1011
 
 
@@ -31,6 +35,7 @@
 	BOOL isLoadingMoreMessages;
        
     BOOL isDataRetrieved;
+    
 }
 
 @property (nonatomic, assign) id delegate;
@@ -43,10 +48,14 @@
 
 @property (nonatomic, assign) CustomSwitch *allFriendsSwitch;
 
+@property (nonatomic, retain) Storage* dataStorage;
+
 - (IBAction)sendMessageDidPress:(id)sender;
 
 - (void)refresh;
 
 - (void)addQuote;
+
+-(void)addRoomOccupantsPicturesPanel;
 
 @end
