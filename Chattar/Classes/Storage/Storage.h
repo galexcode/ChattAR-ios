@@ -7,7 +7,23 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "UserAnnotation.h"
 
 @interface Storage : NSObject
 
+-(BOOL)isStorageEmpty;
+-(void)showWorldDataFromStorage;
+-(void)showFriendsDataFromStorage;
+
+-(void)refreshDataFromStorage;
+-(void)addDataToStorage:(UserAnnotation*)newData;
+-(void)removeLastObjectFromStorage;
+-(void)clearStorage;
+-(BOOL)storageContainsObject:(UserAnnotation*)object;
+-(UserAnnotation*)retrieveDataFromStorageWithIndex:(NSInteger)index;
+
+-(NSInteger)storageCount;
+
+-(void)insertObjectToAllData:(UserAnnotation*)object atIndex:(NSInteger)index;
+-(void)insertObjectToPartialData:(UserAnnotation*)object atIndex:(NSInteger)index;
 @end
