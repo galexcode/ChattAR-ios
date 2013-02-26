@@ -93,6 +93,9 @@ static BackgroundWorker* instance = nil;
     [QBCustomObjects objectsWithClassName:@"Room" delegate:self];
 }
 
+-(void)joinRoom:(QBChatRoom *)room{
+    [[QBChat instance] joinRoom:room];
+}
 -(void)requestAllChatRooms{
     [[QBChat instance] requestAllRooms];
 }
@@ -1577,6 +1580,16 @@ static BackgroundWorker* instance = nil;
     }
 }
 
+-(void)chatRoomDidReceiveMessage:(QBChatMessage *)message fromRoom:(NSString *)roomName{
+    ChatRoom* room = [[DataManager shared] findRoomWithAdditionalInfo:roomName];
+    if (room) {
+        if (!room.messagesHistory) {
+            room.messagesHistory = [[NSMutableArray alloc] init];
+        }
+        [room.messagesHistory addObject:message];
+    }
+}
+
 -(void)chatRoomDidEnter:(QBChatRoom *)room{
     NSLog(@"%@",@"ROOM ENTER OR CREATE!");
     
@@ -1594,6 +1607,12 @@ static BackgroundWorker* instance = nil;
         
             // add room to storage
         [[DataManager shared].qbChatRooms addObject:room];
+    }
+                        // join to already existing room
+    else{
+        if ([tabBarDelegate respondsToSelector:@selector(didEnterExistingRoom)]) {
+            [tabBarDelegate didEnterExistingRoom];
+        }
     }
 }
 

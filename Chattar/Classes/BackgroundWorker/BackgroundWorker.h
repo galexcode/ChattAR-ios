@@ -83,6 +83,7 @@
 -(void)didReceiveChatRooms:(NSArray*)chatRooms;
 -(void)didReceiveAdditionalServerInfo:(NSArray*)additionalInfo;
 -(void)didReceiveRoomsOccupantsNumber;
+-(void)didEnterExistingRoom;
 @end
 
 
@@ -127,4 +128,6 @@
 -(void)retrieveNumberOfUsersInEachRoom;
 
 -(void)calculateDistancesForEachRoom;
+
+-(void)joinRoom:(QBChatRoom*)room;
 @end
