@@ -223,7 +223,6 @@
     // 2. add Friends from FB
     [[DataManager shared].chatPoints addObjectsFromArray:[DataManager shared].allChatPoints];
     
-    
     // add all checkins
     for(UserAnnotation *checkinAnnotatin in [DataManager shared].allCheckins){
         if(![[DataManager shared].chatPoints containsObject:checkinAnnotatin]){

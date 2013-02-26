@@ -26,6 +26,7 @@
         self.tabBarItem.image = [UIImage imageNamed:@"dialogsTab.png"];
 
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveChatRooms) name:kDataIsReadyForDisplaying object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doNeedDisplayChatRoomsController) name:kNeedToDisplayChatRoomController object:nil];
     }
     return self;
 }
@@ -238,13 +239,23 @@
 
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    #warning unimplemented
+    UITableViewCell* selectedCell = [tableView cellForRowAtIndexPath:indexPath];
+    
+    QBChatRoom* selectedChatRoom = [[DataManager shared] findQBRoomWithName:selectedCell.textLabel.text];
+    
+    if (selectedChatRoom) {
+        [[BackgroundWorker instance] joinRoom:selectedChatRoom];
+    }
 }
 
 #pragma mark -
 #pragma mark Notifications Reactions
 -(void)doReceiveChatRooms{
     [_roomsTableView reloadData];
+}
+
+-(void)doNeedDisplayChatRoomsController{
+    #warning unimplemented - display chatrooms controller
 }
 
 #pragma mark -
