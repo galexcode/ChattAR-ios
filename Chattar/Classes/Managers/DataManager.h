@@ -135,5 +135,4 @@
 
 -(NSArray*)photosWithLocationsFromStorageFromUserWithId:(NSDecimalNumber*)userId;
 
--(BOOL)containsChatRoom:(QBChatRoom*)room;
 @end
