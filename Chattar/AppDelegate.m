@@ -92,6 +92,7 @@
     
     // Chat
     ChatViewController* chatViewController = [[ChatViewController alloc] initWithNibName:@"ChatViewController" bundle:nil];
+    chatViewController.dataStorage = [[ChatPointsStorage alloc] init];
     UINavigationController* chatNavigationController = [[UINavigationController alloc] initWithRootViewController:chatViewController];
     [chatViewController release];
     

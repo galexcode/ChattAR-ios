@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 #import "CustomTabBarController.h"
+#import "Storage.h"
+#import "ChatPointsStorage.h"
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate, UIAlertViewDelegate,UITabBarControllerDelegate>{
 }
