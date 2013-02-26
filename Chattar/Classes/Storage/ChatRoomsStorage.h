@@ -7,7 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "Storage.h"
 
-@interface ChatRoomsStorage : NSObject
+@interface ChatRoomsStorage : Storage
 
 @end
