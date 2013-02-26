@@ -10,5 +10,4 @@
 #import "Storage.h"
 
 @interface ChatPointsStorage : Storage
-
 @end
