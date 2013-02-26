@@ -11,6 +11,9 @@
 #import "CustomTabBarController.h"
 #import "Helper.h"
 #import "MessagesViewController.h"
+#import "ChatRoomsStorage.h"
+#import "Storage.h"
+#import "ChatViewController.h"
 
 @interface ChatRoomsViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate,UINavigationControllerDelegate>
 @property (retain, nonatomic) IBOutlet UITableView *roomsTableView;

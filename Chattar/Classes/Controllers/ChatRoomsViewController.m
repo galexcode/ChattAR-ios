@@ -85,6 +85,7 @@
 
 #pragma mark -
 #pragma mark Interface based methods
+
 -(UIView*)createHeaderForSection:(NSInteger)section{
     UILabel* header = [[[UILabel alloc] initWithFrame:CGRectZero] autorelease];
     [header setBackgroundColor:[UIColor clearColor]];
@@ -246,6 +247,17 @@
     if (selectedChatRoom) {
         [[BackgroundWorker instance] joinRoom:selectedChatRoom];
     }
+    
+    ChatRoom* selectedChatRoomWithAdditionalInfo = [[DataManager shared] findRoomWithAdditionalInfo:selectedCell.textLabel.text];
+    ChatRoomsStorage* dataStorage = [[[ChatRoomsStorage alloc] init] autorelease];
+    
+    [dataStorage setCurrentChatRoom:selectedChatRoomWithAdditionalInfo];
+    
+    ChatViewController* chatViewController = [[[ChatViewController alloc] initWithNibName:@"ChatViewController" bundle:nil] autorelease];
+    [chatViewController setDataStorage:dataStorage];
+    [chatViewController addRoomOccupantsPicturesPanel];
+    
+    [self.view addSubview:chatViewController.view];
 }
 
 #pragma mark -
@@ -255,7 +267,6 @@
 }
 
 -(void)doNeedDisplayChatRoomsController{
-    #warning unimplemented - display chatrooms controller
 }
 
 #pragma mark -
