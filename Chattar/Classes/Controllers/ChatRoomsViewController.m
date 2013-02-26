@@ -47,7 +47,15 @@
     self.navigationItem.titleView = segmentedControl;
     [segmentedControl release];
     
-    dialogsController = [[MessagesViewController alloc] initWithNibName:@"MessagesViewController" bundle:nil];
+    [segmentedControl setSelectedSegmentIndex:0];
+    
+    MessagesViewController* messagesVC = [[MessagesViewController alloc] initWithNibName:@"MessagesViewController" bundle:nil];
+    
+    dialogsController = [[UINavigationController alloc] initWithRootViewController:messagesVC];
+    [messagesVC release];
+    dialogsController.navigationBarHidden = YES;
+    
+    [dialogsController setDelegate:self];
 }
 
 - (void)didReceiveMemoryWarning
@@ -107,7 +115,7 @@
     
     
     [sectionTitleView setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"headerBGColor"]]];
-    [sectionTitleView.layer setCornerRadius:5];
+    [sectionTitleView.layer setCornerRadius:8];
 
     [sectionTitleView addSubview:header];
     
@@ -148,22 +156,23 @@
 }
 
 -(void)showChats{
-    [dialogsController.view removeFromSuperview];
+    if ([dialogsController.view superview]) {
+        [dialogsController.view removeFromSuperview];
+    }
+    
 }
 
 -(void)showDialogs{
     if ([dialogsController.view superview] == nil) {
         [self.view addSubview:dialogsController.view];
     }
+    
 }
 
 #pragma mark -
 #pragma mark UITableViewDataSource 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    if (section != mainChatSection) {
-        return 2;
-    }
-    return 1;
+    return (section == mainChatSection) ? 1 : 2;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
@@ -249,4 +258,14 @@
     [_newConversationTextField resignFirstResponder];
     return YES;
 }
+
+#pragma mark - 
+#pragma mark UINavigationControllerDelegate methods
+- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
+    [viewController viewWillAppear:animated];
+}
+- (void)navigationController:(UINavigationController *)navigationController didShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
+    [viewController viewDidAppear:animated];
+}
+
 @end
