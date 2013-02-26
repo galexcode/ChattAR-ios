@@ -850,11 +850,24 @@ static DataManager *instance = nil;
 
 #pragma mark -
 #pragma mark ChatRooms methods
--(BOOL)containsChatRoom:(QBChatRoom *)newRoom{
-    
-    return NO;
+-(QBChatRoom*)findQBRoomWithName:(NSString *)roomName{
+    for (QBChatRoom* room in qbChatRooms) {
+        if ([room.roomName isEqualToString:roomName]) {
+            return room;
+        }
+    }
+    return nil;
 }
 
+-(ChatRoom*)findRoomWithAdditionalInfo:(NSString *)roomName{
+    for (ChatRoom* room in roomsWithAdditionalInfo) {
+        if ([room.xmppName isEqualToString:roomName]) {
+            return room;
+        }
+    }
+    
+    return nil;
+}
 -(BOOL)roomWithNameHasAdditionalInfo:(NSString*)roomName{
     for (ChatRoom* room in [DataManager shared].roomsWithAdditionalInfo) {
         if ([room.xmppName isEqualToString:roomName]) {

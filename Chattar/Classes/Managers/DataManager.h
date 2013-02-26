@@ -109,6 +109,8 @@
 #pragma mark -
 #pragma mark Chat rooms 
 -(BOOL)roomWithNameHasAdditionalInfo:(NSString*)roomName;
+-(QBChatRoom*)findQBRoomWithName:(NSString*)roomName;
+-(ChatRoom*)findRoomWithAdditionalInfo:(NSString*)roomName;
 
 #pragma mark -
 #pragma mark Core Data api

@@ -194,6 +194,9 @@
 		ED55673B16D4C8ED009C385A /* ChatRoomsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED55673916D4C8EA009C385A /* ChatRoomsViewController.m */; };
 		ED55673E16D4C921009C385A /* ChatRoomsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ED55673D16D4C921009C385A /* ChatRoomsViewController.xib */; };
 		ED55674116D4D7A1009C385A /* ChatRoom.m in Sources */ = {isa = PBXBuildFile; fileRef = ED55674016D4D7A1009C385A /* ChatRoom.m */; };
+		ED60014016DCF2230023E5CD /* Storage.m in Sources */ = {isa = PBXBuildFile; fileRef = ED60013F16DCF2230023E5CD /* Storage.m */; };
+		ED60014316DCF2350023E5CD /* ChatPointsStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = ED60014216DCF2350023E5CD /* ChatPointsStorage.m */; };
+		ED60014616DCF24C0023E5CD /* ChatRoomsStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = ED60014516DCF24C0023E5CD /* ChatRoomsStorage.m */; };
 		ED91256C16DB70AE00B11902 /* occupantsCounter.png in Resources */ = {isa = PBXBuildFile; fileRef = ED91256516DB70AE00B11902 /* occupantsCounter.png */; };
 		ED91256D16DB70AE00B11902 /* occupantsCounter@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = ED91256616DB70AE00B11902 /* occupantsCounter@2x.png */; };
 		ED91256E16DB70AE00B11902 /* seeAllButton.png in Resources */ = {isa = PBXBuildFile; fileRef = ED91256716DB70AE00B11902 /* seeAllButton.png */; };
@@ -514,6 +517,12 @@
 		ED55673D16D4C921009C385A /* ChatRoomsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ChatRoomsViewController.xib; sourceTree = "<group>"; };
 		ED55673F16D4D7A1009C385A /* ChatRoom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatRoom.h; sourceTree = "<group>"; };
 		ED55674016D4D7A1009C385A /* ChatRoom.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatRoom.m; sourceTree = "<group>"; };
+		ED60013E16DCF2230023E5CD /* Storage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Storage.h; sourceTree = "<group>"; };
+		ED60013F16DCF2230023E5CD /* Storage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Storage.m; sourceTree = "<group>"; };
+		ED60014116DCF2350023E5CD /* ChatPointsStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatPointsStorage.h; sourceTree = "<group>"; };
+		ED60014216DCF2350023E5CD /* ChatPointsStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatPointsStorage.m; sourceTree = "<group>"; };
+		ED60014416DCF24C0023E5CD /* ChatRoomsStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatRoomsStorage.h; sourceTree = "<group>"; };
+		ED60014516DCF24C0023E5CD /* ChatRoomsStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatRoomsStorage.m; sourceTree = "<group>"; };
 		ED91256516DB70AE00B11902 /* occupantsCounter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = occupantsCounter.png; sourceTree = "<group>"; };
 		ED91256616DB70AE00B11902 /* occupantsCounter@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "occupantsCounter@2x.png"; sourceTree = "<group>"; };
 		ED91256716DB70AE00B11902 /* seeAllButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = seeAllButton.png; sourceTree = "<group>"; };
@@ -757,6 +766,7 @@
 		ED4C8E7D16BFEB5D000751D4 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				ED60013D16DCF2110023E5CD /* Storage */,
 				ED4C8E7E16BFEB5D000751D4 /* Categories */,
 				ED4C8E8916BFEB5D000751D4 /* Controllers */,
 				ED4C8E9F16BFEB5D000751D4 /* FB API */,
@@ -967,7 +977,6 @@
 		ED4C8EF316BFEB5D000751D4 /* Resourses */ = {
 			isa = PBXGroup;
 			children = (
-				ED91256416DB70AE00B11902 /* ChatRooms */,
 				ED4C8EF416BFEB5D000751D4 /* datamodels */,
 				ED4C8EF816BFEB5D000751D4 /* images */,
 				ED4C8F5416BFEB5D000751D4 /* sound.mp3 */,
@@ -987,6 +996,7 @@
 		ED4C8EF816BFEB5D000751D4 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				ED91256416DB70AE00B11902 /* ChatRooms */,
 				ED4C8EF916BFEB5D000751D4 /* 3item.png */,
 				ED4C8EFA16BFEB5D000751D4 /* 3item@2x.png */,
 				ED4C8EFB16BFEB5D000751D4 /* Background.png */,
@@ -1150,6 +1160,19 @@
 			path = CommonViewController;
 			sourceTree = "<group>";
 		};
+		ED60013D16DCF2110023E5CD /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				ED60013E16DCF2230023E5CD /* Storage.h */,
+				ED60013F16DCF2230023E5CD /* Storage.m */,
+				ED60014116DCF2350023E5CD /* ChatPointsStorage.h */,
+				ED60014216DCF2350023E5CD /* ChatPointsStorage.m */,
+				ED60014416DCF24C0023E5CD /* ChatRoomsStorage.h */,
+				ED60014516DCF24C0023E5CD /* ChatRoomsStorage.m */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
 		ED91256416DB70AE00B11902 /* ChatRooms */ = {
 			isa = PBXGroup;
 			children = (
@@ -1166,8 +1189,7 @@
 				ED91256716DB70AE00B11902 /* seeAllButton.png */,
 				ED91256816DB70AE00B11902 /* seeAllButton@2x.png */,
 			);
-			name = ChatRooms;
-			path = images/ChatRooms;
+			path = ChatRooms;
 			sourceTree = "<group>";
 		};
 		FA8E4E961580887B00476EF7 /* Externals */ = {
@@ -1631,6 +1653,9 @@
 				ED55673B16D4C8ED009C385A /* ChatRoomsViewController.m in Sources */,
 				ED55674116D4D7A1009C385A /* ChatRoom.m in Sources */,
 				EDF3C00416D504C100FF563E /* Helper.m in Sources */,
+				ED60014016DCF2230023E5CD /* Storage.m in Sources */,
+				ED60014316DCF2350023E5CD /* ChatPointsStorage.m in Sources */,
+				ED60014616DCF24C0023E5CD /* ChatRoomsStorage.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
