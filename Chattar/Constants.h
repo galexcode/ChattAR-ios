@@ -59,6 +59,8 @@
 #define kNeedToDisplayChatRoomController @"kNeedToDisplayChatRoomController"
 #define kDidReceiveUserProfilePicturesURL @"kDidReceiveUserProfilePicturesURL"
 
+#define kDidReceiveMessage @"kDidReceiveMessage"
+
 #define INDICATOR_TAG 23458
 // Strings
 #define appName @"ChattAR"
