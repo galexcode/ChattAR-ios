@@ -332,7 +332,6 @@
     FBChatViewController *chatController = [[FBChatViewController alloc] initWithNibName:@"FBChatViewController" bundle:nil];
     chatController.chatHistory = conversation;
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-//    [self.navigationController pushViewController:chatController animated:YES];
     UIViewController *topVC = (UIViewController *)self.navigationController.delegate;
     [topVC.navigationController pushViewController:chatController animated:YES];
     
