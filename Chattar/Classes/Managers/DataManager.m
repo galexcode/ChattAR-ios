@@ -61,6 +61,7 @@ static DataManager *instance = nil;
 @synthesize roomsWithAdditionalInfo;
 @synthesize nearbyRooms;
 @synthesize trendingRooms;
+@synthesize currentChatRoom;
 
 + (DataManager *)shared {
 	@synchronized (self) {
@@ -885,6 +886,31 @@ static DataManager *instance = nil;
  */
 - (NSString *)applicationDocumentsDirectory {
 	return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+}
+
+#pragma mark -
+#pragma mark Convertation methods
+
+-(UserAnnotation*)convertQBMessageToUserAnnotation:(QBChatMessage*)message{
+    UserAnnotation* userAnnotation = [[[UserAnnotation alloc] init] autorelease];
+    [userAnnotation setUserStatus:message.text];
+    [userAnnotation setCreatedAt:message.datetime];
+    [userAnnotation setQbUserID:message.senderID];
+    
+    return userAnnotation;
+}
+
+-(UserAnnotation*)convertChatRoomToUserAnnotation:(ChatRoom*)chatRooom{
+    #warning UNIMPLEMENTED
+    return nil;
+}
+
+-(QBChatMessage*)convertUserAnnotationToQBChatMessage:(UserAnnotation*)annotation{
+    QBChatMessage* returnMessage = [[[QBChatMessage alloc] init] autorelease];
+    [returnMessage setDatetime:annotation.createdAt];
+    [returnMessage setText:annotation.userStatus];
+        
+    return returnMessage;
 }
 
 @end

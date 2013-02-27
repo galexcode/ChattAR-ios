@@ -63,6 +63,7 @@
 
 @property (nonatomic, retain) NSMutableArray* nearbyRooms;
 @property (nonatomic, retain) NSMutableArray* trendingRooms;
+@property (nonatomic,retain) ChatRoom* currentChatRoom;
 
 + (DataManager *) shared;
 
@@ -134,5 +135,8 @@
 -(BOOL)addPhotoWithLocationsToStorage:(id)photo;
 
 -(NSArray*)photosWithLocationsFromStorageFromUserWithId:(NSDecimalNumber*)userId;
+-(UserAnnotation*)convertQBMessageToUserAnnotation:(QBChatMessage*)message;
+-(UserAnnotation*)convertChatRoomToUserAnnotation:(ChatRoom*)chatRooom;
+-(QBChatMessage*)convertUserAnnotationToQBChatMessage:(UserAnnotation*)annotation;
 
 @end
