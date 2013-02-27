@@ -24,6 +24,7 @@
             [[DataManager shared].chatPoints addObject:mapAnnotation];
         }
     }
+    
     [friendsIds release];
     //
     // add all checkins
