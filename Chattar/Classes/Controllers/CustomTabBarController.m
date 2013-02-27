@@ -358,6 +358,10 @@
     [[BackgroundWorker instance] requestAllChatRooms];
 }
 
+-(void)didReceiveUserProfilePictures{
+    [[NSNotificationCenter defaultCenter] postNotificationName:kDidReceiveUserProfilePicturesURL object:nil];
+}
+
 -(void)retrieveNearbyRoomsStorage{
     if(![DataManager shared].nearbyRooms){
         [DataManager shared].nearbyRooms = [[NSMutableArray alloc] init];

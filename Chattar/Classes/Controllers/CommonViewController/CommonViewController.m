@@ -91,7 +91,7 @@
 
 - (void)allFriendsSwitchValueDidChanged:(id)sender{
     float origValue = [(CustomSwitch *)sender value];
-    int stateValue;
+    int stateValue = 0;
     if(origValue >= worldValue){
         stateValue = 1;
     }else if(origValue <= friendsValue){
