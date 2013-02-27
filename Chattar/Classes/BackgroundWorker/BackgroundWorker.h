@@ -15,7 +15,9 @@
 #import "JSON.h"
 #import "ProvisionManager.h"
 #import "ChatRoom.h"
-
+#import "Storage.h"
+#import "ChatPointsStorage.h"
+#import "ChatRoomsStorage.h"
                         // delegates
 @protocol ChatControllerDelegate <NSObject>
 
@@ -85,6 +87,8 @@
 -(void)didReceiveRoomsOccupantsNumber;
 -(void)didEnterExistingRoom;
 -(void)didReceiveUserProfilePictures;
+
+-(void)didReceiveMessage;
 @end
 
 
@@ -133,4 +137,9 @@
 -(void)joinRoom:(QBChatRoom*)room;
 
 -(void)requestUsersPictures;
+
+-(void)requestDataForDataStorage:(Storage*)dataStorage;
+
+-(void)postInformationWithDataStorage:(Storage*)dataStorage;
+
 @end

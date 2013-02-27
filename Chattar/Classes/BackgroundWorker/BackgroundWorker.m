@@ -75,12 +75,30 @@ static BackgroundWorker* instance = nil;
 #pragma mark -
 #pragma mark Posting methods
 -(void)postGeoData:(QBLGeoData*)geoData{
-    // post geodata
 	[QBLocation createGeoData:geoData delegate:self];
+}
+
+-(void)postInformationWithDataStorage:(Storage*)dataStorage{
+    if ([dataStorage isKindOfClass:[ChatPointsStorage class]]) {
+        [self postGeoData:((ChatPointsStorage*)dataStorage).geoData];
+
+    }
+    else if ([dataStorage isKindOfClass:[ChatRoomsStorage class]]){
+        [self sendMessage:((ChatRoomsStorage*)dataStorage).messageToSend.text];
+    }
+}
+
+-(void)sendMessage:(NSString*)message{
+    QBChatRoom* room = [[DataManager shared] findQBRoomWithName:[DataManager shared].currentChatRoom.xmppName];
+    [[QBChat instance] sendMessage:message toRoom:room];
 }
 
 #pragma mark -
 #pragma mark Data Requests
+
+-(void)requestChatRoomsData{
+    [self requestUsersPictures];
+}
 
 -(void)requestUsersPictures{
     if ([DataManager shared].currentChatRoom.roomUsers.count) {
@@ -96,7 +114,15 @@ static BackgroundWorker* instance = nil;
         
         numberOfUserPicturesRetrieved = [DataManager shared].currentChatRoom.roomUsers.count;
         [[FBService shared] usersProfilesWithIds:ids delegate:self context:chatRoomUsersProfiles];
+    }
+}
 
+-(void)requestDataForDataStorage:(Storage *)dataStorage{
+    if ([dataStorage isKindOfClass:[ChatPointsStorage class]]) {
+        [self retrieveCachedChatDataAndRequestNewData];
+    }
+    else if([dataStorage isKindOfClass:[ChatRoomsStorage class]]){
+        [self requestUsersPictures];
     }
 }
 
@@ -1228,6 +1254,10 @@ static BackgroundWorker* instance = nil;
                             if ([tabBarDelegate respondsToSelector:@selector(didReceiveUserProfilePictures)]) {
                                 [tabBarDelegate didReceiveUserProfilePictures];
                             }
+                            
+                            if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialData)]) {
+                                [tabBarDelegate chatEndOfRetrievingInitialData];
+                            }
 
                         }
                     }];
@@ -1521,6 +1551,17 @@ static BackgroundWorker* instance = nil;
 
 #pragma mark -
 #pragma mark Adding Methods
+
+-(void)createAndAddNewAnnotationToChatForFBUser:(NSDictionary*)fbUser withQBChatMessage:(QBChatMessage*)message addToTop:(BOOL)toTop withReloadTable:(BOOL)reloadTable{
+    UserAnnotation* newAnnotation = [[DataManager shared] convertQBMessageToUserAnnotation:message];
+    
+    if ([tabBarDelegate respondsToSelector:@selector(willAddNewMessageToChat:addToTop:withReloadTable:isFBCheckin:)]) {
+        [tabBarDelegate willAddNewMessageToChat:newAnnotation addToTop:toTop withReloadTable:reloadTable isFBCheckin:NO];
+    }
+
+}
+
+
 // Add Quote data to annotation
 - (void)addQuoteDataToAnnotation:(UserAnnotation *)annotation geoData:(QBLGeoData *)geoData{
     // get quoted geodata
@@ -1634,6 +1675,27 @@ static BackgroundWorker* instance = nil;
         }
         [room.messagesHistory addObject:message];
     }
+    
+    if ([tabBarDelegate respondsToSelector:@selector(didReceiveMessage)]) {
+        [tabBarDelegate didReceiveMessage];
+    }
+    
+    if ([tabBarDelegate respondsToSelector:@selector(willClearMessageField)]) {
+        [tabBarDelegate willClearMessageField];
+    }
+    
+    // add new Annotation to map/chat/ar
+    [self createAndAddNewAnnotationToChatForFBUser:[DataManager shared].currentFBUser withQBChatMessage:message addToTop:YES withReloadTable:YES];
+    
+    if ([tabBarDelegate respondsToSelector:@selector(didSuccessfulMessageSending)]) {
+        [tabBarDelegate didSuccessfulMessageSending];
+    }
+    
+    if ([tabBarDelegate respondsToSelector:@selector(willScrollToTop)]) {
+        [tabBarDelegate willScrollToTop];
+    }
+
+    
 }
 
 -(void)chatRoomDidEnter:(QBChatRoom *)room{
