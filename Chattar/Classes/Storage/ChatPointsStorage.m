@@ -9,6 +9,18 @@
 #import "ChatPointsStorage.h"
 
 @implementation ChatPointsStorage
+@synthesize geoData;
+-(void)dealloc{
+    [geoData release];
+    [super dealloc];
+}
+
+-(id)init{
+    if (self = [super init]) {
+        self.needsCaching = YES;
+    }
+    return self;
+}
 
 -(void)showFriendsDataFromStorage{
     NSMutableArray *friendsIds = [[[DataManager shared].myFriendsAsDictionary allKeys] mutableCopy];
@@ -109,6 +121,32 @@
     [[DataManager shared].chatPoints removeAllObjects];
 }
 
+-(void)createDataInStorage:(NSDictionary *)data{
+    NSString* messageText = [data objectForKey:@"messageText"];
+    NSString* quoteMark = [data objectForKey:@"quoteMark"];
+    
+	geoData = [QBLGeoData currentGeoData];
+    if(geoData.latitude == 0 && geoData.longitude == 0){
+        CLLocationManager *locationManager = [[[CLLocationManager alloc] init] autorelease];
+        [geoData setLatitude:locationManager.location.coordinate.latitude];
+        [geoData setLongitude:locationManager.location.coordinate.longitude];
+    }
+	geoData.user = [DataManager shared].currentQBUser;
+	
+    // set body - with quote or without
+	if (quoteMark){
+		geoData.status = [quoteMark stringByAppendingString:messageText];
+	}else {
+		geoData.status = messageText;
+	}
+    
+	if (quoteMark){
 
+        // search QB User by fb ID
+        NSString *fbUserID = [[geoData.status substringFromIndex:6] substringToIndex:[quoteMark rangeOfString:nameIdentifier].location-6];
 
+        [[BackgroundWorker instance] requestFriendWithFacebookID:fbUserID andMessageText:messageText];
+	}
+
+}
 @end

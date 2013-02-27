@@ -9,9 +9,23 @@
 #import "ChatRoomsStorage.h"
 
 @implementation ChatRoomsStorage
+@synthesize messageToSend;
+
+-(void)dealloc{
+    [messageToSend release];
+    [super dealloc];
+}
+
+-(id)init{
+    if (self = [super init]) {
+        self.needsCaching = NO;
+    }
+    return self;
+}
+
 
 -(BOOL)isStorageEmpty{
-    return ([DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying.count == 0);
+    return ([DataManager shared].currentChatRoom.messagesHistory == nil);
 }
 -(void)showWorldDataFromStorage{
     if (![DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying) {
@@ -104,6 +118,13 @@
 
 -(void)removeAllPartialData{
     [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying removeAllObjects];
+}
+
+-(void)createDataInStorage:(NSDictionary *)data{
+    NSString* messageText = [data objectForKey:@"messageText"];
+//    NSString* quoteMark = [data objectForKey:@"quoteMark"];
+    messageToSend = [[QBChatMessage alloc] init];
+    [messageToSend setText:messageText];
 }
 
 @end

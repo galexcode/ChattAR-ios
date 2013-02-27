@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 #import "Storage.h"
+#import "BackgroundWorker.h"
 
 @interface ChatPointsStorage : Storage
+@property (nonatomic, retain) QBLGeoData* geoData;
 @end
