@@ -17,4 +17,6 @@
 @property (nonatomic, assign) double distanceFromUser;
 @property (nonatomic, retain) NSMutableArray* roomUsers;
 @property (nonatomic, retain) NSMutableArray* messagesHistory;
+@property (nonatomic, retain) NSMutableArray* usersPictures;
+@property (nonatomic, retain) NSMutableArray* messagesAsUserAnnotationForDisplaying;
 @end

@@ -17,9 +17,13 @@
 @synthesize distanceFromUser;
 @synthesize roomUsers;
 @synthesize messagesHistory;
+@synthesize usersPictures;
+@synthesize messagesAsUserAnnotationForDisplaying;
 
 -(void)dealloc{
     [roomUsers release];
+    [messagesHistory release];
+    [usersPictures release];
     [roomID release];
     [xmppName release];
     [createdAt release];
