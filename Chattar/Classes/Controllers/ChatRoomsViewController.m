@@ -273,9 +273,7 @@
 
     ChatViewController* chatViewController = [[[ChatViewController alloc] initWithNibName:@"ChatViewController" bundle:nil] autorelease];
     [chatViewController setDataStorage:dataStorage];
-    [self.view addSubview:chatViewController.view];
-    
-    [[BackgroundWorker instance] requestUsersPictures];
+    [self.navigationController pushViewController:chatViewController animated:NO];    
 }
 
 #pragma mark -
