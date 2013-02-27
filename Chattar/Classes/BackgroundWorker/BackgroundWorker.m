@@ -14,7 +14,7 @@
 #define mapFBUsers @"mapFBUsers"
 #define chatFBUsers @"chatFBUsers"
 #define moreChatMessages @"getMoreChatMessages"
-
+#define chatRoomUsersProfiles @"chatRoomUsersProfiles"
 #define kGetGeoDataCount 100
 
 @implementation BackgroundWorker
@@ -22,8 +22,8 @@
 @synthesize FBfriends;
 @synthesize chatInitState;
 @synthesize mapInitState;
-
 @synthesize numberOfCheckinsRetrieved;
+@synthesize numberOfUserPicturesRetrieved;
 
 static BackgroundWorker* instance = nil;
 
@@ -41,6 +41,7 @@ static BackgroundWorker* instance = nil;
     if (self = [super init]) {
         self.chatInitState = 0;
         self.mapInitState = 0;
+        
         
         locationManager = [[CLLocationManager alloc] init];
         [locationManager startMonitoringSignificantLocationChanges];
@@ -81,15 +82,25 @@ static BackgroundWorker* instance = nil;
 #pragma mark -
 #pragma mark Data Requests
 
+-(void)requestUsersPictures{
+    if ([DataManager shared].currentChatRoom.roomUsers.count) {
+        NSMutableString* ids = [[[NSMutableString alloc] initWithString:@""] autorelease];
+        
+        [[DataManager shared].currentChatRoom.roomUsers enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            QBUUser* user = (QBUUser*)obj;
+            [ids appendString:user.facebookID];
+            if (idx != [DataManager shared].currentChatRoom.roomUsers.count-1) {
+                [ids appendString:@","];
+            }
+        }];
+        
+        numberOfUserPicturesRetrieved = [DataManager shared].currentChatRoom.roomUsers.count;
+        [[FBService shared] usersProfilesWithIds:ids delegate:self context:chatRoomUsersProfiles];
+
+    }
+}
+
 -(void)requestAdditionalChatRoomsInfo{
-//    NSMutableDictionary *getRequest = [NSMutableDictionary dictionary];
-//    for (QBChatRoom* room in [DataManager shared].qbChatRooms) {
-//        [getRequest setObject:room.roomName forKey:@"xmppName"];
-//        [getRequest setObject:@"xmppName" forKey:@"sort_asc"];
-//    }
-//    
-//    [QBCustomObjects objectsWithClassName:@"Room" extendedRequest:getRequest delegate:self];
-//    
     [QBCustomObjects objectsWithClassName:@"Room" delegate:self];
 }
 
@@ -1115,7 +1126,6 @@ static BackgroundWorker* instance = nil;
                     
                     // conversation
                     NSArray *data = [NSArray arrayWithObjects:[result.body allValues], points, nil];
-                    //dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                     if(processCheckinsQueue == NULL){
                         processCheckinsQueue = dispatch_queue_create("com.quickblox.chattar.process.checkins.queue", NULL);
                     }
@@ -1190,6 +1200,42 @@ static BackgroundWorker* instance = nil;
                     // ...
                 }
 
+            }
+            else if ([context isEqualToString:chatRoomUsersProfiles]){
+                numberOfUserPicturesRetrieved--;
+                
+                dispatch_queue_t savingPicturesQueue = dispatch_queue_create("savingPicturesQueue", NULL);
+                dispatch_async(savingPicturesQueue, ^{
+                    NSArray* keys = [result.body allKeys];
+                    
+                    [keys enumerateObjectsUsingBlock:^(id key, NSUInteger idx, BOOL *stop) {
+                        NSDictionary* userInfo = [result.body objectForKey:key];
+                        NSLog(@"%@",userInfo);
+                        
+                        NSDictionary* pictureDict = [userInfo objectForKey:kPicture];
+                        NSDictionary* pictData = [pictureDict objectForKey:kData];
+                        NSString* url = [pictData objectForKey:kUrl];
+                        
+                        
+                        if (![DataManager shared].currentChatRoom.usersPictures) {
+                            [DataManager shared].currentChatRoom.usersPictures = [[NSMutableArray alloc] init];
+                        }
+                        
+                        [[DataManager shared].currentChatRoom.usersPictures addObject:url];
+                        
+                        if (numberOfUserPicturesRetrieved == 0) {
+                                        // notify delegate that all photos are retrieved
+                            if ([tabBarDelegate respondsToSelector:@selector(didReceiveUserProfilePictures)]) {
+                                [tabBarDelegate didReceiveUserProfilePictures];
+                            }
+
+                        }
+                    }];
+                    
+                    
+                });
+                
+                dispatch_release(savingPicturesQueue);
             }
             else{
                 
@@ -1610,6 +1656,15 @@ static BackgroundWorker* instance = nil;
     }
                         // join to already existing room
     else{
+        if ([[DataManager shared].currentChatRoom.xmppName isEqualToString:room.roomName]) {
+            
+            if (![DataManager shared].currentChatRoom.roomUsers) {
+                [DataManager shared].currentChatRoom.roomUsers = [[NSMutableArray alloc] init];
+            }
+            
+            [[DataManager shared].currentChatRoom.roomUsers addObject:[DataManager shared].currentQBUser];
+        }
+        
         if ([tabBarDelegate respondsToSelector:@selector(didEnterExistingRoom)]) {
             [tabBarDelegate didEnterExistingRoom];
         }
@@ -1617,7 +1672,7 @@ static BackgroundWorker* instance = nil;
 }
 
 -(void)chatRoomDidReceiveListOfUsers:(NSArray *)users room:(NSString *)roomName{
-    ChatRoom* chatRoom = [self findRoomWithAdditionalInfoWithName:roomName];
+    ChatRoom* chatRoom = [[DataManager shared] findRoomWithAdditionalInfo:roomName];
     
     if (chatRoom) {
         static NSInteger roomsReceivedUsers = 0;
@@ -1662,15 +1717,6 @@ static BackgroundWorker* instance = nil;
         return ((UserAnnotation *)[[DataManager shared].chatPoints objectAtIndex:0]);
     }
     
-    return nil;
-}
-
--(ChatRoom*)findRoomWithAdditionalInfoWithName:(NSString*)roomName{
-    for (ChatRoom* room in [DataManager shared].roomsWithAdditionalInfo) {
-        if ([room.xmppName isEqualToString:roomName]) {
-            return room;
-        }
-    }
     return nil;
 }
 

@@ -84,6 +84,7 @@
 -(void)didReceiveAdditionalServerInfo:(NSArray*)additionalInfo;
 -(void)didReceiveRoomsOccupantsNumber;
 -(void)didEnterExistingRoom;
+-(void)didReceiveUserProfilePictures;
 @end
 
 
@@ -107,7 +108,7 @@
 @property (assign) short chatInitState;
 @property (assign) short mapInitState;
 @property (assign) short numberOfCheckinsRetrieved;
-
+@property (assign) NSInteger numberOfUserPicturesRetrieved;
 
 +(BackgroundWorker*)instance;
 
@@ -130,4 +131,6 @@
 -(void)calculateDistancesForEachRoom;
 
 -(void)joinRoom:(QBChatRoom*)room;
+
+-(void)requestUsersPictures;
 @end
