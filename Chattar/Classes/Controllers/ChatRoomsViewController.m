@@ -249,15 +249,17 @@
     }
     
     ChatRoom* selectedChatRoomWithAdditionalInfo = [[DataManager shared] findRoomWithAdditionalInfo:selectedCell.textLabel.text];
-    ChatRoomsStorage* dataStorage = [[[ChatRoomsStorage alloc] init] autorelease];
     
-    [dataStorage setCurrentChatRoom:selectedChatRoomWithAdditionalInfo];
+    if (selectedChatRoomWithAdditionalInfo) {
+        
+        if (![DataManager shared].currentChatRoom) {
+            [DataManager shared].currentChatRoom = [[ChatRoom alloc] init];
+        }
+                            // save current chat room
+        [[DataManager shared] setCurrentChatRoom:selectedChatRoomWithAdditionalInfo];
+        
+    }
     
-    ChatViewController* chatViewController = [[[ChatViewController alloc] initWithNibName:@"ChatViewController" bundle:nil] autorelease];
-    [chatViewController setDataStorage:dataStorage];
-    [chatViewController addRoomOccupantsPicturesPanel];
-    
-    [self.view addSubview:chatViewController.view];
 }
 
 #pragma mark -
@@ -267,6 +269,13 @@
 }
 
 -(void)doNeedDisplayChatRoomsController{
+    ChatRoomsStorage* dataStorage = [[[ChatRoomsStorage alloc] init] autorelease];
+
+    ChatViewController* chatViewController = [[[ChatViewController alloc] initWithNibName:@"ChatViewController" bundle:nil] autorelease];
+    [chatViewController setDataStorage:dataStorage];
+    [self.view addSubview:chatViewController.view];
+    
+    [[BackgroundWorker instance] requestUsersPictures];
 }
 
 #pragma mark -
@@ -286,6 +295,7 @@
 - (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
     [viewController viewWillAppear:animated];
 }
+
 - (void)navigationController:(UINavigationController *)navigationController didShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
     [viewController viewDidAppear:animated];
 }
