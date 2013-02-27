@@ -19,6 +19,7 @@
 #import "Storage.h"
 #import "ChatPointsStorage.h"
 #import "ChatRoomsStorage.h"
+#import "AsyncImageView.h"
 
 #define tableIsUpdating 1011
 
@@ -55,7 +56,5 @@
 - (void)refresh;
 
 - (void)addQuote;
-
--(void)addRoomOccupantsPicturesPanel;
 
 @end

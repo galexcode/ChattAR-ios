@@ -54,6 +54,7 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChatNotReceiveNewFBChatUsers) name:kDidNotReceiveNewFBChatUsers object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doClearCache) name:kDidClearCache object:nil];
         
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveUserProfilePictures) name:kDidReceiveUserProfilePicturesURL object:nil];
     }
     return self;
 }
@@ -148,9 +149,19 @@
     }
 }
 
-
--(void)addRoomOccupantsPicturesPanel{
+-(void)addUserPicturesToPanel{
+    UIImageView* occupantsPanel = [[[UIImageView alloc] initWithFrame:CGRectMake(0, 100, 320, 50)] autorelease];
+    [occupantsPanel setBackgroundColor:[UIColor blueColor]];
     
+    __block int x = 40;
+    [[DataManager shared].currentChatRoom.usersPictures enumerateObjectsUsingBlock:^(NSString* currentPictureURL, NSUInteger index, BOOL *stop) {
+        AsyncImageView* occupantImage = [[[AsyncImageView alloc] initWithFrame:CGRectMake(x, 10, 40, 40)] autorelease];
+        [occupantImage loadImageFromURL:[NSURL URLWithString:currentPictureURL]];
+        
+        [occupantsPanel addSubview:occupantImage];
+        x += occupantImage.bounds.size.width + 10;
+    }];
+    [self.view addSubview:occupantsPanel];
 }
 
 - (IBAction)sendMessageDidPress:(id)sender{
@@ -904,7 +915,10 @@
     }
     else
         [self showWorld];
+}
 
+-(void)doReceiveUserProfilePictures{
+    [self addUserPicturesToPanel];
 }
 
 -(void)doWillSetAllFriendsSwitchEnabled:(NSNotification*)notification{
