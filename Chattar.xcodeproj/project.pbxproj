@@ -214,7 +214,6 @@
 		ED9FFE6C16CBFF730075B3EB /* dialogsTab.png in Resources */ = {isa = PBXBuildFile; fileRef = ED9FFE6816CBFF730075B3EB /* dialogsTab.png */; };
 		ED9FFE6D16CBFF730075B3EB /* mapTab.png in Resources */ = {isa = PBXBuildFile; fileRef = ED9FFE6916CBFF730075B3EB /* mapTab.png */; };
 		ED9FFE6E16CBFF730075B3EB /* settingsTab.png in Resources */ = {isa = PBXBuildFile; fileRef = ED9FFE6A16CBFF730075B3EB /* settingsTab.png */; };
-		EDAC141616D692EA0041FBD4 /* Chattar-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = ED4C8E7916BFEB5D000751D4 /* Chattar-Info.plist */; };
 		EDDDD39616C50F9000942F6F /* ARViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = EDDDD39516C50F8F00942F6F /* ARViewController.xib */; };
 		EDF3C00416D504C100FF563E /* Helper.m in Sources */ = {isa = PBXBuildFile; fileRef = EDF3C00316D504C000FF563E /* Helper.m */; };
 		FA8E4EF11580887B00476EF7 /* Facebook.m in Sources */ = {isa = PBXBuildFile; fileRef = FA8E4E991580887B00476EF7 /* Facebook.m */; };
@@ -1397,7 +1396,7 @@
 		636735C51552CF590061BF75 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0430;
+				LastUpgradeCheck = 0460;
 			};
 			buildConfigurationList = 636735C81552CF590061BF75 /* Build configuration list for PBXProject "Chattar" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1532,7 +1531,6 @@
 				ED9FFE6D16CBFF730075B3EB /* mapTab.png in Resources */,
 				ED9FFE6E16CBFF730075B3EB /* settingsTab.png in Resources */,
 				ED55673E16D4C921009C385A /* ChatRoomsViewController.xib in Resources */,
-				EDAC141616D692EA0041FBD4 /* Chattar-Info.plist in Resources */,
 				ED91256C16DB70AE00B11902 /* occupantsCounter.png in Resources */,
 				ED91256D16DB70AE00B11902 /* occupantsCounter@2x.png in Resources */,
 				ED91256E16DB70AE00B11902 /* seeAllButton.png in Resources */,

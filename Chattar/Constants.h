@@ -57,7 +57,7 @@
 
 #define kDataIsReadyForDisplaying @"kDataIsReadyForDisplaying"
 #define kNeedToDisplayChatRoomController @"kNeedToDisplayChatRoomController"
-
+#define kDidReceiveUserProfilePicturesURL @"kDidReceiveUserProfilePicturesURL"
 
 #define INDICATOR_TAG 23458
 // Strings

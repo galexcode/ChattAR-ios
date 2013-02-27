@@ -331,7 +331,7 @@ static FBService *instance = nil;
 	[parserResult release];
 }
 
--(void)request: didFailWithError:(NSError *)error
+-(void)request:(FBRequest *)request didFailWithError:(NSError *)error
 {
 	NSLog(@"didFailWithError: %@", error);
 }

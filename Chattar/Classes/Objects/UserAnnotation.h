@@ -67,6 +67,7 @@
 @property (nonatomic, retain) NSString* quotedUserName;
 @property (nonatomic, retain) NSDate* quotedMessageDate;
 @property (nonatomic, retain) NSString* quotedMessageText;
+
 // photo with location
 @property (nonatomic, retain) NSDecimalNumber* locationId;
 @property (nonatomic, retain) NSString* thumbnailURL;
