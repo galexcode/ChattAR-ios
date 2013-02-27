@@ -54,7 +54,9 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChatNotReceiveNewFBChatUsers) name:kDidNotReceiveNewFBChatUsers object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doClearCache) name:kDidClearCache object:nil];
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveUserProfilePictures) name:kDidReceiveUserProfilePicturesURL object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveUserProfilePictures:) name:kDidReceiveUserProfilePicturesURL object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveUserProfilePictures:) name:kDidReceiveMessage object:nil];
     }
     return self;
 }
@@ -137,8 +139,8 @@
 -(void)checkForShowingData{
     if ([dataStorage isStorageEmpty]) {
         [messagesTableView reloadData];
-        [[BackgroundWorker instance] retrieveCachedChatDataAndRequestNewData];
-        [super addSpinner];
+        [[BackgroundWorker instance] requestDataForDataStorage:self.dataStorage];
+        [self addSpinner];
     }
     else{
         if ([[self allFriendsSwitch] value] == friendsValue) {
@@ -150,22 +152,23 @@
 }
 
 -(void)addUserPicturesToPanel{
-    UIImageView* occupantsPanel = [[[UIImageView alloc] initWithFrame:CGRectMake(0, 100, 320, 50)] autorelease];
+    UIImageView* occupantsPanel = [[[UIImageView alloc] initWithFrame:CGRectMake(0, messageField.frame.size.height+12, 320, 50)] autorelease];
     [occupantsPanel setBackgroundColor:[UIColor blueColor]];
     
-    __block int x = 40;
+    __block int x = 20;
     [[DataManager shared].currentChatRoom.usersPictures enumerateObjectsUsingBlock:^(NSString* currentPictureURL, NSUInteger index, BOOL *stop) {
-        AsyncImageView* occupantImage = [[[AsyncImageView alloc] initWithFrame:CGRectMake(x, 10, 40, 40)] autorelease];
+        AsyncImageView* occupantImage = [[[AsyncImageView alloc] initWithFrame:CGRectMake(x, 5, 40, 40)] autorelease];
         [occupantImage loadImageFromURL:[NSURL URLWithString:currentPictureURL]];
-        
         [occupantsPanel addSubview:occupantImage];
-        x += occupantImage.bounds.size.width + 10;
+        x += occupantImage.bounds.size.width + 15;
     }];
+    
     [self.view addSubview:occupantsPanel];
+    [self.view bringSubviewToFront:occupantsPanel];
 }
 
 - (IBAction)sendMessageDidPress:(id)sender{
-    
+                                                // check internet connection
     if (![Reachability internetConnected]) {
         
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
@@ -195,32 +198,16 @@
     // remove | and @ symbols
     messageField.text = [messageField.text  stringByReplacingOccurrencesOfString:@"|" withString:@""];
     messageField.text = [messageField.text  stringByReplacingOccurrencesOfString:@"@" withString:@""];
-    
-	QBLGeoData *geoData = [QBLGeoData currentGeoData];
-    if(geoData.latitude == 0 && geoData.longitude == 0){
-        CLLocationManager *locationManager = [[[CLLocationManager alloc] init] autorelease];
-        [geoData setLatitude:locationManager.location.coordinate.latitude];
-        [geoData setLongitude:locationManager.location.coordinate.longitude];
+        
+    NSMutableDictionary* data = [NSMutableDictionary dictionary];
+    [data setObject:messageField.text forKey:@"messageText"];
+    if (quoteMark) {
+        [data setObject:quoteMark forKey:@"quoteMark"];
     }
-	geoData.user = [DataManager shared].currentQBUser;
-	
-    // set body - with quote or without
-	if (quoteMark){
-		geoData.status = [quoteMark stringByAppendingString:messageField.text];
-	}else {
-		geoData.status = messageField.text;
-	}
 
-    [[BackgroundWorker instance] postGeoData:geoData];
-
-	// send push notification if this is quote
-	if (quoteMark){
-        
-        // search QB User by fb ID
-        NSString *fbUserID = [[geoData.status substringFromIndex:6] substringToIndex:[self.quoteMark rangeOfString:nameIdentifier].location-6];
-        
-        [[BackgroundWorker instance] requestFriendWithFacebookID:fbUserID andMessageText:messageField.text];        
-	}
+    [dataStorage createDataInStorage:data];
+    
+    [[BackgroundWorker instance] postInformationWithDataStorage:dataStorage];
     
     if(quotePhotoTop){
         [quotePhotoTop removeFromSuperview];
@@ -232,48 +219,16 @@
         [view release];
     }
 
-	self.quoteMark = nil;
+	self.quoteMark = nil;    
 }
 
 -(void)showWorld{
-//    [[DataManager shared].chatPoints removeAllObjects];
-//    //
-//    // 2. add Friends from FB
-//    [[DataManager shared].chatPoints addObjectsFromArray:[DataManager shared].allChatPoints];
-//    
-//    // add all checkins
-//    for(UserAnnotation *checkinAnnotatin in [DataManager shared].allCheckins){
-//        if(![[DataManager shared].chatPoints containsObject:checkinAnnotatin]){
-//            [[DataManager shared].chatPoints addObject:checkinAnnotatin];
-//        }
-//    }
     [dataStorage showWorldDataFromStorage];
     
     [self refresh];
 }
 
 -(void)showFriends{
-    NSMutableArray *friendsIds = [[[DataManager shared].myFriendsAsDictionary allKeys] mutableCopy];
-    [friendsIds addObject:[DataManager shared].currentFBUserId];// add me
-    
-    // Chat points
-    //
-//    [[DataManager shared].chatPoints removeAllObjects];
-//    //
-//    // add only friends QB points
-//    for(UserAnnotation *mapAnnotation in [DataManager shared].allChatPoints){
-//        if([friendsIds containsObject:[mapAnnotation.fbUser objectForKey:kId]]){
-//            [[DataManager shared].chatPoints addObject:mapAnnotation];
-//        }
-//    }
-//    [friendsIds release];
-//    //
-//    // add all checkins
-//    for(UserAnnotation *checkinAnnotatin in [DataManager shared].allCheckins){
-//        if(![[DataManager shared].chatPoints containsObject:checkinAnnotatin]){
-//            [[DataManager shared].chatPoints addObject:checkinAnnotatin];
-//        }
-//    }
     [dataStorage showFriendsDataFromStorage];
     
     [self refresh];
@@ -321,14 +276,6 @@
 }
 
 - (void)refresh{
-
-    // add new
-    // sort chat messaged due to created date
-//	NSSortDescriptor *sortDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"createdAt" ascending: NO] autorelease];
-//	NSArray* sortedArray = [[DataManager shared].chatPoints sortedArrayUsingDescriptors:[NSArray arrayWithObject:sortDescriptor]];
-//
-//	[[DataManager shared].chatPoints removeAllObjects];
-//	[[DataManager shared].chatPoints addObjectsFromArray:sortedArray];
     
     [dataStorage refreshDataFromStorage];
 	
@@ -917,8 +864,11 @@
         [self showWorld];
 }
 
--(void)doReceiveUserProfilePictures{
-    [self addUserPicturesToPanel];
+-(void)doReceiveUserProfilePictures:(NSNotification*)notification{
+    NSString* context = [notification.userInfo objectForKey:@"context"];
+    if ([context isEqualToString:@"ChatRoomsController"] && [dataStorage isKindOfClass:[ChatRoomsStorage class]]) {
+        [self addUserPicturesToPanel];
+    }
 }
 
 -(void)doWillSetAllFriendsSwitchEnabled:(NSNotification*)notification{
@@ -994,22 +944,18 @@
 
         // New messages
         if (toTop){
-//            [[DataManager shared].allChatPoints insertObject:message atIndex:0];
             [dataStorage insertObjectToAllData:message atIndex:0];
             
             if([self isAllShowed] || [friendsIds containsObject:message.fbUserId] ||
                
                [message.fbUserId isEqualToString:[DataManager shared].currentFBUserId]){
                 
-//                [[DataManager shared].chatPoints insertObject:message atIndex:0];
                 [dataStorage insertObjectToPartialData:message atIndex:0];
                 addedToCurrentChatState = YES;
             }
 
             // old messages
         }else {
-//            [[DataManager shared].allChatPoints insertObject:message atIndex:[[DataManager shared].allChatPoints count] > 0 ?
-//                                                                            ([[DataManager shared].allChatPoints count]-1) : 0];
             [dataStorage insertObjectToAllData:message atIndex:([dataStorage allDataCount] > 0) ?
                                                                                         ([dataStorage allDataCount]-1):
                                                                                         0];
@@ -1017,7 +963,6 @@
             if([self isAllShowed] || [friendsIds containsObject:message.fbUserId] ||
                [message.fbUserId isEqualToString:[DataManager shared].currentFBUserId]){
                 
-//                [[DataManager shared].chatPoints insertObject:message atIndex:[[DataManager shared].chatPoints count] > 0 ? ([[DataManager shared].chatPoints count]-1) : 0];
                 [dataStorage insertObjectToPartialData:message atIndex:[dataStorage storageCount] > 0 ? ([dataStorage storageCount]-1): 0];
                 addedToCurrentChatState = YES;
             }
@@ -1033,12 +978,11 @@
 
     // Save to cache
     //
-    if(!isFBCheckin){
+    if(!isFBCheckin && [dataStorage needsCaching]){
         [[DataManager shared] addChatMessageToStorage:message];
     }
     
     self.messagesTableView.tag = 0;
-
 }
 
 -(void)doRemoveLastChatPoint{

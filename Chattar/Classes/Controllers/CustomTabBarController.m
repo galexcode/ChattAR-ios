@@ -289,6 +289,10 @@
 #pragma mark -
 #pragma mark ChatRoomsDataDelegate methods
 
+-(void)didReceiveMessage{
+    [[NSNotificationCenter defaultCenter] postNotificationName:kDidReceiveMessage object:nil];
+}
+
 -(void)didReceiveChatRooms:(NSArray *)chatRooms{
     if (chatRooms.count) {
         if (![DataManager shared].qbChatRooms) {
@@ -359,7 +363,8 @@
 }
 
 -(void)didReceiveUserProfilePictures{
-    [[NSNotificationCenter defaultCenter] postNotificationName:kDidReceiveUserProfilePicturesURL object:nil];
+    NSDictionary* contextDict = [NSDictionary dictionaryWithObject:@"ChatRoomsController" forKey:@"context"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kDidReceiveUserProfilePicturesURL object:nil userInfo:contextDict];
 }
 
 -(void)retrieveNearbyRoomsStorage{
