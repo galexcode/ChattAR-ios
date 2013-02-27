@@ -28,4 +28,8 @@
 -(void)insertObjectToAllData:(UserAnnotation*)object atIndex:(NSInteger)index;
 -(void)insertObjectToPartialData:(UserAnnotation*)object atIndex:(NSInteger)index;
 -(void)removeAllPartialData;
+
+-(void)createDataInStorage:(NSDictionary*)data;
+
+@property (nonatomic, assign)BOOL needsCaching;
 @end

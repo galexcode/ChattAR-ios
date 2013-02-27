@@ -10,6 +10,7 @@
 
 @implementation Storage
 
+@synthesize needsCaching;
                         // MUST reimplement this methods in subclasses
 -(BOOL)isStorageEmpty{
     return NO;
@@ -54,6 +55,10 @@
     
 }
 -(void)removeAllPartialData{
+    
+}
+
+-(void)createDataInStorage:(NSDictionary *)data{
     
 }
 
