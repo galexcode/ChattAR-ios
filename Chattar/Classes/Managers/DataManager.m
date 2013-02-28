@@ -853,7 +853,8 @@ static DataManager *instance = nil;
 #pragma mark ChatRooms methods
 -(QBChatRoom*)findQBRoomWithName:(NSString *)roomName{
     for (QBChatRoom* room in qbChatRooms) {
-        if ([room.roomName isEqualToString:roomName]) {
+        NSString* nonXMPPName = [Helper createTitleFromXMPPTitle:room.roomName];
+        if ([nonXMPPName isEqualToString:roomName]) {
             return room;
         }
     }
@@ -862,7 +863,7 @@ static DataManager *instance = nil;
 
 -(ChatRoom*)findRoomWithAdditionalInfo:(NSString *)roomName{
     for (ChatRoom* room in roomsWithAdditionalInfo) {
-        if ([room.xmppName isEqualToString:roomName]) {
+        if ([room.roomName isEqualToString:roomName]) {
             return room;
         }
     }
@@ -871,7 +872,9 @@ static DataManager *instance = nil;
 }
 -(BOOL)roomWithNameHasAdditionalInfo:(NSString*)roomName{
     for (ChatRoom* room in [DataManager shared].roomsWithAdditionalInfo) {
-        if ([room.xmppName isEqualToString:roomName]) {
+        
+        NSString* nonXMPPName = [Helper createTitleFromXMPPTitle:roomName];
+        if ([room.roomName isEqualToString:nonXMPPName]) {
             return YES;
         }
     }

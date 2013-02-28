@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "UserAnnotation.h"
 #import "ChatRoom.h"
+#import "Helper.h"
+
 #define maxPopularFriends 40
 
 @interface DataManager : NSObject{
