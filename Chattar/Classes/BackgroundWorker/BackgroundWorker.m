@@ -89,7 +89,7 @@ static BackgroundWorker* instance = nil;
 }
 
 -(void)sendMessage:(NSString*)message{
-    QBChatRoom* room = [[DataManager shared] findQBRoomWithName:[DataManager shared].currentChatRoom.xmppName];
+    QBChatRoom* room = [[DataManager shared] findQBRoomWithName:[DataManager shared].currentChatRoom.roomName];
     [[QBChat instance] sendMessage:message toRoom:room];
 }
 
@@ -481,7 +481,7 @@ static BackgroundWorker* instance = nil;
                 UserAnnotation *chatAnnotation = [checkinAnnotation copy];
                 
                 if ([tabBarDelegate respondsToSelector:@selector(willAddNewMessageToChat:addToTop:withReloadTable:isFBCheckin:)]) {
-                    [tabBarDelegate willAddNewMessageToChat:chatAnnotation addToTop:NO withReloadTable:NO isFBCheckin:YES];
+                    [tabBarDelegate willAddNewMessageToChat:chatAnnotation addToTop:NO withReloadTable:NO isFBCheckin:YES viewControllerIdentifier:chatViewControllerIdentifier];
                 }
                 
                 previousPlaceID = [place objectForKey:kId];
@@ -500,8 +500,8 @@ static BackgroundWorker* instance = nil;
     
     // refresh chat
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([tabBarDelegate respondsToSelector:@selector(willUpdate)]) {
-            [tabBarDelegate willUpdate];
+        if ([tabBarDelegate respondsToSelector:@selector(willUpdateViewControllerIdentifier:)]) {
+            [tabBarDelegate willUpdateViewControllerIdentifier:chatViewControllerIdentifier];
         }
         
         if ([tabBarDelegate respondsToSelector:@selector(willUpdateMarkersForCenterLocation)]) {
@@ -642,13 +642,13 @@ static BackgroundWorker* instance = nil;
 
         // show Message on Chat
         if ([tabBarDelegate respondsToSelector:@selector(willAddNewMessageToChat:addToTop:withReloadTable:isFBCheckin:)]) {
-            [tabBarDelegate willAddNewMessageToChat:chatAnnotation addToTop:NO withReloadTable:NO isFBCheckin:NO];
+            [tabBarDelegate willAddNewMessageToChat:chatAnnotation addToTop:NO withReloadTable:NO isFBCheckin:NO viewControllerIdentifier:chatViewControllerIdentifier];
         }
     }
     NSLog(@"CHAT INIT reloadData");
     dispatch_async(dispatch_get_main_queue(), ^{       
-        if ([tabBarDelegate respondsToSelector:@selector(willUpdate)]) {
-            [tabBarDelegate willUpdate];
+        if ([tabBarDelegate respondsToSelector:@selector(willUpdateViewControllerIdentifier:)]) {
+            [tabBarDelegate willUpdateViewControllerIdentifier:chatViewControllerIdentifier];
         }
     });
     
@@ -662,12 +662,12 @@ static BackgroundWorker* instance = nil;
     NSLog(@"CHAT INIT OK");
     if(self.chatInitState == 1){
         dispatch_async( dispatch_get_main_queue(), ^{
-            if ([tabBarDelegate respondsToSelector:@selector(willSetAllFriendsSwitchEnabled:)]) {
-                [tabBarDelegate willSetAllFriendsSwitchEnabled:YES];
+            if ([tabBarDelegate respondsToSelector:@selector(willSetAllFriendsSwitchEnabled:InViewControllerWithIdentifier:)]) {
+                [tabBarDelegate willSetAllFriendsSwitchEnabled:YES InViewControllerWithIdentifier:chatViewControllerIdentifier];
             }
 
-            if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialData)]) {
-                [tabBarDelegate chatEndOfRetrievingInitialData];
+            if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:)]) {
+                [tabBarDelegate chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:chatViewControllerIdentifier];
             }
         });
         self.chatInitState = 0;
@@ -784,7 +784,7 @@ static BackgroundWorker* instance = nil;
                 // empty
                 if([geoDataSearchResult.geodata count] == 0){
                     if ([tabBarDelegate respondsToSelector:@selector(didNotReceiveNewChatPoints)]) {
-                        [tabBarDelegate didNotReceiveNewChatPoints];
+                        [tabBarDelegate didNotReceiveNewChatPointsForViewControllerWithIdentifier:chatViewControllerIdentifier];
                     }
                     return;
                 }
@@ -897,7 +897,7 @@ static BackgroundWorker* instance = nil;
                 }
                 if([fbChatUsersIds count] == 0){
                     if ([tabBarDelegate respondsToSelector:@selector(didNotReceiveNewFBChatUsers)]) {
-                        [tabBarDelegate didNotReceiveNewFBChatUsers];
+                        [tabBarDelegate didNotReceiveNewFBChatUsersInViewControllerWithIdentifier:chatViewControllerIdentifier];
                     }
                     [fbChatUsersIds release];
                     return;
@@ -1007,7 +1007,7 @@ static BackgroundWorker* instance = nil;
         
         
         if ([tabBarDelegate respondsToSelector:@selector(willClearMessageField)]) {
-            [tabBarDelegate willClearMessageField];
+            [tabBarDelegate willClearMessageFieldInViewControllerWithIdentifier:chatViewControllerIdentifier];
         }
         
         // add new Annotation to map/chat/ar
@@ -1015,11 +1015,11 @@ static BackgroundWorker* instance = nil;
                                                                                  withGeoData:geoDataRes.geoData addToTop:YES withReloadTable:YES];
         
         if ([tabBarDelegate respondsToSelector:@selector(didSuccessfulMessageSending)]) {
-            [tabBarDelegate didSuccessfulMessageSending];
+            [tabBarDelegate didSuccessfulMessageSendingInViewControllerWithIdentifier:chatViewControllerIdentifier];
         }
         
         if ([tabBarDelegate respondsToSelector:@selector(willScrollToTop)]) {
-            [tabBarDelegate willScrollToTop];
+            [tabBarDelegate willScrollToTopInViewControllerWithIdentifier:chatViewControllerIdentifier];
         }
         
     }
@@ -1034,7 +1034,7 @@ static BackgroundWorker* instance = nil;
     else if ([result isKindOfClass:[QBCOCustomObjectPagedResult class]]){
         QBCOCustomObjectPagedResult *getObjectsResult = (QBCOCustomObjectPagedResult *)result;
         if ([tabBarDelegate respondsToSelector:@selector(didReceiveAdditionalServerInfo:)]) {
-            [tabBarDelegate didReceiveAdditionalServerInfo:getObjectsResult.objects];
+            [tabBarDelegate didReceiveAdditionalServerInfo:getObjectsResult.objects ];
         }
     }
     
@@ -1143,7 +1143,7 @@ static BackgroundWorker* instance = nil;
                             }
 
                             if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialData)]) {
-                                [tabBarDelegate chatEndOfRetrievingInitialData];
+                                [tabBarDelegate chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:chatViewControllerIdentifier];
                             }
                             self.chatInitState = 0;
                         }
@@ -1171,7 +1171,7 @@ static BackgroundWorker* instance = nil;
                         }
 
                         if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialData)]) {
-                            [tabBarDelegate chatEndOfRetrievingInitialData];
+                            [tabBarDelegate chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:chatViewControllerIdentifier];
                         }
                         self.chatInitState = 0;
                     }
@@ -1181,14 +1181,14 @@ static BackgroundWorker* instance = nil;
             }
             else if ([context isKindOfClass:[NSArray class]]){                
                 if ([tabBarDelegate respondsToSelector:@selector(willRemoveLastChatPoint)]) {
-                    [tabBarDelegate willRemoveLastChatPoint];
+                    [tabBarDelegate willRemoveLastChatPointForViewControllerWithIdentifier:chatViewControllerIdentifier];
                 }
                 
                 if([result.body isKindOfClass:NSDictionary.class]){
                     NSDictionary *resultError = [result.body objectForKey:kError];
                     if(resultError != nil){
                         if ([tabBarDelegate respondsToSelector:@selector(didReceiveErrorLoadingNewChatPoints)]) {
-                            [tabBarDelegate didReceiveErrorLoadingNewChatPoints];
+                            [tabBarDelegate didReceiveErrorLoadingNewChatPointsForViewControllerWithIdentifier:chatViewControllerIdentifier];
                         }
                         
                         return;
@@ -1216,8 +1216,8 @@ static BackgroundWorker* instance = nil;
                         
                         // refresh table
                         dispatch_async(dispatch_get_main_queue(), ^{                            
-                            if ([tabBarDelegate respondsToSelector:@selector(willUpdate)]) {
-                                [tabBarDelegate willUpdate];
+                            if ([tabBarDelegate respondsToSelector:@selector(willUpdateViewControllerIdentifier:)]) {
+                                [tabBarDelegate willUpdateViewControllerIdentifier:chatViewControllerIdentifier];
                             }
                         });
                     });
@@ -1251,12 +1251,12 @@ static BackgroundWorker* instance = nil;
                         
                         if (numberOfUserPicturesRetrieved == 0) {
                                         // notify delegate that all photos are retrieved
-                            if ([tabBarDelegate respondsToSelector:@selector(didReceiveUserProfilePictures)]) {
-                                [tabBarDelegate didReceiveUserProfilePictures];
+                            if ([tabBarDelegate respondsToSelector:@selector(didReceiveUserProfilePicturesForViewControllerWithIdentifier:)]) {
+                                [tabBarDelegate didReceiveUserProfilePicturesForViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
                             }
                             
-                            if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialData)]) {
-                                [tabBarDelegate chatEndOfRetrievingInitialData];
+                            if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:)]) {
+                                [tabBarDelegate chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
                             }
 
                         }
@@ -1555,8 +1555,8 @@ static BackgroundWorker* instance = nil;
 -(void)createAndAddNewAnnotationToChatForFBUser:(NSDictionary*)fbUser withQBChatMessage:(QBChatMessage*)message addToTop:(BOOL)toTop withReloadTable:(BOOL)reloadTable{
     UserAnnotation* newAnnotation = [[DataManager shared] convertQBMessageToUserAnnotation:message];
     
-    if ([tabBarDelegate respondsToSelector:@selector(willAddNewMessageToChat:addToTop:withReloadTable:isFBCheckin:)]) {
-        [tabBarDelegate willAddNewMessageToChat:newAnnotation addToTop:toTop withReloadTable:reloadTable isFBCheckin:NO];
+    if ([tabBarDelegate respondsToSelector:@selector(willAddNewMessageToChat:addToTop:withReloadTable:isFBCheckin:viewControllerIdentifier:)]) {
+        [tabBarDelegate willAddNewMessageToChat:newAnnotation addToTop:toTop withReloadTable:reloadTable isFBCheckin:NO viewControllerIdentifier:chatRoomsViewControllerIdentifier];
     }
 
 }
@@ -1635,7 +1635,7 @@ static BackgroundWorker* instance = nil;
     }
         
     if ([tabBarDelegate respondsToSelector:@selector(willAddNewMessageToChat:addToTop:withReloadTable:isFBCheckin:)]) {
-        [tabBarDelegate willAddNewMessageToChat:newAnnotation addToTop:toTop withReloadTable:reloadTable isFBCheckin:NO];
+        [tabBarDelegate willAddNewMessageToChat:newAnnotation addToTop:toTop withReloadTable:reloadTable isFBCheckin:NO viewControllerIdentifier:chatViewControllerIdentifier];
     }
        
     
@@ -1662,8 +1662,8 @@ static BackgroundWorker* instance = nil;
 -(void)chatDidReceiveListOfRooms:(NSArray *)rooms{
             // retain rooms
     [rooms retain];
-    if ([tabBarDelegate respondsToSelector:@selector(didReceiveChatRooms:)]) {
-        [tabBarDelegate didReceiveChatRooms:rooms];
+    if ([tabBarDelegate respondsToSelector:@selector(didReceiveChatRooms:forViewControllerWithIdentifier:)]) {
+        [tabBarDelegate didReceiveChatRooms:rooms forViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
     }
 }
 
@@ -1674,27 +1674,27 @@ static BackgroundWorker* instance = nil;
             room.messagesHistory = [[NSMutableArray alloc] init];
         }
         [room.messagesHistory addObject:message];
-    }
-    
-    if ([tabBarDelegate respondsToSelector:@selector(didReceiveMessage)]) {
-        [tabBarDelegate didReceiveMessage];
-    }
-    
-    if ([tabBarDelegate respondsToSelector:@selector(willClearMessageField)]) {
-        [tabBarDelegate willClearMessageField];
-    }
-    
-    // add new Annotation to map/chat/ar
-    [self createAndAddNewAnnotationToChatForFBUser:[DataManager shared].currentFBUser withQBChatMessage:message addToTop:YES withReloadTable:YES];
-    
-    if ([tabBarDelegate respondsToSelector:@selector(didSuccessfulMessageSending)]) {
-        [tabBarDelegate didSuccessfulMessageSending];
-    }
-    
-    if ([tabBarDelegate respondsToSelector:@selector(willScrollToTop)]) {
-        [tabBarDelegate willScrollToTop];
-    }
+        
+        if ([tabBarDelegate respondsToSelector:@selector(didReceiveMessageForViewControllerWithIdentifier:)]) {
+            [tabBarDelegate didReceiveMessageForViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+        }
+        
+        if ([tabBarDelegate respondsToSelector:@selector(willClearMessageFieldInViewControllerWithIdentifier:)]) {
+            [tabBarDelegate willClearMessageFieldInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+        }
+        
+        // add new Annotation to map/chat/ar
+        [self createAndAddNewAnnotationToChatForFBUser:[DataManager shared].currentFBUser withQBChatMessage:message addToTop:YES withReloadTable:YES];
+        
+        if ([tabBarDelegate respondsToSelector:@selector(didSuccessfulMessageSending:)]) {
+            [tabBarDelegate didSuccessfulMessageSendingInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+        }
+        
+        if ([tabBarDelegate respondsToSelector:@selector(willScrollToTop:)]) {
+            [tabBarDelegate willScrollToTopInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+        }
 
+    }
     
 }
 
@@ -1718,7 +1718,7 @@ static BackgroundWorker* instance = nil;
     }
                         // join to already existing room
     else{
-        if ([[DataManager shared].currentChatRoom.xmppName isEqualToString:room.roomName]) {
+        if ([[DataManager shared].currentChatRoom.roomName isEqualToString:room.roomName]) {
             
             if (![DataManager shared].currentChatRoom.roomUsers) {
                 [DataManager shared].currentChatRoom.roomUsers = [[NSMutableArray alloc] init];
@@ -1727,8 +1727,8 @@ static BackgroundWorker* instance = nil;
             [[DataManager shared].currentChatRoom.roomUsers addObject:[DataManager shared].currentQBUser];
         }
         
-        if ([tabBarDelegate respondsToSelector:@selector(didEnterExistingRoom)]) {
-            [tabBarDelegate didEnterExistingRoom];
+        if ([tabBarDelegate respondsToSelector:@selector(didEnterExistingRoomForViewControllerWithIdentifier:)]) {
+            [tabBarDelegate didEnterExistingRoomForViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
         }
     }
 }
@@ -1740,7 +1740,7 @@ static BackgroundWorker* instance = nil;
         static NSInteger roomsReceivedUsers = 0;
         ++roomsReceivedUsers;
         if (roomsReceivedUsers == [DataManager shared].qbChatRooms.count) {
-            [tabBarDelegate didReceiveRoomsOccupantsNumber];
+            [tabBarDelegate didReceiveRoomsOccupantsNumberForViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
         }
         [chatRoom setRoomUsers:users.mutableCopy];
     }

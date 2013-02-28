@@ -51,6 +51,8 @@
 
 @property (nonatomic, retain) Storage* dataStorage;
 
+@property (nonatomic, retain) NSString* controllerReuseIdentifier;
+
 - (IBAction)sendMessageDidPress:(id)sender;
 
 - (void)refresh;

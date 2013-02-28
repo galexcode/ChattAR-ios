@@ -93,8 +93,12 @@
     // Chat
     ChatViewController* chatViewController = [[ChatViewController alloc] initWithNibName:@"ChatViewController" bundle:nil];
     chatViewController.dataStorage = [[ChatPointsStorage alloc] init];
+    chatViewController.controllerReuseIdentifier = [[NSString alloc] initWithString:chatViewControllerIdentifier];
+    
     UINavigationController* chatNavigationController = [[UINavigationController alloc] initWithRootViewController:chatViewController];
     [chatViewController release];
+    
+    
     
     // Map
     MapViewController* mapViewController = [[MapViewController alloc] initWithNibName:@"MapViewController" bundle:nil];

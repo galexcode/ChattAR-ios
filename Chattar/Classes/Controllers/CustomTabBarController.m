@@ -169,10 +169,6 @@
         [[DataManager shared].allCheckins addObjectsFromArray:cachedCheckins];    
 }
 
--(void)didNotReceiveNewChatPoints{
-    [[NSNotificationCenter defaultCenter] postNotificationName:kDidNotReceiveNewChatPoints object:nil];
-}
-
 -(void)didReceiveError:(NSString *)errorMessage{
     NSMutableDictionary* error = [[[NSMutableDictionary alloc] init] autorelease];
     [error setObject:errorMessage forKey:@"errorMessage"];
@@ -187,57 +183,101 @@
 
 #pragma mark -
 #pragma mark ChatControllerDelegate Methods
--(void)didNotReceiveNewFBChatUsers{
-    [[NSNotificationCenter defaultCenter] postNotificationName:kDidNotReceiveNewFBChatUsers object:nil];
-}
--(void)didSuccessfulMessageSending{
-    [[NSNotificationCenter defaultCenter] postNotificationName:kDidSuccessfulMessageSending object:nil];
+
+-(void)didNotReceiveNewChatPointsForViewControllerWithIdentifier:(NSString *)identifier{
+    NSMutableDictionary* context = [NSMutableDictionary dictionary];
+    [context setObject:identifier forKey:@"context"];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:kDidNotReceiveNewChatPoints object:nil userInfo:context];
 }
 
--(void)willRemoveLastChatPoint{
-    [[NSNotificationCenter defaultCenter] postNotificationName:kWillRemoveLastChatPoint object:nil];
+
+-(void)didNotReceiveNewFBChatUsersInViewControllerWithIdentifier:(NSString *)identifier{
+    NSMutableDictionary* context = [NSMutableDictionary dictionary];
+    [context setObject:identifier forKey:@"context"];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kDidNotReceiveNewFBChatUsers object:nil userInfo:context];
+}
+-(void)didSuccessfulMessageSendingInViewControllerWithIdentifier:(NSString *)identifier{
+    NSMutableDictionary* context = [NSMutableDictionary dictionary];
+    [context setObject:identifier forKey:@"context"];
+    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:kDidSuccessfulMessageSending object:nil userInfo:context];
 }
 
--(void)didReceiveErrorLoadingNewChatPoints{
-    [[NSNotificationCenter defaultCenter] postNotificationName:kdidReceiveErrorLoadingNewChatPoints object:nil];
+-(void)willRemoveLastChatPointForViewControllerWithIdentifier:(NSString *)identifier{
+    NSMutableDictionary* context = [NSMutableDictionary dictionary];
+    [context setObject:identifier forKey:@"context"];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kWillRemoveLastChatPoint object:nil userInfo:context];
 }
 
--(void)willUpdate{
-    [[NSNotificationCenter defaultCenter] postNotificationName:kWillUpdate object:nil];
+-(void)didReceiveErrorLoadingNewChatPointsForViewControllerWithIdentifier:(NSString *)identifier{
+    NSMutableDictionary* context = [NSMutableDictionary dictionary];
+    [context setObject:identifier forKey:@"context"];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kdidReceiveErrorLoadingNewChatPoints object:nil userInfo:context];
 }
 
--(void)willClearMessageField{
-    [[NSNotificationCenter defaultCenter] postNotificationName:kWillClearMessageField object:nil];
+-(void)willUpdateViewControllerIdentifier:(NSString *)identifier{
+    NSMutableDictionary* context = [NSMutableDictionary dictionary];
+    [context setObject:identifier forKey:@"context"];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kWillUpdate object:nil userInfo:context];
 }
 
--(void)willSetAllFriendsSwitchEnabled:(BOOL)switchEnabled{
+-(void)willClearMessageFieldInViewControllerWithIdentifier:(NSString *)identifier{
+    NSMutableDictionary* context = [NSMutableDictionary dictionary];
+    [context setObject:identifier forKey:@"context"];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kWillClearMessageField object:nil userInfo:context];
+}
+
+-(void)willSetAllFriendsSwitchEnabled:(BOOL)switchEnabled InViewControllerWithIdentifier:(NSString *)identifier{
     NSMutableDictionary* data = [[[NSMutableDictionary alloc] init] autorelease];
     [data setObject:[NSNumber numberWithBool:switchEnabled] forKey:@"switchEnabled"];
+    [data setObject:identifier forKey:@"context"];
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:kWillSetAllFriendsSwitchEnabled object:nil userInfo:data];
 }
 
--(void)willAddNewMessageToChat:(UserAnnotation *)annotation addToTop:(BOOL)toTop withReloadTable:(BOOL)reloadTable isFBCheckin:(BOOL)isFBCheckin{
+-(void)willAddNewMessageToChat:(UserAnnotation *)annotation
+                   addToTop:(BOOL)toTop
+                   withReloadTable:(BOOL)reloadTable
+                   isFBCheckin:(BOOL)isFBCheckin
+                   viewControllerIdentifier:(NSString *)identifier{
+    
     NSMutableDictionary* newMessageData = [[[NSMutableDictionary alloc] init] autorelease];
     [newMessageData setObject:annotation forKey:@"newMessage"];
     [newMessageData setObject:[NSNumber numberWithBool:toTop] forKey:@"addToTop"];
     [newMessageData setObject:[NSNumber numberWithBool:reloadTable] forKey:@"reloadTable"];
     [newMessageData setObject:[NSNumber numberWithBool:isFBCheckin] forKey:@"isFBCheckin"];
+    [newMessageData setObject:identifier forKey:@"context"];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:kWillAddNewMessageToChat object:nil userInfo:newMessageData];
 }
 
--(void)willScrollToTop{
-    [[NSNotificationCenter defaultCenter] postNotificationName:kWillScrollToTop object:nil];
+-(void)willScrollToTopInViewControllerWithIdentifier:(NSString *)identifier{
+    NSMutableDictionary* context = [NSMutableDictionary dictionary];
+    [context setObject:identifier forKey:@"context"];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kWillScrollToTop object:nil userInfo:context];
 }
 
--(void)willSetEnabledMessageField:(BOOL)enabled{
+-(void)willSetEnabledMessageField:(BOOL)enabled viewControllerWithIdentifier:(NSString *)identifier{
     NSMutableDictionary* data = [[[NSMutableDictionary alloc] init] autorelease];
     [data setObject:[NSNumber numberWithBool:enabled] forKey:@"messageFieldEnabled"];
+    [data setObject:identifier forKey:@"context"];
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:kWillSetMessageFieldEnabled object:nil userInfo:data];
 }
 
--(void)chatEndOfRetrievingInitialData{
-    [[NSNotificationCenter defaultCenter] postNotificationName:kChatEndOfRetrievingInitialData object:nil];
+-(void)chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:(NSString *)identifier{
+    NSMutableDictionary* context = [NSMutableDictionary dictionary];
+    [context setObject:identifier forKey:@"context"];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kChatEndOfRetrievingInitialData object:nil userInfo:context];
 }
 
 #pragma mark -
@@ -289,12 +329,19 @@
 #pragma mark -
 #pragma mark ChatRoomsDataDelegate methods
 
--(void)didReceiveMessage{
-    [[NSNotificationCenter defaultCenter] postNotificationName:kDidReceiveMessage object:nil];
+-(void)didReceiveMessageForViewControllerWithIdentifier:(NSString *)identifier{
+    NSMutableDictionary* context = [NSMutableDictionary dictionary];
+    [context setObject:identifier forKey:@"context"];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kDidReceiveMessage object:nil userInfo:context];
 }
 
--(void)didReceiveChatRooms:(NSArray *)chatRooms{
+-(void)didReceiveChatRooms:(NSArray *)chatRooms forViewControllerWithIdentifier:(NSString *)identifier{
     if (chatRooms.count) {
+        
+        NSMutableDictionary* context = [NSMutableDictionary dictionary];
+        [context setObject:identifier forKey:@"context"];
+        
         if (![DataManager shared].qbChatRooms) {
             [DataManager shared].qbChatRooms = [[NSMutableArray alloc] init];
         }
@@ -305,30 +352,31 @@
             }
         }
 
-        [self prepareDataForDisplaying];
+        
+        // get number of users for all rooms
+        [[BackgroundWorker instance] retrieveNumberOfUsersInEachRoom];
+        
+        // get distances from rooms to current user location
+        [[BackgroundWorker instance] calculateDistancesForEachRoom];
+        
+        [self retrieveNearbyRoomsStorage];
+        
+        // sort depending on rating value
+        
+        #warning TODO:implement calculating rooms ratings
+        
+        [self retrieveTrendingRoomsStorage];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:kDataIsReadyForDisplaying object:nil userInfo:context];
+
     }
 }
 
--(void)didEnterExistingRoom{
-    [[NSNotificationCenter defaultCenter] postNotificationName:kNeedToDisplayChatRoomController object:nil];
-}
+-(void)didEnterExistingRoomForViewControllerWithIdentifier:(NSString *)identifier{
+    NSMutableDictionary* context = [NSMutableDictionary dictionary];
+    [context setObject:identifier forKey:@"context"];
 
--(void)prepareDataForDisplaying{
-    // get number of users for all rooms
-    [[BackgroundWorker instance] retrieveNumberOfUsersInEachRoom];
-    
-    // get distances from rooms to current user location
-    [[BackgroundWorker instance] calculateDistancesForEachRoom];
-    
-    [self retrieveNearbyRoomsStorage];
-    
-    // sort depending on rating value
-    
-    #warning TODO:implement calculating rooms ratings
-    
-    [self retrieveTrendingRoomsStorage];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:kDataIsReadyForDisplaying object:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kNeedToDisplayChatRoomController object:nil userInfo:context];
 }
 
 -(void)didReceiveRoomsOccupantsNumber{
@@ -353,7 +401,15 @@
         roomObject.ownerLocation = CLLocationCoordinate2DMake(latitude, longitude);
         
         roomObject.roomID = object.ID;
-        roomObject.xmppName = [object.fields objectForKey:@"xmppName"];
+        
+        if ([Helper checkSymbol:@"@" inString:[object.fields objectForKey:@"xmppName"]]) {
+            NSArray* splittedStrings = [[object.fields objectForKey:@"xmppName"] componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"@"]];
+            roomObject.roomName = [splittedStrings objectAtIndex:0];
+        }
+        else{
+            roomObject.roomName = [object.fields objectForKey:@"xmppName"];
+        }
+        
         roomObject.roomRating = INITIAL_CHATROOM_RATING;
         
         [[DataManager shared].roomsWithAdditionalInfo addObject:roomObject];
@@ -362,9 +418,11 @@
     [[BackgroundWorker instance] requestAllChatRooms];
 }
 
--(void)didReceiveUserProfilePictures{
-    NSDictionary* contextDict = [NSDictionary dictionaryWithObject:@"ChatRoomsController" forKey:@"context"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:kDidReceiveUserProfilePicturesURL object:nil userInfo:contextDict];
+-(void)didReceiveUserProfilePicturesForViewControllerWithIdentifier:(NSString *)identifier{
+    NSMutableDictionary* context = [NSMutableDictionary dictionary];
+    [context setObject:identifier forKey:@"context"];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kDidReceiveUserProfilePicturesURL object:nil userInfo:context];
 }
 
 -(void)retrieveNearbyRoomsStorage{

@@ -68,7 +68,8 @@
 // Flurry
 #define FLURRY_API_KEY @"KMD7NSM4DF344W9JVCGN"
 #define FLURRY_EVENT_USER_DID_LOGIN @"User did login"
-
+#define chatViewControllerIdentifier @"chatViewControllerIdentifier"
+#define chatRoomsViewControllerIdentifier @"chatRoomsViewControllerIdentifier" 
 // Tab bar indexes enum
 enum TabbarIndexes {
     chatIndex = 0, mapIndex,radarIndex,dialogsIndex

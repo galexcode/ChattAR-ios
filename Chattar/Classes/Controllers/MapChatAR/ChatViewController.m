@@ -26,6 +26,7 @@
 @synthesize quoteMark, quotePhotoTop;
 @synthesize delegate;
 @synthesize dataStorage;
+@synthesize controllerReuseIdentifier;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -37,30 +38,29 @@
 
                     // logout
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(logoutDone) name:kNotificationLogout object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doUpdate) name:kWillUpdate object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doScrollToTop) name:kWillScrollToTop object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doClearMessageField) name:kWillClearMessageField object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doRemoveLastChatPoint) name:kWillRemoveLastChatPoint object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doUpdate:) name:kWillUpdate object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doScrollToTop:) name:kWillScrollToTop object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doClearMessageField:) name:kWillClearMessageField object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doRemoveLastChatPoint:) name:kWillRemoveLastChatPoint object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAddNewPointToChat:) name:kWillAddNewMessageToChat object:nil ];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doNotReceiveNewChatPoints) name:kDidNotReceiveNewChatPoints object:nil ];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveErrorLoadingNewChatPoints) name:kdidReceiveErrorLoadingNewChatPoints object:nil ];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doSuccessfulMessageSending) name:kDidSuccessfulMessageSending object:nil ];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doNotReceiveNewChatPoints:) name:kDidNotReceiveNewChatPoints object:nil ];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveErrorLoadingNewChatPoints:) name:kdidReceiveErrorLoadingNewChatPoints object:nil ];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doSuccessfulMessageSending:) name:kDidSuccessfulMessageSending object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doShowAllFriends) name:kWillShowAllFriends object:nil ];
 
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChatEndRetrievingData) name:kChatEndOfRetrievingInitialData object:nil ];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChatEndRetrievingData:) name:kChatEndOfRetrievingInitialData object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetAllFriendsSwitchEnabled:) name:kWillSetAllFriendsSwitchEnabled object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetMessageFieldEnabled:) name:kWillSetMessageFieldEnabled object:nil ];
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChatNotReceiveNewFBChatUsers) name:kDidNotReceiveNewFBChatUsers object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChatNotReceiveNewFBChatUsers:) name:kDidNotReceiveNewFBChatUsers object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doClearCache) name:kDidClearCache object:nil];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveUserProfilePictures:) name:kDidReceiveUserProfilePicturesURL object:nil];
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveUserProfilePictures:) name:kDidReceiveMessage object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAddNewPointToChat:) name:kDidReceiveMessage object:nil];
     }
     return self;
 }
-
 
 - (void)viewDidLoad
 {
@@ -130,6 +130,7 @@
 
 - (void)dealloc {
     [dataStorage release];
+    [controllerReuseIdentifier release];
     [super dealloc];
 }
 
@@ -853,156 +854,206 @@
     [self.messagesTableView reloadData];
 }
 
--(void)doChatNotReceiveNewFBChatUsers{
-    [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
-    [self refresh];
+-(void)doChatNotReceiveNewFBChatUsers:(NSNotification*)notification{
+    NSString* context = [notification.userInfo objectForKey:@"context"];
     
-    if ([self.allFriendsSwitch value] == friendsValue) {
-        [self showFriends];
+    if ([context isEqualToString:self.controllerReuseIdentifier]) {
+        [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
+        [self refresh];
+        
+        if ([self.allFriendsSwitch value] == friendsValue) {
+            [self showFriends];
+        }
+        else
+            [self showWorld];
     }
-    else
-        [self showWorld];
+    
 }
 
 -(void)doReceiveUserProfilePictures:(NSNotification*)notification{
     NSString* context = [notification.userInfo objectForKey:@"context"];
-    if ([context isEqualToString:@"ChatRoomsController"] && [dataStorage isKindOfClass:[ChatRoomsStorage class]]) {
+    
+    if ([context isEqualToString:self.controllerReuseIdentifier] && [self.controllerReuseIdentifier isEqualToString:chatRoomsViewControllerIdentifier]) {
         [self addUserPicturesToPanel];
     }
 }
 
 -(void)doWillSetAllFriendsSwitchEnabled:(NSNotification*)notification{
-    BOOL enabled = [[[notification userInfo] objectForKey:@"switchEnabled"] boolValue];
-    [self.allFriendsSwitch setEnabled:enabled];
+    NSString* context = [notification.userInfo objectForKey:@"context"];
+    
+    if ([context isEqualToString:self.controllerReuseIdentifier]) {
+        BOOL enabled = [[[notification userInfo] objectForKey:@"switchEnabled"] boolValue];
+        [self.allFriendsSwitch setEnabled:enabled];
+    }
 }
 
 -(void)doWillSetMessageFieldEnabled:(NSNotification*)notification{
-    BOOL enabled = [[[notification userInfo] objectForKey:@"messageFieldEnabled"] boolValue];
-    [messageField setEnabled:enabled];
+    NSString* context = [notification.userInfo objectForKey:@"context"];
+
+    if ([context isEqualToString:self.controllerReuseIdentifier]) {
+        BOOL enabled = [[[notification userInfo] objectForKey:@"messageFieldEnabled"] boolValue];
+        [messageField setEnabled:enabled];
+    }
 }
 
 -(void)doShowAllFriends{
     [self showWorld];
 }
--(void)doSuccessfulMessageSending{
-    [sendMessageActivityIndicator stopAnimating];
-    messageField.rightView = nil;
-    quotePhotoTop = nil;
-}
-
--(void)doChatEndRetrievingData{
-    messageField.enabled = YES;
-    isDataRetrieved = YES;
-            
-    [self.allFriendsSwitch setEnabled:YES];
-    [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
+-(void)doSuccessfulMessageSending:(NSNotification*)notification{
+    NSString* context = [notification.userInfo objectForKey:@"context"];
     
-    [self refresh];
-    
-    if ([self.allFriendsSwitch value] == friendsValue) {
-        [self showFriends];
-    }
-    else
-        [self showWorld];
-
-}
-
--(void)doUpdate{
-    [self refresh];
-}
-
--(void)doScrollToTop{
-    // scroll to top
-    if(/*[DataManager shared].chatPoints.count*/ [dataStorage storageCount]> 0){
-        [messagesTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+    if ([context isEqualToString:self.controllerReuseIdentifier]) {
+        [sendMessageActivityIndicator stopAnimating];
+        messageField.rightView = nil;
+        quotePhotoTop = nil;
     }
 }
 
--(void)doClearMessageField{
-    // clear text
-    messageField.text = @"";
-    [messageField resignFirstResponder];
+-(void)doChatEndRetrievingData:(NSNotification*)notification{
+    NSString* context = [notification.userInfo objectForKey:@"context"];
+
+    if ([context isEqualToString:self.controllerReuseIdentifier]) {
+        messageField.enabled = YES;
+        isDataRetrieved = YES;
+        
+        [self.allFriendsSwitch setEnabled:YES];
+        [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
+        
+        [self refresh];
+        
+        if ([self.allFriendsSwitch value] == friendsValue) {
+            [self showFriends];
+        }
+        else
+            [self showWorld];
+        
+    }
+}
+
+-(void)doUpdate:(NSNotification*)notification{
+    NSString* context = [notification.userInfo objectForKey:@"context"];
+    if ([context isEqualToString:self.controllerReuseIdentifier]) {
+        [self refresh];
+    }
+}
+
+-(void)doScrollToTop:(NSNotification*)notification{
+    NSString* context = [notification.userInfo objectForKey:@"context"];
+    
+                // if this is action not for this controller skip it
+    if ([context isEqualToString:self.controllerReuseIdentifier]) {
+        // scroll to top
+        if([dataStorage storageCount]> 0){
+            [messagesTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+        }
+
+    }
+}
+
+-(void)doClearMessageField:(NSNotification*)notification{
+    NSString* context = [notification.userInfo objectForKey:@"context"];
+    
+    if ([context isEqualToString:self.controllerReuseIdentifier]) {
+        // clear text
+        messageField.text = @"";
+        [messageField resignFirstResponder];
+    }
 }
 
 -(void)doAddNewPointToChat:(NSNotification*) notification{
-    UserAnnotation* message = [notification.userInfo objectForKey:@"newMessage"];
-    BOOL toTop = [[notification.userInfo objectForKey:@"addToTop"] boolValue];
-    BOOL reloadTable = [[notification.userInfo objectForKey:@"reloadTable"] boolValue];
-    BOOL isFBCheckin = [[notification.userInfo objectForKey:@"isFBCheckin"] boolValue];
-    self.messagesTableView.tag = tableIsUpdating;
-
-    if(message.geoDataID != -1){
-       [[DataManager shared].chatMessagesIDs addObject:[NSString stringWithFormat:@"%d", message.geoDataID]];
-    }
-
-    NSArray *friendsIds = [[DataManager shared].myFriendsAsDictionary allKeys];
-
-    // Add to Chat
-    __block BOOL addedToCurrentChatState = NO;
+    NSString* context = [notification.userInfo objectForKey:@"context"];
     
-    dispatch_async( dispatch_get_main_queue(), ^{
-
-        // New messages
-        if (toTop){
-            [dataStorage insertObjectToAllData:message atIndex:0];
-            
-            if([self isAllShowed] || [friendsIds containsObject:message.fbUserId] ||
-               
-               [message.fbUserId isEqualToString:[DataManager shared].currentFBUserId]){
-                
-                [dataStorage insertObjectToPartialData:message atIndex:0];
-                addedToCurrentChatState = YES;
-            }
-
-            // old messages
-        }else {
-            [dataStorage insertObjectToAllData:message atIndex:([dataStorage allDataCount] > 0) ?
-                                                                                        ([dataStorage allDataCount]-1):
-                                                                                        0];
-            
-            if([self isAllShowed] || [friendsIds containsObject:message.fbUserId] ||
-               [message.fbUserId isEqualToString:[DataManager shared].currentFBUserId]){
-                
-                [dataStorage insertObjectToPartialData:message atIndex:[dataStorage storageCount] > 0 ? ([dataStorage storageCount]-1): 0];
-                addedToCurrentChatState = YES;
-            }
+    if ([context isEqualToString:self.controllerReuseIdentifier]) {
+        
+        UserAnnotation* message = [notification.userInfo objectForKey:@"newMessage"];
+        BOOL toTop = [[notification.userInfo objectForKey:@"addToTop"] boolValue];
+        BOOL reloadTable = [[notification.userInfo objectForKey:@"reloadTable"] boolValue];
+        BOOL isFBCheckin = [[notification.userInfo objectForKey:@"isFBCheckin"] boolValue];
+        self.messagesTableView.tag = tableIsUpdating;
+        
+        if(message.geoDataID != -1){
+            [[DataManager shared].chatMessagesIDs addObject:[NSString stringWithFormat:@"%d", message.geoDataID]];
         }
+        
+        NSArray *friendsIds = [[DataManager shared].myFriendsAsDictionary allKeys];
+        
+        // Add to Chat
+        __block BOOL addedToCurrentChatState = NO;
+        
+        dispatch_async( dispatch_get_main_queue(), ^{
+            
+            // New messages
+            if (toTop){
+                [dataStorage insertObjectToAllData:message atIndex:0];
+                
+                if([self isAllShowed] || [friendsIds containsObject:message.fbUserId] ||
+                   
+                   [message.fbUserId isEqualToString:[DataManager shared].currentFBUserId]){
+                    
+                    [dataStorage insertObjectToPartialData:message atIndex:0];
+                    addedToCurrentChatState = YES;
+                }
+                
+                // old messages
+            }else {
+                [dataStorage insertObjectToAllData:message atIndex:([dataStorage allDataCount] > 0) ?
+                 ([dataStorage allDataCount]-1):
+                 0];
+                
+                if([self isAllShowed] || [friendsIds containsObject:message.fbUserId] ||
+                   [message.fbUserId isEqualToString:[DataManager shared].currentFBUserId]){
+                    
+                    [dataStorage insertObjectToPartialData:message atIndex:[dataStorage storageCount] > 0 ? ([dataStorage storageCount]-1): 0];
+                    addedToCurrentChatState = YES;
+                }
+            }
+            //
+            if(addedToCurrentChatState && reloadTable){
+                // on main thread
+                
+                [self.messagesTableView reloadData];
+                
+            }
+        });
+        
+        // Save to cache
         //
-        if(addedToCurrentChatState && reloadTable){
-            // on main thread
-
-            [self.messagesTableView reloadData];
-
+        if(!isFBCheckin && [dataStorage needsCaching] && [dataStorage isKindOfClass:[ChatRoomsStorage class]]){
+            [[DataManager shared] addChatMessageToStorage:message];
         }
-    });
+        
+        self.messagesTableView.tag = 0;
 
-    // Save to cache
-    //
-    if(!isFBCheckin && [dataStorage needsCaching]){
-        [[DataManager shared] addChatMessageToStorage:message];
+    }
+}
+
+-(void)doRemoveLastChatPoint:(NSNotification*)notification{
+    NSString* context = [notification.userInfo objectForKey:@"context"];
+
+    if ([context isEqualToString:self.controllerReuseIdentifier]) {
+        if ([dataStorage storageCount] != 0) {
+            [dataStorage removeLastObjectFromStorage];
+        }
     }
     
-    self.messagesTableView.tag = 0;
 }
 
--(void)doRemoveLastChatPoint{
-//    if ([DataManager shared].chatPoints.count != 0) {
-//        [[DataManager shared].chatPoints removeLastObject];
-//    }
-    if ([dataStorage storageCount] != 0) {
+-(void)doNotReceiveNewChatPoints:(NSNotification*)notification{
+    NSString* context = [notification.userInfo objectForKey:@"context"];
+    
+    if ([context isEqualToString:self.controllerReuseIdentifier]) {
         [dataStorage removeLastObjectFromStorage];
+        [messagesTableView reloadData];
+        isLoadingMoreMessages = NO;
     }
 }
 
--(void)doNotReceiveNewChatPoints{
-//    [[DataManager shared].chatPoints removeLastObject];
-    [dataStorage removeLastObjectFromStorage];
-    [messagesTableView reloadData];
-    isLoadingMoreMessages = NO;
-}
-
--(void)doReceiveErrorLoadingNewChatPoints{
-    [messagesTableView reloadData];
+-(void)doReceiveErrorLoadingNewChatPoints:(NSNotification*)notification{
+    NSString* context = [notification.userInfo objectForKey:@"context"];
+    
+    if ([context isEqualToString:self.controllerReuseIdentifier]) {
+        [messagesTableView reloadData];
+    }
 }
 
 - (void)logoutDone{
@@ -1018,9 +1069,6 @@
 }
 
 -(void)clear{
-//    [[DataManager shared].allChatPoints removeAllObjects];
-//    [[DataManager shared].chatPoints removeAllObjects];
-//    [[DataManager shared].chatMessagesIDs removeAllObjects];
     [dataStorage clearStorage];
     
     [[DataManager shared].myFriends removeAllObjects];

@@ -22,30 +22,36 @@
 @protocol ChatControllerDelegate <NSObject>
 
 @optional
--(void)willUpdate;
--(void)willAddNewMessageToChat:(UserAnnotation*)annotation addToTop:(BOOL)toTop withReloadTable:(BOOL)reloadTable isFBCheckin:(BOOL)isFBCheckin;
--(void)willClearMessageField;
--(void)didSuccessfulMessageSending;
--(void)willScrollToTop;
--(void)willSetEnabledMessageField:(BOOL)enabled;
--(void)willSetAllFriendsSwitchEnabled:(BOOL)switchEnabled;
--(void)chatEndOfRetrievingInitialData;
+-(void)willUpdateViewControllerIdentifier:(NSString*)identifier;
+-(void)willAddNewMessageToChat:(UserAnnotation*)annotation
+                                                addToTop:(BOOL)toTop
+                                                withReloadTable:(BOOL)reloadTable
+                                                isFBCheckin:(BOOL)isFBCheckin
+                                                viewControllerIdentifier:(NSString*)identifier;
 
--(void)chatDidReceiveAllCachedData:(NSDictionary*)cachedData;
--(void)didNotReceiveNewFBChatUsers;
+-(void)willClearMessageFieldInViewControllerWithIdentifier:(NSString*)identifier;
+-(void)didSuccessfulMessageSendingInViewControllerWithIdentifier:(NSString*)identifier;
+-(void)willScrollToTopInViewControllerWithIdentifier:(NSString*)identifier;
+-(void)willSetEnabledMessageField:(BOOL)enabled viewControllerWithIdentifier:(NSString*)identifier;
+-(void)willSetAllFriendsSwitchEnabled:(BOOL)switchEnabled InViewControllerWithIdentifier:(NSString*)identifier;
+-(void)chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:(NSString*)identifier;
+
+-(void)didNotReceiveNewFBChatUsersInViewControllerWithIdentifier:(NSString*)identifier;
+-(void)didNotReceiveNewChatPointsForViewControllerWithIdentifier:(NSString*)identifier;
+-(void)willRemoveLastChatPointForViewControllerWithIdentifier:(NSString*)identifier;
+-(void)didReceiveErrorLoadingNewChatPointsForViewControllerWithIdentifier:(NSString*)identifier;
+
 @end
 
 @protocol DataDelegate <NSObject>
 
 @optional
+-(void)chatDidReceiveAllCachedData:(NSDictionary*)cachedData;
+
 -(void)didReceiveError:(NSString*)errorMessage;
 -(void) willAddNewPoint:(UserAnnotation*)point isFBCheckin:(BOOL)isFBCheckin;
 -(void) willSaveMapARPoints:(NSArray*)newMapPoints;
--(void)didNotReceiveNewChatPoints;
--(void)willRemoveLastChatPoint;
--(void)didReceiveErrorLoadingNewChatPoints;
 -(void)willShowAllFriends;
-
 @end
 
 
@@ -82,13 +88,13 @@
 @protocol ChatRoomDataDelegate <NSObject>
 
 @optional
--(void)didReceiveChatRooms:(NSArray*)chatRooms;
+-(void)didReceiveChatRooms:(NSArray*)chatRooms forViewControllerWithIdentifier:(NSString*)identifier;
 -(void)didReceiveAdditionalServerInfo:(NSArray*)additionalInfo;
--(void)didReceiveRoomsOccupantsNumber;
--(void)didEnterExistingRoom;
--(void)didReceiveUserProfilePictures;
+-(void)didReceiveRoomsOccupantsNumberForViewControllerWithIdentifier:(NSString*)identifier;
+-(void)didEnterExistingRoomForViewControllerWithIdentifier:(NSString*)identifier;
+-(void)didReceiveUserProfilePicturesForViewControllerWithIdentifier:(NSString*)identifier;
 
--(void)didReceiveMessage;
+-(void)didReceiveMessageForViewControllerWithIdentifier:(NSString*)identifier;
 @end
 
 
