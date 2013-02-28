@@ -11,4 +11,6 @@
 @interface Helper : NSObject
 +(BOOL)isStringCorrect:(NSString*)stringToCheck;
 +(NSArray*)sortArray:(NSArray*) array dependingOnField:(NSString*)fieldName inAscendingOrder:(BOOL)ascending;
++(BOOL)checkSymbol:(NSString*)symbol inString:(NSString*)string;
++(NSString*)createTitleFromXMPPTitle:(NSString*)result;
 @end

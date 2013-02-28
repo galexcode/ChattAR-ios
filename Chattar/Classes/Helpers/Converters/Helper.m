@@ -26,4 +26,17 @@
     
     return array;
 }
+
++(BOOL)checkSymbol:(NSString *)symbol inString:(NSString *)string{
+    NSCharacterSet* characterSet = [NSCharacterSet characterSetWithCharactersInString:symbol];
+    if ([string rangeOfCharacterFromSet:characterSet].location == NSNotFound) {
+        return NO;
+    }
+    return YES;
+}
+
++(NSString*)createTitleFromXMPPTitle:(NSString*)xmppTitle{
+    NSCharacterSet* characterSet = [NSCharacterSet characterSetWithCharactersInString:@"@"];
+    return [[xmppTitle componentsSeparatedByCharactersInSet:characterSet] objectAtIndex:0];
+}
 @end
