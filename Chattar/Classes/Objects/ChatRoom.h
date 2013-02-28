@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 @interface ChatRoom : NSObject
-@property (nonatomic,retain) NSString* xmppName;
+@property (nonatomic,retain) NSString* roomName;
 @property (nonatomic, assign) CLLocationCoordinate2D ownerLocation;
 @property (nonatomic,retain) NSString* roomID;
 @property (nonatomic, retain) NSDate* createdAt;

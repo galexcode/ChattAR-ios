@@ -12,7 +12,7 @@
 @synthesize createdAt;
 @synthesize ownerLocation;
 @synthesize roomID;
-@synthesize xmppName;
+@synthesize roomName;
 @synthesize roomRating;
 @synthesize distanceFromUser;
 @synthesize roomUsers;
@@ -25,7 +25,7 @@
     [messagesHistory release];
     [usersPictures release];
     [roomID release];
-    [xmppName release];
+    [roomName release];
     [createdAt release];
     [super dealloc];
 }
