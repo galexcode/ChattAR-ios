@@ -194,7 +194,7 @@
         case trendingSection:{
             if (indexPath.row < [DataManager shared].trendingRooms.count) {
                 ChatRoom* room = [[DataManager shared].trendingRooms objectAtIndex:indexPath.row];
-                NSString* cellText = [NSString stringWithFormat:@"%@",room.xmppName];
+                NSString* cellText = [NSString stringWithFormat:@"%@",room.roomName];
                 UIImageView* accessoryView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"occupantsCounter.png"]] autorelease];
                 UILabel* counter = [[[UILabel alloc] initWithFrame:CGRectMake(20, -1, 20, 20)] autorelease];
                 [counter setText:[NSString stringWithFormat:@"%d",room.roomUsers.count]];
@@ -273,6 +273,7 @@
 
     ChatViewController* chatViewController = [[[ChatViewController alloc] initWithNibName:@"ChatViewController" bundle:nil] autorelease];
     [chatViewController setDataStorage:dataStorage];
+    chatViewController.controllerReuseIdentifier = [[NSString alloc] initWithString:chatRoomsViewControllerIdentifier];
     [self.navigationController pushViewController:chatViewController animated:NO];    
 }
 
