@@ -59,7 +59,7 @@
 
 -(void)refreshDataFromStorage{
                                         // sort QB messages by date of creation
-    NSSortDescriptor *sortDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"dateTime" ascending: NO] autorelease];
+    NSSortDescriptor *sortDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"datetime" ascending: NO] autorelease];
 	NSArray* sortedArray = [[DataManager shared].currentChatRoom.messagesHistory sortedArrayUsingDescriptors:[NSArray arrayWithObject:sortDescriptor]];
     
 	[[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying removeAllObjects];
@@ -98,19 +98,24 @@
 -(NSInteger)storageCount{
     return [DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying.count;
 }
+
 -(NSInteger)allDataCount{
     return [DataManager shared].currentChatRoom.messagesHistory.count;
 }
 
 -(void)insertObjectToAllData:(UserAnnotation*)object atIndex:(NSInteger)index{
+        
     if (index >= 0 && index < [DataManager shared].currentChatRoom.messagesHistory.count) {
         QBChatMessage* message = [[DataManager shared] convertUserAnnotationToQBChatMessage:object];
         [[DataManager shared].currentChatRoom.messagesHistory addObject:message];
     }
 }
 
-
 -(void)insertObjectToPartialData:(UserAnnotation*)object atIndex:(NSInteger)index{
+    if (![DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying) {
+        [DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying = [[NSMutableArray alloc] init];
+    }
+    
     if (index >= 0 && index < [DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying.count) {
         [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying insertObject:object atIndex:index];
     }
