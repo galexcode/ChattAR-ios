@@ -913,7 +913,7 @@ static DataManager *instance = nil;
             }
         }];
     }   
-    
+    userAnnotation.distance = (int)([self.currentChatRoom distanceFromUser]);
     return userAnnotation;
 }
 
