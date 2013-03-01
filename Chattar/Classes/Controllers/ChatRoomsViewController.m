@@ -257,9 +257,7 @@
         }
                             // save current chat room
         [[DataManager shared] setCurrentChatRoom:selectedChatRoomWithAdditionalInfo];
-        
     }
-    
 }
 
 #pragma mark -
@@ -273,6 +271,7 @@
 
     ChatViewController* chatViewController = [[[ChatViewController alloc] initWithNibName:@"ChatViewController" bundle:nil] autorelease];
     [chatViewController setDataStorage:dataStorage];
+    
     chatViewController.controllerReuseIdentifier = [[NSString alloc] initWithString:chatRoomsViewControllerIdentifier];
     [self.navigationController pushViewController:chatViewController animated:NO];    
 }
