@@ -333,6 +333,7 @@
     NSMutableDictionary* context = [NSMutableDictionary dictionary];
     [context setObject:identifier forKey:@"context"];
     
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:kDidReceiveMessage object:nil userInfo:context];
 }
 
@@ -352,7 +353,6 @@
             }
         }
 
-        
         // get number of users for all rooms
         [[BackgroundWorker instance] retrieveNumberOfUsersInEachRoom];
         
@@ -368,7 +368,6 @@
         [self retrieveTrendingRoomsStorage];
         
         [[NSNotificationCenter defaultCenter] postNotificationName:kDataIsReadyForDisplaying object:nil userInfo:context];
-
     }
 }
 
@@ -379,7 +378,8 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:kNeedToDisplayChatRoomController object:nil userInfo:context];
 }
 
--(void)didReceiveRoomsOccupantsNumber{
+-(void)didReceiveRoomsOccupantsNumberForViewControllerWithIdentifier:(NSString *)identifier{
+    
 }
 
 
