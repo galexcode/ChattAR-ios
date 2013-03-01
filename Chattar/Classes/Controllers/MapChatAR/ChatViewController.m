@@ -144,12 +144,17 @@
         [[BackgroundWorker instance] requestDataForDataStorage:self.dataStorage];
         [self addSpinner];
     }
+
     else{
         if ([[self allFriendsSwitch] value] == friendsValue) {
             [self showFriends];
         }
         else
             [self showWorld];
+        
+        if ([dataStorage isKindOfClass:[ChatRoomsStorage class]]) {
+            [self addUserPicturesToPanel];
+        }
     }
 }
 

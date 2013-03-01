@@ -96,10 +96,6 @@ static BackgroundWorker* instance = nil;
 #pragma mark -
 #pragma mark Data Requests
 
--(void)requestChatRoomsData{
-    [self requestUsersPictures];
-}
-
 -(void)requestUsersPictures{
     if ([DataManager shared].currentChatRoom.roomUsers.count) {
         NSMutableString* ids = [[[NSMutableString alloc] initWithString:@""] autorelease];
@@ -133,6 +129,7 @@ static BackgroundWorker* instance = nil;
 -(void)joinRoom:(QBChatRoom *)room{
     [[QBChat instance] joinRoom:room];
 }
+
 -(void)requestAllChatRooms{
     [[QBChat instance] requestAllRooms];
 }
