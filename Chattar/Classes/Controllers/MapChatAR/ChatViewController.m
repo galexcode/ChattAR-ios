@@ -42,7 +42,6 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doScrollToTop:) name:kWillScrollToTop object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doClearMessageField:) name:kWillClearMessageField object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doRemoveLastChatPoint:) name:kWillRemoveLastChatPoint object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAddNewPointToChat:) name:kWillAddNewMessageToChat object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doNotReceiveNewChatPoints:) name:kDidNotReceiveNewChatPoints object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveErrorLoadingNewChatPoints:) name:kdidReceiveErrorLoadingNewChatPoints object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doSuccessfulMessageSending:) name:kDidSuccessfulMessageSending object:nil ];
@@ -58,6 +57,8 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveUserProfilePictures:) name:kDidReceiveUserProfilePicturesURL object:nil];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAddNewPointToChat:) name:kDidReceiveMessage object:nil];
+//        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAddNewPointToChat:) name:kWillAddNewMessageToChat object:nil ];
+
     }
     return self;
 }
@@ -157,8 +158,12 @@
     [occupantsPanel setBackgroundColor:[UIColor blueColor]];
     
     __block int x = 20;
-    [[DataManager shared].currentChatRoom.usersPictures enumerateObjectsUsingBlock:^(NSString* currentPictureURL, NSUInteger index, BOOL *stop) {
+    [[DataManager shared].currentChatRoom.usersPictures enumerateObjectsUsingBlock:^(NSDictionary* userData, NSUInteger index, BOOL *stop) {
         AsyncImageView* occupantImage = [[[AsyncImageView alloc] initWithFrame:CGRectMake(x, 5, 40, 40)] autorelease];
+        
+        NSString* currentPictureURL = [userData objectForKey:@"pictureURL"];
+         
+        
         [occupantImage loadImageFromURL:[NSURL URLWithString:currentPictureURL]];
         [occupantsPanel addSubview:occupantImage];
         x += occupantImage.bounds.size.width + 15;
@@ -419,7 +424,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return [dataStorage storageCount];//[DataManager shared].chatPoints.count;
+    return [dataStorage storageCount];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -428,8 +433,8 @@
     
     UserAnnotation *currentAnnotation = nil;
     
-    if (/*[DataManager shared].chatPoints.count*/[dataStorage storageCount] > [indexPath row]) {
-        currentAnnotation = [dataStorage retrieveDataFromStorageWithIndex:indexPath.row];//[[DataManager shared].chatPoints objectAtIndex:[indexPath row]];
+    if ([dataStorage storageCount] > [indexPath row]) {
+        currentAnnotation = [dataStorage retrieveDataFromStorageWithIndex:indexPath.row];
     }
     
     if ([currentAnnotation isKindOfClass:[UITableViewCell class]]){
@@ -1022,7 +1027,7 @@
         
         // Save to cache
         //
-        if(!isFBCheckin && [dataStorage needsCaching] && [dataStorage isKindOfClass:[ChatRoomsStorage class]]){
+        if(!isFBCheckin && [dataStorage needsCaching] && [dataStorage isKindOfClass:[ChatPointsStorage class]]){
             [[DataManager shared] addChatMessageToStorage:message];
         }
         
