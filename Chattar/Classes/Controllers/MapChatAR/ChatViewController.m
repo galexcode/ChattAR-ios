@@ -164,8 +164,11 @@
         x += occupantImage.bounds.size.width + 15;
     }];
     
-    [self.view addSubview:occupantsPanel];
-    [self.view bringSubviewToFront:occupantsPanel];
+    [self.view insertSubview:occupantsPanel aboveSubview:messagesTableView];
+    CGRect tableFrame = messagesTableView.frame;
+    tableFrame.origin.y += occupantsPanel.frame.size.height;
+    tableFrame.size.height -= occupantsPanel.frame.size.height;
+    messagesTableView.frame = tableFrame;
 }
 
 - (IBAction)sendMessageDidPress:(id)sender{
@@ -971,7 +974,7 @@
         BOOL isFBCheckin = [[notification.userInfo objectForKey:@"isFBCheckin"] boolValue];
         self.messagesTableView.tag = tableIsUpdating;
         
-        if(message.geoDataID != -1){
+        if(message.geoDataID != -1 && [self.controllerReuseIdentifier isEqualToString:chatViewControllerIdentifier]){
             [[DataManager shared].chatMessagesIDs addObject:[NSString stringWithFormat:@"%d", message.geoDataID]];
         }
         
@@ -995,7 +998,8 @@
                 }
                 
                 // old messages
-            }else {
+            }
+            else {
                 [dataStorage insertObjectToAllData:message atIndex:([dataStorage allDataCount] > 0) ?
                  ([dataStorage allDataCount]-1):
                  0];
