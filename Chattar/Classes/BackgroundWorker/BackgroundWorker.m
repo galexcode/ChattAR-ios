@@ -1229,43 +1229,36 @@ static BackgroundWorker* instance = nil;
             }
             else if ([context isEqualToString:chatRoomUsersProfiles]){
                 numberOfUserPicturesRetrieved--;
-                
-                dispatch_queue_t savingPicturesQueue = dispatch_queue_create("savingPicturesQueue", NULL);
-                dispatch_async(savingPicturesQueue, ^{
-                    NSArray* keys = [result.body allKeys];
-                    
-                    [keys enumerateObjectsUsingBlock:^(id key, NSUInteger idx, BOOL *stop) {
-                        NSDictionary* userInfo = [result.body objectForKey:key];
-                        NSLog(@"%@",userInfo);
-                        
-                        NSDictionary* pictureDict = [userInfo objectForKey:kPicture];
-                        NSDictionary* pictData = [pictureDict objectForKey:kData];
-                        NSString* url = [pictData objectForKey:kUrl];
-                        
-                        
-                        if (![DataManager shared].currentChatRoom.usersPictures) {
-                            [DataManager shared].currentChatRoom.usersPictures = [[NSMutableArray alloc] init];
-                        }
-                        
-                        [[DataManager shared].currentChatRoom.usersPictures addObject:url];
-                        
-                        if (numberOfUserPicturesRetrieved == 0) {
-                                        // notify delegate that all photos are retrieved
-                            if ([tabBarDelegate respondsToSelector:@selector(didReceiveUserProfilePicturesForViewControllerWithIdentifier:)]) {
-                                [tabBarDelegate didReceiveUserProfilePicturesForViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
-                            }
-                            
-                            if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:)]) {
-                                [tabBarDelegate chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
-                            }
+                                    // this should be executed in other thread
+                NSArray* keys = [result.body allKeys];
+                for (NSString* key in keys) {
+                    NSDictionary* userInfo = [result.body objectForKey:key];
+                    NSLog(@"%@",userInfo);
 
+                    NSDictionary* pictureDict = [userInfo objectForKey:kPicture];
+                    NSDictionary* pictData = [pictureDict objectForKey:kData];
+                    NSString* url = [pictData objectForKey:kUrl];
+
+
+                    if (![DataManager shared].currentChatRoom.usersPictures) {
+                        [DataManager shared].currentChatRoom.usersPictures = [[NSMutableArray alloc] init];
+                    }
+
+                    [[DataManager shared].currentChatRoom.usersPictures addObject:url];
+
+                    if (numberOfUserPicturesRetrieved == 0) {
+                                    // notify delegate that all photos are retrieved
+                        if ([tabBarDelegate respondsToSelector:@selector(didReceiveUserProfilePicturesForViewControllerWithIdentifier:)]) {
+                            [tabBarDelegate didReceiveUserProfilePicturesForViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
                         }
-                    }];
-                    
-                    
-                });
-                
-                dispatch_release(savingPicturesQueue);
+
+                        if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:)]) {
+                            [tabBarDelegate chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+                        }
+
+                    }
+                }
+
             }
             else{
                 
@@ -1718,7 +1711,8 @@ static BackgroundWorker* instance = nil;
     }
                         // join to already existing room
     else{
-        if ([[DataManager shared].currentChatRoom.roomName isEqualToString:room.roomName]) {
+        NSString* nonXMPPRoomName = [Helper createTitleFromXMPPTitle:room.roomName];
+        if ([[DataManager shared].currentChatRoom.roomName isEqualToString:nonXMPPRoomName]) {
             
             if (![DataManager shared].currentChatRoom.roomUsers) {
                 [DataManager shared].currentChatRoom.roomUsers = [[NSMutableArray alloc] init];
@@ -1737,12 +1731,12 @@ static BackgroundWorker* instance = nil;
     ChatRoom* chatRoom = [[DataManager shared] findRoomWithAdditionalInfo:roomName];
     
     if (chatRoom) {
-        static NSInteger roomsReceivedUsers = 0;
-        ++roomsReceivedUsers;
-        if (roomsReceivedUsers == [DataManager shared].qbChatRooms.count) {
-            [tabBarDelegate didReceiveRoomsOccupantsNumberForViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+        if (!chatRoom.roomUsers) {
+            chatRoom.roomUsers = [[NSMutableArray alloc] init];
         }
-        [chatRoom setRoomUsers:users.mutableCopy];
+    
+        [chatRoom.roomUsers removeAllObjects];
+        [chatRoom.roomUsers addObjectsFromArray:users];
     }
     
 }
