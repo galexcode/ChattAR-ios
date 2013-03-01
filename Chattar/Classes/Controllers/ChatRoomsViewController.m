@@ -59,6 +59,10 @@
     [dialogsController setDelegate:self];
 }
 
+-(void)viewWillAppear:(BOOL)animated{
+    [self.roomsTableView deselectRowAtIndexPath:[self.roomsTableView indexPathForSelectedRow] animated:YES];
+}
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
@@ -224,6 +228,7 @@
             break;
     }
     
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
     return cell;
 }
 
@@ -240,24 +245,34 @@
 
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+
     UITableViewCell* selectedCell = [tableView cellForRowAtIndexPath:indexPath];
     
-    QBChatRoom* selectedChatRoom = [[DataManager shared] findQBRoomWithName:selectedCell.textLabel.text];
-    
-    if (selectedChatRoom) {
-        [[BackgroundWorker instance] joinRoom:selectedChatRoom];
-    }
-    
     ChatRoom* selectedChatRoomWithAdditionalInfo = [[DataManager shared] findRoomWithAdditionalInfo:selectedCell.textLabel.text];
+    QBChatRoom* selectedChatRoom = [[DataManager shared] findQBRoomWithName:selectedCell.textLabel.text];
     
     if (selectedChatRoomWithAdditionalInfo) {
         
         if (![DataManager shared].currentChatRoom) {
             [DataManager shared].currentChatRoom = [[ChatRoom alloc] init];
         }
-                            // save current chat room
+        
+        // save current chat room
         [[DataManager shared] setCurrentChatRoom:selectedChatRoomWithAdditionalInfo];
+        
     }
+
+    
+    if (![selectedChatRoom isJoined]) {
+        if (selectedChatRoom) {
+            [[BackgroundWorker instance] joinRoom:selectedChatRoom];
+        }
+    }
+    else{
+        [self doNeedDisplayChatRoomsController];
+    }
+    
 }
 
 #pragma mark -
@@ -273,7 +288,8 @@
     [chatViewController setDataStorage:dataStorage];
     
     chatViewController.controllerReuseIdentifier = [[NSString alloc] initWithString:chatRoomsViewControllerIdentifier];
-    [self.navigationController pushViewController:chatViewController animated:NO];    
+    chatViewController.title = NSLocalizedString([DataManager shared].currentChatRoom.roomName, nil);
+    [self.navigationController pushViewController:chatViewController animated:NO];
 }
 
 #pragma mark -
