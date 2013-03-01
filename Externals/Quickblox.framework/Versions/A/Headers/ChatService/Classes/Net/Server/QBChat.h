@@ -29,7 +29,7 @@ typedef enum QBChatServiceError {
     QBUUser *qbUser;
 }
 
-
+    
 #pragma mark -
 #pragma mark Base Messaging
 
@@ -93,7 +93,8 @@ typedef enum QBChatServiceError {
 
 /**
  Create room or join if room with this name already exist. QBChatDelegate's method 'chatRoomDidEnter:' will be called.
- If room name contains " " or "-" characters - they will replaceed with "".
+ If room name contains (" ") (space) character - it will be replaceed with "_" (underscore) character.
+ If room name contains ("),(&),('),(/),(:),(<),(>),(@) (double quote, ampersand, single quote, forward slash, colon, less than, greater than, at-sign) characters - they will be removed.
  
  @param name Room name
  @param isMembersOnly YES if you want to create room that users cannot enter without being on the member list. If set NO - room will be opened for all users
@@ -185,6 +186,12 @@ typedef enum QBChatServiceError {
  Finish call
  */
 -(void) finishCall;
+
+
+#pragma mark -
+#pragma mark Helpers
+
++ (NSString *)roomNameToValidRoomName:(NSString *)roomName;
 
 
 #pragma mark -
