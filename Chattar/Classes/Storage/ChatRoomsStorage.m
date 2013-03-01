@@ -48,7 +48,8 @@
     [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying removeAllObjects];
     
     for (QBChatMessage*message in [DataManager shared].currentChatRoom.messagesHistory) {
-        if ([friendsIds containsObject:message.senderID]) {
+        NSNumber* senderID = @(message.senderID);
+        if ([friendsIds containsObject:senderID]) {
             UserAnnotation* messageAnnotation = [[DataManager shared] convertQBMessageToUserAnnotation:message];
             [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying addObject:messageAnnotation];
         }
@@ -116,7 +117,7 @@
         [DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying = [[NSMutableArray alloc] init];
     }
     
-    if (index >= 0 && index < [DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying.count) {
+    if (index >= 0 && index < [DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying.count && object != nil) {
         [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying insertObject:object atIndex:index];
     }
 }
