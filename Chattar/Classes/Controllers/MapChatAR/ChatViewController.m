@@ -57,8 +57,8 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveUserProfilePictures:) name:kDidReceiveUserProfilePicturesURL object:nil];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAddNewPointToChat:) name:kDidReceiveMessage object:nil];
-//        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAddNewPointToChat:) name:kWillAddNewMessageToChat object:nil ];
 
+        isPanelDisplayed = NO;
     }
     return self;
 }
@@ -152,8 +152,9 @@
         else
             [self showWorld];
         
-        if ([dataStorage isKindOfClass:[ChatRoomsStorage class]]) {
+        if ([dataStorage isKindOfClass:[ChatRoomsStorage class]] && !isPanelDisplayed) {
             [self addUserPicturesToPanel];
+            isPanelDisplayed = YES;
         }
     }
 }
@@ -440,6 +441,10 @@
     
     if ([dataStorage storageCount] > [indexPath row]) {
         currentAnnotation = [dataStorage retrieveDataFromStorageWithIndex:indexPath.row];
+    }
+    
+    if (!currentAnnotation) {
+        return (UITableViewCell*)currentAnnotation;
     }
     
     if ([currentAnnotation isKindOfClass:[UITableViewCell class]]){
@@ -886,8 +891,11 @@
 -(void)doReceiveUserProfilePictures:(NSNotification*)notification{
     NSString* context = [notification.userInfo objectForKey:@"context"];
     
-    if ([context isEqualToString:self.controllerReuseIdentifier] && [self.controllerReuseIdentifier isEqualToString:chatRoomsViewControllerIdentifier]) {
+    if ([context isEqualToString:self.controllerReuseIdentifier] &&
+                        [self.controllerReuseIdentifier isEqualToString:chatRoomsViewControllerIdentifier]
+                        && !isPanelDisplayed) {
         [self addUserPicturesToPanel];
+        isPanelDisplayed = YES;
     }
 }
 

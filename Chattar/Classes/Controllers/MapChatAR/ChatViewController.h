@@ -36,6 +36,7 @@
 	BOOL isLoadingMoreMessages;
        
     BOOL isDataRetrieved;
+    BOOL isPanelDisplayed;
     
 }
 
