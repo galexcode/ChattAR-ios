@@ -896,11 +896,34 @@ static DataManager *instance = nil;
 
 -(UserAnnotation*)convertQBMessageToUserAnnotation:(QBChatMessage*)message{
     UserAnnotation* userAnnotation = [[[UserAnnotation alloc] init] autorelease];
+    
     [userAnnotation setUserStatus:message.text];
     [userAnnotation setCreatedAt:message.datetime];
-    [userAnnotation setQbUserID:message.senderID];
+    
+    QBUUser* user = [self findQBUserByID:message.senderID];
+    if (user) {
+        NSString* qbUserFBID = user.facebookID;
+        
+        [self.currentChatRoom.usersPictures enumerateObjectsUsingBlock:^(NSDictionary* userDict, NSUInteger idx, BOOL *stop) {
+            NSString* fbID = [userDict objectForKey:@"userFBId"];
+            
+            if ([qbUserFBID isEqualToString:fbID]) {
+                userAnnotation.userPhotoUrl = [userDict objectForKey:@"pictureURL"];
+                *stop = YES;
+            }
+        }];
+    }   
     
     return userAnnotation;
+}
+
+-(QBUUser*)findQBUserByID:(NSInteger)qbID{
+    for (QBUUser* user in self.currentChatRoom.roomUsers) {
+        if (user.ID == qbID) {
+            return user;
+        }
+    }
+    return nil;
 }
 
 -(UserAnnotation*)convertChatRoomToUserAnnotation:(ChatRoom*)chatRooom{
