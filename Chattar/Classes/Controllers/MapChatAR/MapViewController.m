@@ -161,7 +161,7 @@
     if ([DataManager shared].mapPoints.count == 0 && [DataManager shared].mapPointsIDs.count == 0) {
         [self mapClear];
         [[BackgroundWorker instance] retrieveCachedMapDataAndRequestNewData];
-        [super addSpinner];
+        [self addSpinner];
         
         // additional request for checkins
         if ([DataManager shared].allCheckins.count == 0) {

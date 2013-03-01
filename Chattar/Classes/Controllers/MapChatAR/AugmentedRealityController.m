@@ -867,7 +867,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         [[BackgroundWorker instance] retrieveCachedMapDataAndRequestNewData];                   // AR uses map controller data
         [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
         [distanceSlider setEnabled:NO];
-        [super addSpinner];
+        [self addSpinner];
         
         // additional request for checkins
         if ([DataManager shared].allCheckins.count == 0) {
