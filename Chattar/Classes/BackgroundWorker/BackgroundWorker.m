@@ -1229,36 +1229,46 @@ static BackgroundWorker* instance = nil;
             }
             else if ([context isEqualToString:chatRoomUsersProfiles]){
                 numberOfUserPicturesRetrieved--;
-                                    // this should be executed in other thread
                 NSArray* keys = [result.body allKeys];
-                for (NSString* key in keys) {
-                    NSDictionary* userInfo = [result.body objectForKey:key];
-                    NSLog(@"%@",userInfo);
+                
+                dispatch_queue_t userPicturesQueue = dispatch_queue_create("userPicturesQueue", NULL);
+                dispatch_async(userPicturesQueue, ^{
+                    [keys enumerateObjectsUsingBlock:^(NSString* key, NSUInteger idx, BOOL *stop) {
+                        NSDictionary* userInfo = [result.body objectForKey:key];
+                        NSLog(@"%@",userInfo);
+                        NSString* userFBId = [userInfo objectForKey:kId];
 
-                    NSDictionary* pictureDict = [userInfo objectForKey:kPicture];
-                    NSDictionary* pictData = [pictureDict objectForKey:kData];
-                    NSString* url = [pictData objectForKey:kUrl];
-
-
-                    if (![DataManager shared].currentChatRoom.usersPictures) {
-                        [DataManager shared].currentChatRoom.usersPictures = [[NSMutableArray alloc] init];
-                    }
-
-                    [[DataManager shared].currentChatRoom.usersPictures addObject:url];
-
-                    if (numberOfUserPicturesRetrieved == 0) {
-                                    // notify delegate that all photos are retrieved
-                        if ([tabBarDelegate respondsToSelector:@selector(didReceiveUserProfilePicturesForViewControllerWithIdentifier:)]) {
-                            [tabBarDelegate didReceiveUserProfilePicturesForViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+                        NSDictionary* pictureDict = [userInfo objectForKey:kPicture];
+                        NSDictionary* pictData = [pictureDict objectForKey:kData];
+                        NSString* url = [pictData objectForKey:kUrl];
+                        
+                        
+                        if (![DataManager shared].currentChatRoom.usersPictures) {
+                            [DataManager shared].currentChatRoom.usersPictures = [[NSMutableArray alloc] init];
                         }
-
-                        if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:)]) {
-                            [tabBarDelegate chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
-                        }
-
+                        
+                        NSMutableDictionary* userData = [NSMutableDictionary dictionary];
+                        [userData setObject:userFBId forKey:@"userFBId"];
+                        [userData setObject:url forKey:@"pictureURL"];
+                        
+                        [[DataManager shared].currentChatRoom.usersPictures addObject:userData];
+                    }];
+                });
+                
+                dispatch_release(userPicturesQueue);
+                
+                                            // this should be executed in other thread
+                if (numberOfUserPicturesRetrieved == 0) {
+                    // notify delegate that all photos are retrieved
+                    if ([tabBarDelegate respondsToSelector:@selector(didReceiveUserProfilePicturesForViewControllerWithIdentifier:)]) {
+                        [tabBarDelegate didReceiveUserProfilePicturesForViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
                     }
+                    
+                    if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:)]) {
+                        [tabBarDelegate chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+                    }
+                    
                 }
-
             }
             else{
                 
@@ -1666,25 +1676,27 @@ static BackgroundWorker* instance = nil;
         if (!room.messagesHistory) {
             room.messagesHistory = [[NSMutableArray alloc] init];
         }
-        [room.messagesHistory addObject:message];
-        
-        if ([tabBarDelegate respondsToSelector:@selector(didReceiveMessageForViewControllerWithIdentifier:)]) {
-            [tabBarDelegate didReceiveMessageForViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
-        }
-        
-        if ([tabBarDelegate respondsToSelector:@selector(willClearMessageFieldInViewControllerWithIdentifier:)]) {
-            [tabBarDelegate willClearMessageFieldInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
-        }
-        
-        // add new Annotation to map/chat/ar
-        [self createAndAddNewAnnotationToChatForFBUser:[DataManager shared].currentFBUser withQBChatMessage:message addToTop:YES withReloadTable:YES];
-        
-        if ([tabBarDelegate respondsToSelector:@selector(didSuccessfulMessageSending:)]) {
-            [tabBarDelegate didSuccessfulMessageSendingInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
-        }
-        
-        if ([tabBarDelegate respondsToSelector:@selector(willScrollToTop:)]) {
-            [tabBarDelegate willScrollToTopInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+        if (message.text.length > 0) {
+            [room.messagesHistory addObject:message];
+            
+            if ([tabBarDelegate respondsToSelector:@selector(didReceiveMessageForViewControllerWithIdentifier:)]) {
+                [tabBarDelegate didReceiveMessageForViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+            }
+            
+            if ([tabBarDelegate respondsToSelector:@selector(willClearMessageFieldInViewControllerWithIdentifier:)]) {
+                [tabBarDelegate willClearMessageFieldInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+            }
+            
+            // add new Annotation to map/chat/ar
+            [self createAndAddNewAnnotationToChatForFBUser:[DataManager shared].currentFBUser withQBChatMessage:message addToTop:YES withReloadTable:YES];
+            
+            if ([tabBarDelegate respondsToSelector:@selector(didSuccessfulMessageSendingInViewControllerWithIdentifier:)]) {
+                [tabBarDelegate didSuccessfulMessageSendingInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+            }
+            
+            if ([tabBarDelegate respondsToSelector:@selector(willScrollToTopInViewControllerWithIdentifier:)]) {
+                [tabBarDelegate willScrollToTopInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+            }
         }
 
     }
