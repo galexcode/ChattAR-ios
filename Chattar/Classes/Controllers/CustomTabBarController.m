@@ -332,8 +332,7 @@
 -(void)didReceiveMessageForViewControllerWithIdentifier:(NSString *)identifier{
     NSMutableDictionary* context = [NSMutableDictionary dictionary];
     [context setObject:identifier forKey:@"context"];
-    
-    
+        
     [[NSNotificationCenter defaultCenter] postNotificationName:kDidReceiveMessage object:nil userInfo:context];
 }
 

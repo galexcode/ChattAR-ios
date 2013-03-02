@@ -58,6 +58,9 @@
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAddNewPointToChat:) name:kDidReceiveMessage object:nil];
 
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAddNewPointToChat:) name:kWillAddNewMessageToChat object:nil];
+
+
         isPanelDisplayed = NO;
     }
     return self;
@@ -137,6 +140,48 @@
 
 #pragma mark -
 #pragma mark Interface based methods
+
+-(void)addMessageToChatTable: (UserAnnotation*)message toTableTop:(BOOL)toTop withReloadTable:(BOOL)reloadTable{
+    // Add to Chat
+    __block BOOL addedToCurrentChatState = NO;
+    NSArray *friendsIds = [[DataManager shared].myFriendsAsDictionary allKeys];
+    
+    dispatch_async( dispatch_get_main_queue(), ^{
+        
+        // New messages
+        if (toTop){
+            if([self isAllShowed] || [friendsIds containsObject:message.fbUserId] ||
+               
+               [message.fbUserId isEqualToString:[DataManager shared].currentFBUserId]){
+                
+                [dataStorage insertObjectToPartialData:message atIndex:0];
+                addedToCurrentChatState = YES;
+            }
+            
+            // old messages
+        }
+        else {
+            [dataStorage insertObjectToAllData:message atIndex:([dataStorage allDataCount] > 0) ?
+             ([dataStorage allDataCount]-1):
+             0];
+            
+            if([self isAllShowed] || [friendsIds containsObject:message.fbUserId] ||
+               [message.fbUserId isEqualToString:[DataManager shared].currentFBUserId]){
+                
+                [dataStorage insertObjectToPartialData:message atIndex:[dataStorage storageCount] > 0 ? ([dataStorage storageCount]-1): 0];
+                addedToCurrentChatState = YES;
+            }
+        }
+        //
+        if(addedToCurrentChatState && reloadTable){
+            // on main thread
+            
+            [self.messagesTableView reloadData];
+            
+        }
+    });
+
+}
 
 -(void)checkForShowingData{
     if ([dataStorage isStorageEmpty]) {
@@ -337,7 +382,7 @@
     NSString *userName = nil;
     if([marker isKindOfClass:UITableViewCell.class]){ 
         userName = ((UILabel *)[marker viewWithTag:1105]).text;
-        self.selectedUserAnnotation = [dataStorage retrieveDataFromStorageWithIndex:marker.tag];//[[DataManager shared].chatPoints objectAtIndex:marker.tag];
+        self.selectedUserAnnotation = [dataStorage retrieveDataFromStorageWithIndex:marker.tag];
     }
 	
 	NSString* title;
@@ -442,11 +487,7 @@
     if ([dataStorage storageCount] > [indexPath row]) {
         currentAnnotation = [dataStorage retrieveDataFromStorageWithIndex:indexPath.row];
     }
-    
-    if (!currentAnnotation) {
-        return (UITableViewCell*)currentAnnotation;
-    }
-    
+        
     if ([currentAnnotation isKindOfClass:[UITableViewCell class]]){
 		return (UITableViewCell*)currentAnnotation;
 	}
@@ -964,7 +1005,7 @@
                 // if this is action not for this controller skip it
     if ([context isEqualToString:self.controllerReuseIdentifier]) {
         // scroll to top
-        if([dataStorage storageCount]> 0){
+        if([dataStorage storageCount] > 0){
             [messagesTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
         }
 
@@ -996,47 +1037,9 @@
             [[DataManager shared].chatMessagesIDs addObject:[NSString stringWithFormat:@"%d", message.geoDataID]];
         }
         
-        NSArray *friendsIds = [[DataManager shared].myFriendsAsDictionary allKeys];
-        
-        // Add to Chat
-        __block BOOL addedToCurrentChatState = NO;
-        
-        dispatch_async( dispatch_get_main_queue(), ^{
-            
-            // New messages
-            if (toTop){
-                [dataStorage insertObjectToAllData:message atIndex:0];
-                
-                if([self isAllShowed] || [friendsIds containsObject:message.fbUserId] ||
-                   
-                   [message.fbUserId isEqualToString:[DataManager shared].currentFBUserId]){
-                    
-                    [dataStorage insertObjectToPartialData:message atIndex:0];
-                    addedToCurrentChatState = YES;
-                }
-                
-                // old messages
-            }
-            else {
-                [dataStorage insertObjectToAllData:message atIndex:([dataStorage allDataCount] > 0) ?
-                 ([dataStorage allDataCount]-1):
-                 0];
-                
-                if([self isAllShowed] || [friendsIds containsObject:message.fbUserId] ||
-                   [message.fbUserId isEqualToString:[DataManager shared].currentFBUserId]){
-                    
-                    [dataStorage insertObjectToPartialData:message atIndex:[dataStorage storageCount] > 0 ? ([dataStorage storageCount]-1): 0];
-                    addedToCurrentChatState = YES;
-                }
-            }
-            //
-            if(addedToCurrentChatState && reloadTable){
-                // on main thread
-                
-                [self.messagesTableView reloadData];
-                
-            }
-        });
+        if ([self.controllerReuseIdentifier isEqualToString:chatViewControllerIdentifier]) {
+            [self addMessageToChatTable:message toTableTop:toTop withReloadTable:reloadTable];
+        }
         
         // Save to cache
         //
