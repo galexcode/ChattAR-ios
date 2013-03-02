@@ -30,4 +30,7 @@
     [super dealloc];
 }
 
+-(NSString*)description{
+    return [NSString stringWithFormat:@"room name - %@ \n room rating - %f \n number of room users - %d \n room messages - %@",roomName,roomRating,roomUsers.count,messagesHistory];
+}
 @end
