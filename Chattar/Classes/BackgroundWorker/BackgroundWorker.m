@@ -1673,12 +1673,8 @@ static BackgroundWorker* instance = nil;
         if (!room.messagesHistory) {
             room.messagesHistory = [[NSMutableArray alloc] init];
         }
-        if (message.text.length > 0) {
+        if (message.text.length > 0 && message.text) {
             [room.messagesHistory addObject:message];
-            
-            if ([tabBarDelegate respondsToSelector:@selector(didReceiveMessageForViewControllerWithIdentifier:)]) {
-                [tabBarDelegate didReceiveMessageForViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
-            }
             
             if ([tabBarDelegate respondsToSelector:@selector(willClearMessageFieldInViewControllerWithIdentifier:)]) {
                 [tabBarDelegate willClearMessageFieldInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
