@@ -259,7 +259,7 @@
         }
         
         // save current chat room
-        [[DataManager shared] setCurrentChatRoom:selectedChatRoomWithAdditionalInfo];
+        [DataManager shared].currentChatRoom = selectedChatRoomWithAdditionalInfo;
         
     }
 

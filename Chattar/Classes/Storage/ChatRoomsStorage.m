@@ -67,12 +67,16 @@
                     // create new sorted and array for displaying
     for (QBChatMessage* message in sortedArray) {
         UserAnnotation* messageAnnotation = [[DataManager shared] convertQBMessageToUserAnnotation:message];
-        [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying addObject:messageAnnotation];
+        if (![[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying containsObject:messageAnnotation]) {
+            [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying addObject:messageAnnotation];
+        }
     }
 }
 
 -(void)addDataToStorage:(UserAnnotation*)newData{
-    [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying addObject:newData];
+    if (![[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying containsObject:newData]) {
+        [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying addObject:newData];
+    }
 }
 -(void)removeLastObjectFromStorage{
     if ([DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying.count) {
@@ -108,7 +112,9 @@
         
     if (index >= 0 && index < [DataManager shared].currentChatRoom.messagesHistory.count) {
         QBChatMessage* message = [[DataManager shared] convertUserAnnotationToQBChatMessage:object];
-        [[DataManager shared].currentChatRoom.messagesHistory addObject:message];
+        if (![[DataManager shared].currentChatRoom.messagesHistory containsObject:message]) {
+            [[DataManager shared].currentChatRoom.messagesHistory addObject:message];
+        }
     }
 }
 
@@ -118,7 +124,9 @@
     }
     
     if (index >= 0 && index < [DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying.count && object != nil) {
-        [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying insertObject:object atIndex:index];
+        if (![[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying containsObject:object]) {
+            [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying insertObject:object atIndex:index];
+        }
     }
 }
 
