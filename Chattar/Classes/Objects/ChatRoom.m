@@ -19,7 +19,7 @@
 @synthesize messagesHistory;
 @synthesize usersPictures;
 @synthesize messagesAsUserAnnotationForDisplaying;
-
+@synthesize isSendingMessage;
 -(void)dealloc{
     [roomUsers release];
     [messagesHistory release];

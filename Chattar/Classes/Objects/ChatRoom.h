@@ -19,4 +19,5 @@
 @property (nonatomic, retain) NSMutableArray* messagesHistory;
 @property (nonatomic, retain) NSMutableArray* usersPictures;
 @property (nonatomic, retain) NSMutableArray* messagesAsUserAnnotationForDisplaying;
+@property (nonatomic, assign) BOOL isSendingMessage;
 @end
