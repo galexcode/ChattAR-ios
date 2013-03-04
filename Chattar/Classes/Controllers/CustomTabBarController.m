@@ -57,8 +57,6 @@
     [[BackgroundWorker instance] retrieveCachedChatDataAndRequestNewData];
     [[BackgroundWorker instance] retrieveCachedMapDataAndRequestNewData];
     [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
-    
-    [[BackgroundWorker instance] requestAdditionalChatRoomsInfo];
 }
 
 #pragma mark - 
@@ -75,7 +73,7 @@
     [BackgroundWorker instance].numberOfCheckinsRetrieved = ceil([[[DataManager shared].myPopularFriends allObjects] count]/fmaxRequestsInBatch);
     [[NSNotificationCenter defaultCenter] postNotificationName:kGeneralDataEndRetrieving object:nil];
     
-    [self requestControllerData];
+//    [self requestControllerData];
 }
 
 -(void)didReceiveInboxMessages:(NSDictionary *)inboxMessages andPopularFriends:(NSSet *)popFriends{
