@@ -116,6 +116,7 @@ static BackgroundWorker* instance = nil;
 -(void)requestDataForDataStorage:(Storage *)dataStorage{
     if ([dataStorage isKindOfClass:[ChatPointsStorage class]]) {
         [self retrieveCachedChatDataAndRequestNewData];
+        [self retrieveCachedFBCheckinsAndRequestNewCheckins];
     }
     else if([dataStorage isKindOfClass:[ChatRoomsStorage class]]){
         [self requestUsersPictures];
@@ -277,13 +278,7 @@ static BackgroundWorker* instance = nil;
         
     }
     
-    if (cashedFBCheckins.count > 0) {
-        if ([tabBarDelegate respondsToSelector:@selector(willShowAllFriends)]) {
-            [tabBarDelegate willShowAllFriends];
-        }
-    }
-    
-    else{
+    if (cashedFBCheckins.count <= 0) {
         if ([tabBarDelegate respondsToSelector:@selector(willSetEnabledDistanceSlider:)]) {
             [tabBarDelegate willSetEnabledDistanceSlider:NO];
         }
@@ -477,7 +472,7 @@ static BackgroundWorker* instance = nil;
                 // show Message on Chat
                 UserAnnotation *chatAnnotation = [checkinAnnotation copy];
                 
-                if ([tabBarDelegate respondsToSelector:@selector(willAddNewMessageToChat:addToTop:withReloadTable:isFBCheckin:)]) {
+                if ([tabBarDelegate respondsToSelector:@selector(willAddNewMessageToChat:addToTop:withReloadTable:isFBCheckin:viewControllerIdentifier:)]) {
                     [tabBarDelegate willAddNewMessageToChat:chatAnnotation addToTop:NO withReloadTable:NO isFBCheckin:YES viewControllerIdentifier:chatViewControllerIdentifier];
                 }
                 
@@ -638,7 +633,7 @@ static BackgroundWorker* instance = nil;
         ++index;
 
         // show Message on Chat
-        if ([tabBarDelegate respondsToSelector:@selector(willAddNewMessageToChat:addToTop:withReloadTable:isFBCheckin:)]) {
+        if ([tabBarDelegate respondsToSelector:@selector(willAddNewMessageToChat:addToTop:withReloadTable:isFBCheckin:viewControllerIdentifier:)]) {
             [tabBarDelegate willAddNewMessageToChat:chatAnnotation addToTop:NO withReloadTable:NO isFBCheckin:NO viewControllerIdentifier:chatViewControllerIdentifier];
         }
     }
@@ -1556,7 +1551,11 @@ static BackgroundWorker* instance = nil;
     UserAnnotation* newAnnotation = [[DataManager shared] convertQBMessageToUserAnnotation:message];
     
     if ([tabBarDelegate respondsToSelector:@selector(willAddNewMessageToChat:addToTop:withReloadTable:isFBCheckin:viewControllerIdentifier:)]) {
-        [tabBarDelegate willAddNewMessageToChat:newAnnotation addToTop:toTop withReloadTable:reloadTable isFBCheckin:NO viewControllerIdentifier:chatRoomsViewControllerIdentifier];
+        [tabBarDelegate willAddNewMessageToChat:newAnnotation
+                                       addToTop:toTop
+                                       withReloadTable:reloadTable
+                                       isFBCheckin:NO
+                                       viewControllerIdentifier:chatRoomsViewControllerIdentifier];
     }
 
 }
@@ -1688,6 +1687,9 @@ static BackgroundWorker* instance = nil;
                 if ([tabBarDelegate respondsToSelector:@selector(willScrollToTopInViewControllerWithIdentifier:)]) {
                     [tabBarDelegate willScrollToTopInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
                 }
+                
+                [self createAndAddNewAnnotationToChatForFBUser:[DataManager shared].currentFBUser withQBChatMessage:message addToTop:YES withReloadTable:YES];
+                
                 room.isSendingMessage = NO;
             }
         }
