@@ -1675,20 +1675,20 @@ static BackgroundWorker* instance = nil;
         }
         if (message.text.length > 0 && message.text) {
             [room.messagesHistory addObject:message];
-            
-            if ([tabBarDelegate respondsToSelector:@selector(willClearMessageFieldInViewControllerWithIdentifier:)]) {
-                [tabBarDelegate willClearMessageFieldInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
-            }
-            
-            // add new Annotation to map/chat/ar
-            [self createAndAddNewAnnotationToChatForFBUser:[DataManager shared].currentFBUser withQBChatMessage:message addToTop:YES withReloadTable:YES];
-            
-            if ([tabBarDelegate respondsToSelector:@selector(didSuccessfulMessageSendingInViewControllerWithIdentifier:)]) {
-                [tabBarDelegate didSuccessfulMessageSendingInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
-            }
-            
-            if ([tabBarDelegate respondsToSelector:@selector(willScrollToTopInViewControllerWithIdentifier:)]) {
-                [tabBarDelegate willScrollToTopInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+                        
+            if (room.isSendingMessage) {
+                if ([tabBarDelegate respondsToSelector:@selector(willClearMessageFieldInViewControllerWithIdentifier:)]) {
+                    [tabBarDelegate willClearMessageFieldInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+                }
+                
+                if ([tabBarDelegate respondsToSelector:@selector(didSuccessfulMessageSendingInViewControllerWithIdentifier:)]) {
+                    [tabBarDelegate didSuccessfulMessageSendingInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+                }
+                
+                if ([tabBarDelegate respondsToSelector:@selector(willScrollToTopInViewControllerWithIdentifier:)]) {
+                    [tabBarDelegate willScrollToTopInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+                }
+                room.isSendingMessage = NO;
             }
         }
 

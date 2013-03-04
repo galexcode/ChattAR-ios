@@ -256,6 +256,7 @@
         
         if (![DataManager shared].currentChatRoom) {
             [DataManager shared].currentChatRoom = [[ChatRoom alloc] init];
+            [DataManager shared].currentChatRoom.isSendingMessage = NO;
         }
         
         // save current chat room

@@ -119,6 +119,7 @@
 }
 
 -(void)insertObjectToPartialData:(UserAnnotation*)object atIndex:(NSInteger)index{
+    
     if (![DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying) {
         [DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying = [[NSMutableArray alloc] init];
     }
