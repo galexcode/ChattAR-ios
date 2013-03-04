@@ -65,6 +65,8 @@
 // Strings
 #define appName @"ChattAR"
 
+#define DLog(...)NSLog(@"%@", [NSString stringWithFormat:@"%s:%d -> %@", __PRETTY_FUNCTION__, __LINE__, __VA_ARGS__])
+
 // Flurry
 #define FLURRY_API_KEY @"KMD7NSM4DF344W9JVCGN"
 #define FLURRY_EVENT_USER_DID_LOGIN @"User did login"
