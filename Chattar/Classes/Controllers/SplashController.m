@@ -282,8 +282,6 @@
         
         ((AppDelegate *)[[UIApplication sharedApplication] delegate]).tabBarController.selectedIndex = 0;
         
-                            // notify tabbar to request FB info
-        [[NSNotificationCenter defaultCenter] postNotificationName:kRegisterPushNotificatons object:nil];
         
         [[FBService shared].facebook setSessionDelegate:nil];
         
@@ -314,6 +312,10 @@
 #pragma mark QBChat login
 -(void)chatDidLogin{
     NSLog(@"SUCCESS LOGIN QBCHAT!");
+    
+    // notify tabbar to request FB info
+    [[NSNotificationCenter defaultCenter] postNotificationName:kRegisterPushNotificatons object:nil];
+
 }
 
 -(void)chatDidNotLogin{
