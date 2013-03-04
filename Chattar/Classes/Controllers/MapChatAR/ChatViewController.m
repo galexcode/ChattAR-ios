@@ -56,8 +56,6 @@
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveUserProfilePictures:) name:kDidReceiveUserProfilePicturesURL object:nil];
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAddNewPointToChat:) name:kDidReceiveMessage object:nil];
-
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAddNewPointToChat:) name:kWillAddNewMessageToChat object:nil];
 
 
@@ -195,7 +193,7 @@
                 [dataStorage insertObjectToAllData:message atIndex:index];
                 
                 index = ([dataStorage storageCount] > 0) ? ([dataStorage storageCount]-1) : 0;
-                [dataStorage insertObjectToAllData:message atIndex:index];
+                [dataStorage insertObjectToPartialData:message atIndex:index];
             }
         });
     }
@@ -1068,7 +1066,7 @@
         }
         
         self.messagesTableView.tag = 0;
-
+        [self.messagesTableView reloadData];
     }
 }
 
