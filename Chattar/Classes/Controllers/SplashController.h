@@ -14,7 +14,6 @@
     IBOutlet UIActivityIndicatorView *activityIndicator;
     IBOutlet UIButton *loginButton;
     MBProgressHUD* hud;
-    NSString* qbToken;
 }
 
 @property (nonatomic) BOOL openedAtStartApp;
