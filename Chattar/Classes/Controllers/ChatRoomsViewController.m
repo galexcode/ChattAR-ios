@@ -17,6 +17,7 @@
 
 @implementation ChatRoomsViewController
 @synthesize dialogsController;
+@synthesize loadingIndicator = _loadingIndicator;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -60,6 +61,18 @@
 }
 
 -(void)viewWillAppear:(BOOL)animated{
+    if ([DataManager shared].qbChatRooms.count == 0 && [DataManager shared].roomsWithAdditionalInfo.count == 0) {
+        [[BackgroundWorker instance] requestAdditionalChatRoomsInfo];
+        [self addSpinner];
+        
+        // additional request for checkins
+        if ([DataManager shared].allCheckins.count == 0) {
+            [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
+        }        
+    }
+    else
+        [_roomsTableView reloadData];
+    
     [self.roomsTableView deselectRowAtIndexPath:[self.roomsTableView indexPathForSelectedRow] animated:YES];
 }
 
@@ -73,11 +86,13 @@
     [_roomsTableView release];
     [_newConversationTextField release];
     [dialogsController release];
+    [_loadingIndicator release];
     [super dealloc];
 }
 - (void)viewDidUnload {
     [self setRoomsTableView:nil];
     [self setNewConversationTextField:nil];
+    [self setLoadingIndicator:nil];
     [super viewDidUnload];
 }
 - (IBAction)startButtonTap:(UIButton *)sender {
@@ -89,6 +104,22 @@
 
 #pragma mark -
 #pragma mark Interface based methods
+
+-(void)addSpinner{
+    if (!_loadingIndicator) {
+        _loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    }
+    
+    if (![self.view viewWithTag:INDICATOR_TAG]) {
+        [self.view addSubview:_loadingIndicator];
+        [_loadingIndicator startAnimating];
+    }
+    
+    _loadingIndicator.center = self.view.center;
+    [self.view bringSubviewToFront:_loadingIndicator];
+    
+    [_loadingIndicator setTag:INDICATOR_TAG];
+}
 
 -(UIView*)createHeaderForSection:(NSInteger)section{
     UILabel* header = [[[UILabel alloc] initWithFrame:CGRectZero] autorelease];
@@ -261,7 +292,6 @@
         
         // save current chat room
         [DataManager shared].currentChatRoom = selectedChatRoomWithAdditionalInfo;
-        
     }
 
     
@@ -279,6 +309,8 @@
 #pragma mark -
 #pragma mark Notifications Reactions
 -(void)doReceiveChatRooms{
+    [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
+    
     [_roomsTableView reloadData];
 }
 

@@ -21,6 +21,7 @@
 - (IBAction)startButtonTap:(UIButton *)sender;
 
 @property (nonatomic, retain) UINavigationController* dialogsController;
+@property (retain, nonatomic) IBOutlet UIActivityIndicatorView *loadingIndicator;
 
 @end
 enum TableSections {
