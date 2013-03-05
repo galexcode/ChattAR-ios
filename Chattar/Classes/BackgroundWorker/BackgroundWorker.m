@@ -1673,7 +1673,6 @@ static BackgroundWorker* instance = nil;
             room.messagesHistory = [[NSMutableArray alloc] init];
         }
         if (message.text.length > 0 && message.text) {
-            [room.messagesHistory addObject:message];
                         
             if (room.isSendingMessage) {
                 if ([tabBarDelegate respondsToSelector:@selector(willClearMessageFieldInViewControllerWithIdentifier:)]) {
@@ -1692,6 +1691,9 @@ static BackgroundWorker* instance = nil;
                 
                 room.isSendingMessage = NO;
             }
+            else
+                [room.messagesHistory addObject:message];
+
         }
 
     }
