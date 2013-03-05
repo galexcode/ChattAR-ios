@@ -197,6 +197,8 @@
 		ED60014016DCF2230023E5CD /* Storage.m in Sources */ = {isa = PBXBuildFile; fileRef = ED60013F16DCF2230023E5CD /* Storage.m */; };
 		ED60014316DCF2350023E5CD /* ChatPointsStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = ED60014216DCF2350023E5CD /* ChatPointsStorage.m */; };
 		ED60014616DCF24C0023E5CD /* ChatRoomsStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = ED60014516DCF24C0023E5CD /* ChatRoomsStorage.m */; };
+		ED8749E716E6288F00D4EA19 /* seeAllExpanded.png in Resources */ = {isa = PBXBuildFile; fileRef = ED8749E516E6288F00D4EA19 /* seeAllExpanded.png */; };
+		ED8749E816E6288F00D4EA19 /* seeAllExpanded@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = ED8749E616E6288F00D4EA19 /* seeAllExpanded@2x.png */; };
 		ED91256C16DB70AE00B11902 /* occupantsCounter.png in Resources */ = {isa = PBXBuildFile; fileRef = ED91256516DB70AE00B11902 /* occupantsCounter.png */; };
 		ED91256D16DB70AE00B11902 /* occupantsCounter@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = ED91256616DB70AE00B11902 /* occupantsCounter@2x.png */; };
 		ED91256E16DB70AE00B11902 /* seeAllButton.png in Resources */ = {isa = PBXBuildFile; fileRef = ED91256716DB70AE00B11902 /* seeAllButton.png */; };
@@ -522,6 +524,8 @@
 		ED60014216DCF2350023E5CD /* ChatPointsStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatPointsStorage.m; sourceTree = "<group>"; };
 		ED60014416DCF24C0023E5CD /* ChatRoomsStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatRoomsStorage.h; sourceTree = "<group>"; };
 		ED60014516DCF24C0023E5CD /* ChatRoomsStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatRoomsStorage.m; sourceTree = "<group>"; };
+		ED8749E516E6288F00D4EA19 /* seeAllExpanded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = seeAllExpanded.png; sourceTree = "<group>"; };
+		ED8749E616E6288F00D4EA19 /* seeAllExpanded@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "seeAllExpanded@2x.png"; sourceTree = "<group>"; };
 		ED91256516DB70AE00B11902 /* occupantsCounter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = occupantsCounter.png; sourceTree = "<group>"; };
 		ED91256616DB70AE00B11902 /* occupantsCounter@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "occupantsCounter@2x.png"; sourceTree = "<group>"; };
 		ED91256716DB70AE00B11902 /* seeAllButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = seeAllButton.png; sourceTree = "<group>"; };
@@ -1175,6 +1179,8 @@
 		ED91256416DB70AE00B11902 /* ChatRooms */ = {
 			isa = PBXGroup;
 			children = (
+				ED8749E516E6288F00D4EA19 /* seeAllExpanded.png */,
+				ED8749E616E6288F00D4EA19 /* seeAllExpanded@2x.png */,
 				ED91258616DBA97F00B11902 /* headerBGColor.png */,
 				ED91258216DB9C0900B11902 /* background.png */,
 				ED91257A16DB73FD00B11902 /* startConversationButton.png */,
@@ -1543,6 +1549,8 @@
 				ED91257D16DB73FD00B11902 /* startConversationButton@2x.png in Resources */,
 				ED91258316DB9C0A00B11902 /* background.png in Resources */,
 				ED91258716DBA97F00B11902 /* headerBGColor.png in Resources */,
+				ED8749E716E6288F00D4EA19 /* seeAllExpanded.png in Resources */,
+				ED8749E816E6288F00D4EA19 /* seeAllExpanded@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

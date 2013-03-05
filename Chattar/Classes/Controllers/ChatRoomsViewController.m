@@ -18,6 +18,9 @@
 @implementation ChatRoomsViewController
 @synthesize dialogsController;
 @synthesize loadingIndicator = _loadingIndicator;
+@synthesize mainHeaderSection;
+@synthesize nearbyHeaderSection;
+@synthesize trendingHeaderSection;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -91,6 +94,10 @@
     [dialogsController release];
     [_loadingIndicator release];
     [expandedSections release];
+    
+    [mainHeaderSection release];
+    [trendingHeaderSection release];
+    [nearbyHeaderSection release];
     [super dealloc];
 }
 - (void)viewDidUnload {
@@ -149,64 +156,78 @@
     [_loadingIndicator setTag:INDICATOR_TAG];
 }
 
--(UIView*)createHeaderForSection:(NSInteger)section{
-    UILabel* header = [[[UILabel alloc] initWithFrame:CGRectZero] autorelease];
-    [header setBackgroundColor:[UIColor clearColor]];
-    [header setTextColor:[UIColor whiteColor]];
-    CGSize titleViewSize;
-    
+-(UIView*)createHeaderForSection:(NSInteger)section{    
     switch (section) {
         case mainChatSection:{
-            [header setText:@"Main"];
+            if (!mainHeaderSection) {
+                mainHeaderSection = [[self createViewWithTitle:@"Main" forSection:section] retain];
+            }
+            return mainHeaderSection;
         }
             break;
         case trendingSection:{
-            [header setText:@"Trending"];
+            if (!trendingHeaderSection) {
+                trendingHeaderSection = [[self createViewWithTitle:@"Trending" forSection:section] retain];
+            }
+            return trendingHeaderSection;
         }
             break;
-            
+
         case nearbySection:{
-            [header setText:@"Nearby"];
+            if (!nearbyHeaderSection) {
+                nearbyHeaderSection = [[self createViewWithTitle:@"Nearby" forSection:section] retain];
+            }
+            return nearbyHeaderSection;
         }
             break;
-            
+
         default:
             break;
     }
-    
+    return nil;
+}
+
+-(UIImageView*)createViewWithTitle:(NSString*)title forSection:(NSInteger)section{
+    UILabel* header = [[[UILabel alloc] initWithFrame:CGRectZero] autorelease];
+    [header setBackgroundColor:[UIColor clearColor]];
+    [header setTextColor:[UIColor whiteColor]];
+    [header setText:title];
+    CGSize titleViewSize;
+
     titleViewSize = [header.text sizeWithFont:header.font];
     [header setFrame:CGRectMake(10, 5, titleViewSize.width, titleViewSize.height)];
     UIView* sectionTitleView = [[[UIView alloc] initWithFrame:CGRectMake(20, 0, titleViewSize.width + 20, 30)] autorelease];
-    
-    
+
+
     [sectionTitleView setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"headerBGColor"]]];
     [sectionTitleView.layer setCornerRadius:8];
 
     [sectionTitleView addSubview:header];
-    
+
     UIImageView* viewForHeaderInSection = [[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.roomsTableView.bounds.size.width, 30)] autorelease];
     [viewForHeaderInSection addSubview:sectionTitleView];
-    
+
     UILabel* seeAllText = [[[UILabel alloc] initWithFrame:CGRectZero] autorelease];
     [seeAllText setBackgroundColor:[UIColor clearColor]];
     CGSize seeAllTextSize = [@"See All" sizeWithFont:seeAllText.font];
-    
+
     [seeAllText setFrame:CGRectMake(_roomsTableView.bounds.size.width-95, 5, seeAllTextSize.width, seeAllTextSize.height)];
     [seeAllText setTextColor:[UIColor grayColor]];
     [seeAllText setText:@"See All"];
     [viewForHeaderInSection addSubview:seeAllText];
-    
+
     UIButton* seeAllButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [seeAllButton setFrame:CGRectMake(_roomsTableView.bounds.size.width-40, 5, 20, 20)];
+
     [seeAllButton setImage:[UIImage imageNamed:@"seeAllButton.png"] forState:UIControlStateNormal];
-    
+
     if (section == nearbySection) {
         [seeAllButton setTag:NEARBY_SECTION_INDEX];
     }
     else if (section == trendingSection){
         [seeAllButton setTag:TRENDING_SECTION_INDEX];
     }
-    
+
     [seeAllButton addTarget:self action:@selector(expandSection:) forControlEvents:UIControlEventTouchDown];
     [viewForHeaderInSection addSubview:seeAllButton];
     [viewForHeaderInSection bringSubviewToFront:seeAllButton];
@@ -265,9 +286,12 @@
         }
         
         if (currentlyExpanded) {
+            [sender setImage:[UIImage imageNamed:@"seeAllButton.png"] forState:UIControlStateNormal];
             [_roomsTableView deleteRowsAtIndexPaths:tmpArray withRowAnimation:UITableViewRowAnimationTop];
         }
+        
         else{
+            [sender setImage:[UIImage imageNamed:@"seeAllExpanded.png"] forState:UIControlStateNormal];
             [_roomsTableView insertRowsAtIndexPaths:tmpArray withRowAnimation:UITableViewRowAnimationTop];
         }
         
