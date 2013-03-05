@@ -926,11 +926,6 @@ static DataManager *instance = nil;
     return nil;
 }
 
--(UserAnnotation*)convertChatRoomToUserAnnotation:(ChatRoom*)chatRooom{
-    #warning UNIMPLEMENTED
-    return nil;
-}
-
 -(QBChatMessage*)convertUserAnnotationToQBChatMessage:(UserAnnotation*)annotation{
     QBChatMessage* returnMessage = [[[QBChatMessage alloc] init] autorelease];
     [returnMessage setDatetime:annotation.createdAt];

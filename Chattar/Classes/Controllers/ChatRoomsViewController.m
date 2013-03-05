@@ -28,6 +28,7 @@
 
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveChatRooms) name:kDataIsReadyForDisplaying object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doNeedDisplayChatRoomsController) name:kNeedToDisplayChatRoomController object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doCreateNewRoom) name:kNewChatRoomCreated object:nil];
     }
     return self;
 }
@@ -58,6 +59,8 @@
     dialogsController.navigationBarHidden = YES;
     
     [dialogsController setDelegate:self];
+    
+    expandedSections = [[NSMutableIndexSet alloc] init];
 }
 
 -(void)viewWillAppear:(BOOL)animated{
@@ -87,6 +90,7 @@
     [_newConversationTextField release];
     [dialogsController release];
     [_loadingIndicator release];
+    [expandedSections release];
     [super dealloc];
 }
 - (void)viewDidUnload {
@@ -104,6 +108,30 @@
 
 #pragma mark -
 #pragma mark Interface based methods
+
+-(void)showChatController{
+    ChatRoomsStorage* dataStorage = [[[ChatRoomsStorage alloc] init] autorelease];
+
+    ChatViewController* chatViewController = [[[ChatViewController alloc] initWithNibName:@"ChatViewController" bundle:nil] autorelease];
+    [chatViewController setDataStorage:dataStorage];
+    
+    chatViewController.controllerReuseIdentifier = [[NSString alloc] initWithString:chatRoomsViewControllerIdentifier];
+    chatViewController.title = NSLocalizedString([DataManager shared].currentChatRoom.roomName, nil);
+    [self.navigationController pushViewController:chatViewController animated:NO];
+
+}
+
+- (BOOL)canCollapseSection:(NSInteger)section
+{
+    if (section == nearbySection) {
+        return ([DataManager shared].nearbyRooms.count > 2);
+    }
+    else if (section == trendingSection){
+        return ([DataManager shared].trendingRooms.count > 2);
+    }
+    
+    return NO;
+}
 
 -(void)addSpinner{
     if (!_loadingIndicator) {
@@ -172,7 +200,17 @@
     [seeAllButton setFrame:CGRectMake(_roomsTableView.bounds.size.width-40, 5, 20, 20)];
     [seeAllButton setImage:[UIImage imageNamed:@"seeAllButton.png"] forState:UIControlStateNormal];
     
+    if (section == nearbySection) {
+        [seeAllButton setTag:NEARBY_SECTION_INDEX];
+    }
+    else if (section == trendingSection){
+        [seeAllButton setTag:TRENDING_SECTION_INDEX];
+    }
+    
+    [seeAllButton addTarget:self action:@selector(expandSection:) forControlEvents:UIControlEventTouchDown];
     [viewForHeaderInSection addSubview:seeAllButton];
+    [viewForHeaderInSection bringSubviewToFront:seeAllButton];
+    [viewForHeaderInSection setUserInteractionEnabled:YES];
     
     return viewForHeaderInSection;
 }
@@ -189,6 +227,50 @@
             
         default:
             break;
+    }
+}
+
+-(void)expandSection:(UIButton*)sender{
+    NSInteger currentSection = -1;
+                    // determine section
+    if (sender.tag == NEARBY_SECTION_INDEX) {
+        currentSection = nearbySection;
+    }
+
+    else if (sender.tag == TRENDING_SECTION_INDEX){
+        currentSection = trendingSection;
+    }
+    
+    if ([self canCollapseSection:currentSection]) {
+        BOOL currentlyExpanded = [expandedSections containsIndex:currentSection];
+        
+        NSInteger rows;
+        
+        NSMutableArray *tmpArray = [NSMutableArray array];
+        
+        if (currentlyExpanded){
+            rows = [self tableView:_roomsTableView numberOfRowsInSection:currentSection];
+            [expandedSections removeIndex:currentSection];
+        }
+        
+        else{
+            [expandedSections addIndex:currentSection];
+            rows = [self tableView:_roomsTableView numberOfRowsInSection:currentSection];
+        }
+        
+        for (int i = NUMBER_OF_ROWS_BY_DEFAULT; i < rows; i++){
+            NSIndexPath *tmpIndexPath = [NSIndexPath indexPathForRow:i
+                                                           inSection:currentSection];
+            [tmpArray addObject:tmpIndexPath];
+        }
+        
+        if (currentlyExpanded) {
+            [_roomsTableView deleteRowsAtIndexPaths:tmpArray withRowAnimation:UITableViewRowAnimationTop];
+        }
+        else{
+            [_roomsTableView insertRowsAtIndexPaths:tmpArray withRowAnimation:UITableViewRowAnimationTop];
+        }
+        
     }
 }
 
@@ -209,7 +291,22 @@
 #pragma mark -
 #pragma mark UITableViewDataSource 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return (section == mainChatSection) ? 1 : 2;
+    if ([self canCollapseSection:section])
+    {
+        if ([expandedSections containsIndex:section])
+        {
+            if (section == nearbySection) {
+                return [DataManager shared].nearbyRooms.count;
+            }
+            else if (section == trendingSection){
+                return [DataManager shared].trendingRooms.count;
+            }
+        }
+        
+        return NUMBER_OF_ROWS_BY_DEFAULT; 
+    }
+    
+    return (section == mainChatSection) ? 1 : NUMBER_OF_ROWS_BY_DEFAULT;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
@@ -218,13 +315,12 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     static NSString* identifier = @"CellIdentifier";
-    UITableViewCell* cell = [_roomsTableView dequeueReusableCellWithIdentifier:identifier];
+    UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:identifier];
     
     if (!cell) {
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
     }
     
-        
     switch (indexPath.section) {
         case trendingSection:{
             if (indexPath.row < [DataManager shared].trendingRooms.count) {
@@ -244,7 +340,7 @@
         case nearbySection:{
             if (indexPath.row < [DataManager shared].nearbyRooms.count) {
                 ChatRoom* room = [[DataManager shared].nearbyRooms objectAtIndex:indexPath.row];
-                NSString* cellText = [NSString stringWithFormat:@"%f",room.distanceFromUser];
+                NSString* cellText = [NSString stringWithFormat:@"%d miles",(int)room.distanceFromUser];
                 UIImageView* accessoryView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"occupantsCounter.png"]] autorelease];
                 UILabel* counter = [[[UILabel alloc] initWithFrame:CGRectMake(20, -1, 20, 20)] autorelease];
                 [counter setBackgroundColor:[UIColor clearColor]];
@@ -283,6 +379,21 @@
     ChatRoom* selectedChatRoomWithAdditionalInfo = [[DataManager shared] findRoomWithAdditionalInfo:selectedCell.textLabel.text];
     QBChatRoom* selectedChatRoom = [[DataManager shared] findQBRoomWithName:selectedCell.textLabel.text];
     
+//    int index = 0;
+//    
+//    switch (indexPath.section) {
+//        case trendingSection:
+//            indexPath.
+//            break;
+//        
+//        case nearbySection:
+//            break;
+//            
+//        default:
+//            break;
+//    }
+//    
+    
     if (selectedChatRoomWithAdditionalInfo) {
         
         if (![DataManager shared].currentChatRoom) {
@@ -308,6 +419,11 @@
 
 #pragma mark -
 #pragma mark Notifications Reactions
+
+-(void)doCreateNewRoom{
+    [self showChatController];
+}
+
 -(void)doReceiveChatRooms{
     [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
     
@@ -315,14 +431,7 @@
 }
 
 -(void)doNeedDisplayChatRoomsController{
-    ChatRoomsStorage* dataStorage = [[[ChatRoomsStorage alloc] init] autorelease];
-
-    ChatViewController* chatViewController = [[[ChatViewController alloc] initWithNibName:@"ChatViewController" bundle:nil] autorelease];
-    [chatViewController setDataStorage:dataStorage];
-    
-    chatViewController.controllerReuseIdentifier = [[NSString alloc] initWithString:chatRoomsViewControllerIdentifier];
-    chatViewController.title = NSLocalizedString([DataManager shared].currentChatRoom.roomName, nil);
-    [self.navigationController pushViewController:chatViewController animated:NO];
+    [self showChatController];
 }
 
 #pragma mark -

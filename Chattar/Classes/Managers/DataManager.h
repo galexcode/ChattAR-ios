@@ -138,7 +138,6 @@
 
 -(NSArray*)photosWithLocationsFromStorageFromUserWithId:(NSDecimalNumber*)userId;
 -(UserAnnotation*)convertQBMessageToUserAnnotation:(QBChatMessage*)message;
--(UserAnnotation*)convertChatRoomToUserAnnotation:(ChatRoom*)chatRooom;
 -(QBChatMessage*)convertUserAnnotationToQBChatMessage:(UserAnnotation*)annotation;
 
 @end

@@ -58,7 +58,6 @@
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAddNewPointToChat:) name:kWillAddNewMessageToChat object:nil];
 
-
         isPanelDisplayed = NO;
     }
     return self;
@@ -924,6 +923,7 @@
 
 #pragma mark -
 #pragma mark Notifications Reaction
+
 
 -(void)doClearCache{
     showAllUsers  = NO;

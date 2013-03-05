@@ -20,4 +20,6 @@
 @property (nonatomic, retain) NSMutableArray* usersPictures;
 @property (nonatomic, retain) NSMutableArray* messagesAsUserAnnotationForDisplaying;
 @property (nonatomic, assign) BOOL isSendingMessage;
+
++(ChatRoom*)createRoomWithAdditionalInfoWithName:(NSString*)_roomName coordinates:(CLLocationCoordinate2D)coordinates;
 @end

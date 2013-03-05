@@ -20,6 +20,7 @@
 @synthesize usersPictures;
 @synthesize messagesAsUserAnnotationForDisplaying;
 @synthesize isSendingMessage;
+
 -(void)dealloc{
     [roomUsers release];
     [messagesHistory release];
@@ -32,5 +33,21 @@
 
 -(NSString*)description{
     return [NSString stringWithFormat:@"room name - %@ \n room rating - %f \n number of room users - %d \n room messages - %@",roomName,roomRating,roomUsers.count,messagesHistory];
+}
++(ChatRoom*)createRoomWithAdditionalInfoWithName:(NSString*)_roomName coordinates:(CLLocationCoordinate2D)coordinates{
+    ChatRoom* room = [[[ChatRoom alloc] init] autorelease];
+    [room setOwnerLocation:coordinates];
+    [room setCreatedAt:[NSDate date]];
+    [room setRoomName:_roomName];
+    [room setIsSendingMessage:NO];
+    
+    if (!room.messagesHistory) {
+        room.messagesHistory = [[NSMutableArray alloc] init];
+    }
+    
+    if (!room.messagesAsUserAnnotationForDisplaying) {
+        room.messagesAsUserAnnotationForDisplaying = [[NSMutableArray alloc] init];
+    }
+    return room;
 }
 @end

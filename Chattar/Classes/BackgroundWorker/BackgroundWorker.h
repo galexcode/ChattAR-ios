@@ -95,6 +95,7 @@
 -(void)didReceiveUserProfilePicturesForViewControllerWithIdentifier:(NSString*)identifier;
 
 -(void)didReceiveMessageForViewControllerWithIdentifier:(NSString*)identifier;
+-(void)didCreateNewChatRoom:(NSString*)roomName viewControllerWithIdentifier:(NSString*)identifier;
 @end
 
 

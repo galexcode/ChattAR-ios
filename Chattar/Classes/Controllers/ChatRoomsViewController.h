@@ -15,7 +15,13 @@
 #import "Storage.h"
 #import "ChatViewController.h"
 
-@interface ChatRoomsViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate,UINavigationControllerDelegate>
+#define NUMBER_OF_ROWS_BY_DEFAULT 2
+#define NEARBY_SECTION_INDEX 1 
+#define TRENDING_SECTION_INDEX 2
+@interface ChatRoomsViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate,UINavigationControllerDelegate>{
+    NSMutableIndexSet* expandedSections;
+}
+
 @property (retain, nonatomic) IBOutlet UITableView *roomsTableView;
 @property (retain, nonatomic) IBOutlet UITextField *newConversationTextField;
 - (IBAction)startButtonTap:(UIButton *)sender;

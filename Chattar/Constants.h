@@ -60,6 +60,7 @@
 #define kDidReceiveUserProfilePicturesURL @"kDidReceiveUserProfilePicturesURL"
 
 #define kDidReceiveMessage @"kDidReceiveMessage"
+#define kNewChatRoomCreated @"kNewChatRoomCreated"
 
 #define INDICATOR_TAG 23458
 // Strings

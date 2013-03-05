@@ -1717,6 +1717,20 @@ static BackgroundWorker* instance = nil;
         
             // add room to storage
         [[DataManager shared].qbChatRooms addObject:room];
+        
+                                                // set created room as current
+        ChatRoom* newRoom = [ChatRoom createRoomWithAdditionalInfoWithName:[Helper createTitleFromXMPPTitle:room.roomName] coordinates:locationManager.location.coordinate];
+        [DataManager shared].currentChatRoom = newRoom;
+        
+        if (![DataManager shared].roomsWithAdditionalInfo) {
+            [DataManager shared].roomsWithAdditionalInfo = [[NSMutableArray alloc] init];
+        }
+        
+        [[DataManager shared].roomsWithAdditionalInfo addObject:newRoom];
+                
+        if ([tabBarDelegate respondsToSelector:@selector(didCreateNewChatRoom:viewControllerWithIdentifier:)]) {
+            [tabBarDelegate didCreateNewChatRoom:room.roomName viewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+        }
     }
                         // join to already existing room
     else{
