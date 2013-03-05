@@ -195,6 +195,8 @@
                 index = ([dataStorage storageCount] > 0) ? ([dataStorage storageCount]-1) : 0;
                 [dataStorage insertObjectToPartialData:message atIndex:index];
             }
+            
+            [self.messagesTableView reloadData];
         });
     }
     
