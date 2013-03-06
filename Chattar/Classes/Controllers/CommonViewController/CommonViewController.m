@@ -141,7 +141,6 @@
 
 - (void)actionSheetViewFBProfile{
     // View personal FB page
-    
     NSString *url = [NSString stringWithFormat:@"http://www.facebook.com/profile.php?id=%@",self.selectedUserAnnotation.fbUserId];
     
     WebViewController *webViewControleler = [[WebViewController alloc] init];

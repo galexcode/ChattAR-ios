@@ -75,7 +75,7 @@
 - (void)createSessionWithDelegate:(id)delegate{    
     // QuickBlox application authorization
     
-    if(openedAtStartApp){
+    if (openedAtStartApp) {
 
         [activityIndicator startAnimating];
 
@@ -268,7 +268,11 @@
     }else if([result isKindOfClass:QBUUserResult.class]){
         QBUUserResult *res = (QBUUserResult *)result;
         [DataManager shared].currentQBUser = res.user;
-    }    
+    }
+    else {
+        NSLog(@"%@",result.errors);
+    }
+    
 }
 
 #pragma mark -
