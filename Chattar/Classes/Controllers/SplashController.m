@@ -195,8 +195,9 @@
         // save FB user
         [DataManager shared].currentFBUser = [[result.body mutableCopy] autorelease];
         [DataManager shared].currentFBUserId = [[DataManager shared].currentFBUser objectForKey:kId];
+        // 
+        [QBUsers userWithFacebookID:[DataManager shared].currentFBUserId delegate:self];
                 
-        [QBUsers logInWithSocialProvider:@"facebook" accessToken:[[[DataManager shared] fbUserTokenAndDate] objectForKey:FBAccessTokenKey] accessTokenSecret:nil delegate:self];
     }
 }
 
@@ -231,6 +232,7 @@
             [[QBChat instance] setDelegate:self];
             [[QBChat instance] loginWithUser:user];
             
+            
             // register as subscribers for receiving push notifications
             [QBMessages TRegisterSubscriptionWithDelegate:self];
         }
@@ -263,11 +265,10 @@
         NSArray *cookies = [cookiesStorage cookies];
         NSData *data = [NSKeyedArchiver archivedDataWithRootObject:cookies];
         [[NSUserDefaults standardUserDefaults] setObject:data forKey:FB_COOKIES];
+    }else if([result isKindOfClass:QBUUserResult.class]){
+        QBUUserResult *res = (QBUUserResult *)result;
+        [DataManager shared].currentQBUser = res.user;
     }    
-    else {
-        NSLog(@"%@",result.errors);
-    }
-    
 }
 
 #pragma mark -
