@@ -100,6 +100,7 @@
     [nearbyHeaderSection release];
     [super dealloc];
 }
+
 - (void)viewDidUnload {
     [self setRoomsTableView:nil];
     [self setNewConversationTextField:nil];
@@ -110,6 +111,11 @@
     NSString* roomName = _newConversationTextField.text;
     if ([Helper isStringCorrect:roomName]) {
         [[BackgroundWorker instance] createChatRoom:roomName];
+    }
+    else{
+        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Incorrect chat room name" message:@"Please enter valid chat room name" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+        [alert show];
+        [alert release];
     }
 }
 
