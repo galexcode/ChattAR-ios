@@ -409,21 +409,6 @@
     ChatRoom* selectedChatRoomWithAdditionalInfo = [[DataManager shared] findRoomWithAdditionalInfo:selectedCell.textLabel.text];
     QBChatRoom* selectedChatRoom = [[DataManager shared] findQBRoomWithName:selectedCell.textLabel.text];
     
-//    int index = 0;
-//    
-//    switch (indexPath.section) {
-//        case trendingSection:
-//            indexPath.
-//            break;
-//        
-//        case nearbySection:
-//            break;
-//            
-//        default:
-//            break;
-//    }
-//    
-    
     if (selectedChatRoomWithAdditionalInfo) {
         
         if (![DataManager shared].currentChatRoom) {
