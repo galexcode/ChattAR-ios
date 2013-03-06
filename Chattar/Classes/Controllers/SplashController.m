@@ -72,19 +72,7 @@
     loginButton.hidden = !isShow;
 }
 
-- (void)createSessionWithDelegate:(id)delegate{
-//  	// Create extended application authorization request (for push notifications)
-//	QBASessionCreationRequest *extendedAuthRequest = [[QBASessionCreationRequest alloc] init];
-//    if([DataManager shared].currentFBUser){
-//        extendedAuthRequest.userLogin = [[NumberToLetterConverter instance] convertNumbersToLetters:[[DataManager shared].currentFBUser objectForKey:kId]];
-//        extendedAuthRequest.userPassword = [NSString stringWithFormat:@"%u", [[[DataManager shared].currentFBUser objectForKey:kId] hash]];
-//    }
-//	
-//	// QuickBlox application authorization
-//	[QBAuth createSessionWithExtendedRequest:extendedAuthRequest delegate:delegate];
-//	
-//	[extendedAuthRequest release];
-    
+- (void)createSessionWithDelegate:(id)delegate{    
     // QuickBlox application authorization
     
     if(openedAtStartApp){
@@ -207,8 +195,7 @@
         // save FB user
         [DataManager shared].currentFBUser = [[result.body mutableCopy] autorelease];
         [DataManager shared].currentFBUserId = [[DataManager shared].currentFBUser objectForKey:kId];
-        
-                        // try to auth
+                
         [QBUsers logInWithSocialProvider:@"facebook" accessToken:[[[DataManager shared] fbUserTokenAndDate] objectForKey:FBAccessTokenKey] accessTokenSecret:nil delegate:self];
     }
 }
@@ -235,10 +222,20 @@
                 }
             }
             
+            QBAAuthSessionCreationResult* res = (QBAAuthSessionCreationResult*)result;
             
-        // Errors
+            QBUUser* user = [QBUUser user];
+            user.password =  [BaseService sharedService].token;
+            user.ID = res.session.userID;
+            
+            [[QBChat instance] setDelegate:self];
+            [[QBChat instance] loginWithUser:user];
+            
+            // register as subscribers for receiving push notifications
+            [QBMessages TRegisterSubscriptionWithDelegate:self];
         }
         else{
+            // Errors
             NSString *message = [result.errors stringValue];
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Errors", nil) 
                                                             message:message  
@@ -251,32 +248,7 @@
             [activityIndicator stopAnimating];
         }
 	
-	// QuickBlox User authenticate result
-    }else if([result isKindOfClass:[QBUUserLogInResult class]]){
-        // Success result
-		if(result.success){
-            QBUUserLogInResult *res = (QBUUserLogInResult *)result;
-            
-            // save current user
-            [DataManager shared].currentQBUser = res.user;
-            
-
-            // log in QBChat
-            QBUUser* user = [QBUUser user];
-            user.ID = res.user.ID;
-            user.password = [BaseService sharedService].token;
-            
-            //            // log in QBChat
-            [[QBChat instance] setDelegate:self];
-            [[QBChat instance] loginWithUser:user];
-
-            // register as subscribers for receiving push notifications
-            [QBMessages TRegisterSubscriptionWithDelegate:self];
-            
-		}
-                    // Register for Push Notifications result
-	}else
-        if([result isKindOfClass:[QBMRegisterSubscriptionTaskResult class]]){
+    }else if([result isKindOfClass:[QBMRegisterSubscriptionTaskResult class]]){
         
         [Flurry logEvent:FLURRY_EVENT_USER_DID_LOGIN];
         
@@ -291,11 +263,10 @@
         NSArray *cookies = [cookiesStorage cookies];
         NSData *data = [NSKeyedArchiver archivedDataWithRootObject:cookies];
         [[NSUserDefaults standardUserDefaults] setObject:data forKey:FB_COOKIES];
+    }    
+    else {
+        NSLog(@"%@",result.errors);
     }
-    
-        else {
-            NSLog(@"%@",result.errors);
-        }
     
 }
 
