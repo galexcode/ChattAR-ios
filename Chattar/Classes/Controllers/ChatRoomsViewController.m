@@ -402,12 +402,18 @@
 
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    
 
-    UITableViewCell* selectedCell = [tableView cellForRowAtIndexPath:indexPath];
-    
-    ChatRoom* selectedChatRoomWithAdditionalInfo = [[DataManager shared] findRoomWithAdditionalInfo:selectedCell.textLabel.text];
-    QBChatRoom* selectedChatRoom = [[DataManager shared] findQBRoomWithName:selectedCell.textLabel.text];
+    ChatRoom* selectedChatRoomWithAdditionalInfo = nil;
+    switch (indexPath.section) {
+        case nearbySection:
+            selectedChatRoomWithAdditionalInfo = [[DataManager shared].nearbyRooms objectAtIndex:indexPath.row];
+            break;
+        case trendingSection:
+            selectedChatRoomWithAdditionalInfo = [[DataManager shared].trendingRooms objectAtIndex:indexPath.row];
+        default:
+            break;
+    }
+    QBChatRoom* selectedChatRoom = [[DataManager shared] findQBRoomWithName:selectedChatRoomWithAdditionalInfo.roomName];
     
     if (selectedChatRoomWithAdditionalInfo) {
         
