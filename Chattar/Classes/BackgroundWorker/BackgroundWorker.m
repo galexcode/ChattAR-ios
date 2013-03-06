@@ -217,8 +217,8 @@ static BackgroundWorker* instance = nil;
     // get chat messages from cash
     NSArray *cashedChatMessages = [[DataManager shared] chatMessagesFromStorage];
     
-    NSMutableArray* chatPoints = [[NSMutableArray alloc] init];
-    NSMutableArray* chatMessagesIDs = [[NSMutableArray alloc] init];
+    NSMutableArray* chatPoints = [[[NSMutableArray alloc] init] autorelease];
+    NSMutableArray* chatMessagesIDs = [[[NSMutableArray alloc] init] autorelease];
     
     NSDate *lastMessageDate = nil;
 
@@ -231,18 +231,16 @@ static BackgroundWorker* instance = nil;
             [chatPoints addObject:chatCashedMessage.body];
             [chatMessagesIDs addObject:[NSString stringWithFormat:@"%d", ((UserAnnotation *)chatCashedMessage.body).geoDataID]];
         }
-    }
         
-    NSMutableDictionary* allChatData = [[[NSMutableDictionary alloc] init] autorelease];
-    [allChatData setObject:chatPoints forKey:@"allChatPoints"];
-    [allChatData setObject:chatMessagesIDs forKey:@"chatMessagesIDs"];
-    
-    if ([tabBarDelegate respondsToSelector:@selector(chatDidReceiveAllCachedData:)]) {
-        [tabBarDelegate chatDidReceiveAllCachedData:allChatData];
+        NSMutableDictionary* allChatData = [[[NSMutableDictionary alloc] init] autorelease];
+        [allChatData setObject:chatPoints forKey:@"allChatPoints"];
+        [allChatData setObject:chatMessagesIDs forKey:@"chatMessagesIDs"];
+        
+        if ([tabBarDelegate respondsToSelector:@selector(chatDidReceiveAllCachedData:)]) {
+            [tabBarDelegate chatDidReceiveAllCachedData:allChatData];
+        }
+
     }
-    
-    [chatPoints release];
-    [chatMessagesIDs release];    
     
     // get points for chat
 	QBLGeoDataGetRequest *searchChatMessagesRequest = [[QBLGeoDataGetRequest alloc] init];
@@ -869,8 +867,8 @@ static BackgroundWorker* instance = nil;
 				[ids release];
                 
                 // update chat
-            }else if([((NSString *)contextInfo) isEqualToString:chatSearch]){
-                
+           }else if([((NSString *)contextInfo) isEqualToString:chatSearch]){
+               
                 // get fb users info
                 NSMutableSet *fbChatUsersIds = [[NSMutableSet alloc] init];
                 
@@ -912,7 +910,7 @@ static BackgroundWorker* instance = nil;
                                                  context:context];
                 [fbChatUsersIds release];
                 [ids release];
-            }
+           }
             
         }
         else     // search QB user by FB ID result
@@ -998,7 +996,7 @@ static BackgroundWorker* instance = nil;
         QBLGeoDataResult *geoDataRes = (QBLGeoDataResult*)result;
         
         
-        if ([tabBarDelegate respondsToSelector:@selector(willClearMessageField)]) {
+        if ([tabBarDelegate respondsToSelector:@selector(willClearMessageFieldInViewControllerWithIdentifier:)]) {
             [tabBarDelegate willClearMessageFieldInViewControllerWithIdentifier:chatViewControllerIdentifier];
         }
         
@@ -1006,11 +1004,11 @@ static BackgroundWorker* instance = nil;
         [self createAndAddNewAnnotationToMapChatARForFBUser:[DataManager shared].currentFBUser
                                                                                  withGeoData:geoDataRes.geoData addToTop:YES withReloadTable:YES];
         
-        if ([tabBarDelegate respondsToSelector:@selector(didSuccessfulMessageSending)]) {
+        if ([tabBarDelegate respondsToSelector:@selector(didSuccessfulMessageSendingInViewControllerWithIdentifier:)]) {
             [tabBarDelegate didSuccessfulMessageSendingInViewControllerWithIdentifier:chatViewControllerIdentifier];
         }
         
-        if ([tabBarDelegate respondsToSelector:@selector(willScrollToTop)]) {
+        if ([tabBarDelegate respondsToSelector:@selector(willScrollToTopInViewControllerWithIdentifier:)]) {
             [tabBarDelegate willScrollToTopInViewControllerWithIdentifier:chatViewControllerIdentifier];
         }
         
@@ -1633,7 +1631,7 @@ static BackgroundWorker* instance = nil;
         newAnnotation.distance = 0;
     }
         
-    if ([tabBarDelegate respondsToSelector:@selector(willAddNewMessageToChat:addToTop:withReloadTable:isFBCheckin:)]) {
+    if ([tabBarDelegate respondsToSelector:@selector(willAddNewMessageToChat:addToTop:withReloadTable:isFBCheckin:viewControllerIdentifier:)]) {
         [tabBarDelegate willAddNewMessageToChat:newAnnotation addToTop:toTop withReloadTable:reloadTable isFBCheckin:NO viewControllerIdentifier:chatViewControllerIdentifier];
     }
        
