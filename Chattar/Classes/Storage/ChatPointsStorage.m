@@ -106,13 +106,23 @@
 }
 
 -(void)insertObjectToAllData:(UserAnnotation *)object atIndex:(NSInteger)index{
-    if (index >= 0 && index < [DataManager shared].allChatPoints.count) {
+    if (![DataManager shared].allChatPoints) {
+        [DataManager shared].allChatPoints = [[NSMutableArray alloc] init];
+    }
+
+    if ((index >= 0 && index < [DataManager shared].allChatPoints.count) || !index) {
+        
         [[DataManager shared].allChatPoints insertObject:object atIndex:index];
     }
 }
 
 -(void)insertObjectToPartialData:(UserAnnotation *)object atIndex:(NSInteger)index{
-    if (index >= 0 && index < [DataManager shared].chatPoints.count) {
+    if (![DataManager shared].chatPoints) {
+        [DataManager shared].chatPoints = [[NSMutableArray alloc] init];
+    }
+
+    if ((index >= 0 && index < [DataManager shared].chatPoints.count) || !index) {
+
         [[DataManager shared].chatPoints insertObject:object atIndex:index];
     }
 }

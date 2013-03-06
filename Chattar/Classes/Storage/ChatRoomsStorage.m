@@ -112,6 +112,7 @@
         
     if (index >= 0 && index < [DataManager shared].currentChatRoom.messagesHistory.count) {
         QBChatMessage* message = [[DataManager shared] convertUserAnnotationToQBChatMessage:object];
+        
         if (![[DataManager shared].currentChatRoom.messagesHistory containsObject:message]) {
             [[DataManager shared].currentChatRoom.messagesHistory addObject:message];
         }
