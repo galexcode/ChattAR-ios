@@ -42,11 +42,39 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doGeneralDataEndRetrieving) name:kGeneralDataEndRetrieving object:nil];
 }
 
-- (void)startApplication{
-    // show Login & Registrations buttons
-    [activityIndicator stopAnimating];
-    
-    [self showLoginButton:YES];
+- (void)startApplication {
+    [FBService shared].facebook.accessToken = [[[DataManager shared] fbUserTokenAndDate] objectForKey:FBAccessTokenKey];
+    [FBService shared].facebook.expirationDate = [[[DataManager shared] fbUserTokenAndDate] objectForKey:FBExpirationDateKey];
+
+    if ([[FBService shared].facebook isSessionValid]) {       
+        [activityIndicator startAnimating];
+        
+        [self showLoginButton:NO];
+
+        // get user's profile
+        [[FBService shared] userProfileWithDelegate:self];
+        
+        // auth in Chat
+        [[FBService shared] logInChat];
+        
+        [self createSessionWithDelegate:self];
+
+        
+        // restore FB cookies
+        NSHTTPCookieStorage *cookiesStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+        NSData *data = [[NSUserDefaults standardUserDefaults] objectForKey:FB_COOKIES];
+        NSArray *cookies = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+        for(NSHTTPCookie *cook in cookies) {
+            if([cook.domain rangeOfString:@"facebook.com"].location != NSNotFound){
+                [cookiesStorage setCookie:cook];
+            }
+        }
+
+    }
+    else {
+        [activityIndicator stopAnimating];
+        [self showLoginButton:YES];
+    }
 }
 
 -(void)viewDidAppear:(BOOL)animated{
@@ -72,20 +100,7 @@
     loginButton.hidden = !isShow;
 }
 
-- (void)createSessionWithDelegate:(id)delegate{    
-    // QuickBlox application authorization
-    
-    if (openedAtStartApp) {
-
-        [activityIndicator startAnimating];
-
-		[NSTimer scheduledTimerWithTimeInterval:60*60*2-600 // Expiration date of access token is 2 hours. Repeat request for new token every 1 hour and 50 minutes.
-                                         target:self
-                                       selector:@selector(createSession)
-                                       userInfo:nil
-                                        repeats:YES];
-    }
-    
+- (void)createSessionWithDelegate:(id)delegate{        
     QBASessionCreationRequest *extendedAuthRequest = [QBASessionCreationRequest request];
     extendedAuthRequest.socialProvider = @"facebook";
     extendedAuthRequest.socialProviderAccessToken = [FBService shared].facebook.accessToken;
@@ -146,21 +161,33 @@
 #pragma mark -
 #pragma mark FBSessionDelegate
 
-- (void)fbDidLogin {
+- (void)fbDidLogin{
     NSLog(@"fbDidLogin");
+    
+    if (openedAtStartApp) {
+        
+        [activityIndicator startAnimating];
+        
+		[NSTimer scheduledTimerWithTimeInterval:60*60*2-600 // Expiration date of access token is 2 hours. Repeat request for new token every 1 hour and 50 minutes.
+                                         target:self
+                                       selector:@selector(createSession)
+                                       userInfo:nil
+                                        repeats:YES];
+    }
+
     
     // save FB token and expiration date
     [[DataManager shared] saveFBToken:[FBService shared].facebook.accessToken 
                               andDate:[FBService shared].facebook.expirationDate];
     
     [self createSessionWithDelegate:self];
-    
+        
     // auth in Chat
     [[FBService shared] logInChat];
     
     // get user's profile
     [[FBService shared] userProfileWithDelegate:self];
-    
+            
     [activityIndicator startAnimating];
     [self showLoginButton:NO];
 }
@@ -212,17 +239,6 @@
     if([result isKindOfClass:[QBAAuthSessionCreationResult class]]){
         // Success result
 		if(result.success){                        
-            
-            // restore FB cookies
-            NSHTTPCookieStorage *cookiesStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-            NSData *data = [[NSUserDefaults standardUserDefaults] objectForKey:FB_COOKIES];
-            NSArray *cookies = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-            for(NSHTTPCookie *cook in cookies){
-                if([cook.domain rangeOfString:@"facebook.com"].location != NSNotFound){
-                    [cookiesStorage setCookie:cook];
-                }
-            }
-            
             QBAAuthSessionCreationResult* res = (QBAAuthSessionCreationResult*)result;
             
             QBUUser* user = [QBUUser user];
