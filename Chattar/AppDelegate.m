@@ -98,8 +98,6 @@
     UINavigationController* chatNavigationController = [[UINavigationController alloc] initWithRootViewController:chatViewController];
     [chatViewController release];
     
-    
-    
     // Map
     MapViewController* mapViewController = [[MapViewController alloc] initWithNibName:@"MapViewController" bundle:nil];
     UINavigationController* mapNavigationController = [[UINavigationController alloc] initWithRootViewController:mapViewController];
@@ -164,10 +162,12 @@
     [self.tabBarController presentModalViewController:splashViewController animated:animated];
     [splashViewController release];
     
-    // logout
-    if(animated){
-        [[FBService shared].facebook setSessionDelegate:splashViewController];
-    }
+//    // logout
+//    if(animated){
+//        [[FBService shared].facebook setSessionDelegate:splashViewController];
+//    }
+    [[FBService shared].facebook setSessionDelegate:splashViewController];
+    
 }
 
 // For iOS 4.2+ support
@@ -250,12 +250,6 @@ void uncaughtExceptionHandler(NSException *exception) {
 #ifndef DEBUG
     [Flurry logError:@"Uncaught" message:@"Crash!" exception:exception];
 #endif
-}
-
-#pragma mark -
-#pragma mark UITabBarControllerDelegate methods
--(void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController{
-    
 }
 
 @end

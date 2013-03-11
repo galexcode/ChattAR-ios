@@ -11,7 +11,7 @@
 #import "Storage.h"
 #import "ChatPointsStorage.h"
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate, UIAlertViewDelegate,UITabBarControllerDelegate>{
+@interface AppDelegate : UIResponder <UIApplicationDelegate, UIAlertViewDelegate>{
 }
 @property (retain, nonatomic) UIWindow *window;
 @property (retain, nonatomic) CustomTabBarController *tabBarController;
