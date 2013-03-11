@@ -40,27 +40,26 @@
 {
 
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
     [_newConversationTextField setDelegate:self];
+    NSArray* segments = @[@"Pick up your chat", @"Dialogs"];
     
-    UISegmentedControl* segmentedControl = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:
-                                                                                      NSLocalizedString(@"Pick your chat",nil),
-                                                                                      NSLocalizedString(@"My Dialogs",nil),
-                                                                                      nil]];
-    [segmentedControl setSegmentedControlStyle:UISegmentedControlStyleBar];
-    [segmentedControl setFrame:CGRectMake(20, 7, 280, 30)];
-    [segmentedControl addTarget:self action:@selector(segmentValueDidChanged:) forControlEvents:UIControlEventValueChanged];
-    self.navigationItem.titleView = segmentedControl;
-    [segmentedControl release];
+    UISegmentedControl* segmentControl = [[UISegmentedControl alloc] initWithItems:segments];
+    [segmentControl setSegmentedControlStyle:UISegmentedControlStyleBar];
+    [segmentControl setFrame:CGRectMake(20, 7, 280, 30)];
+    [segmentControl addTarget:self action:@selector(segmentValueDidChanged:) forControlEvents:UIControlEventValueChanged];
+    [segmentControl setSelectedSegmentIndex:0];
+    self.navigationItem.titleView = segmentControl;
     
-    [segmentedControl setSelectedSegmentIndex:0];
-    
+    [segmentControl release];
+
     MessagesViewController* messagesVC = [[MessagesViewController alloc] initWithNibName:@"MessagesViewController" bundle:nil];
     
     dialogsController = [[UINavigationController alloc] initWithRootViewController:messagesVC];
+    
     [messagesVC release];
     dialogsController.navigationBarHidden = YES;
     
+//    [self.navigationController setNavigationBarHidden:YES];
     [dialogsController setDelegate:self];
     
     expandedSections = [[NSMutableIndexSet alloc] init];
@@ -70,6 +69,9 @@
     if ([DataManager shared].qbChatRooms.count == 0 && [DataManager shared].roomsWithAdditionalInfo.count == 0) {
         [[BackgroundWorker instance] requestAdditionalChatRoomsInfo];
         [self addSpinner];
+        
+        NSLog(@"%@",self.navigationItem.titleView);
+
         
         // additional request for checkins
         if ([DataManager shared].allCheckins.count == 0) {
@@ -98,6 +100,8 @@
     [mainHeaderSection release];
     [trendingHeaderSection release];
     [nearbyHeaderSection release];
+    
+    [_displayView release];
     [super dealloc];
 }
 
@@ -105,6 +109,7 @@
     [self setRoomsTableView:nil];
     [self setNewConversationTextField:nil];
     [self setLoadingIndicator:nil];
+    [self setDisplayView:nil];
     [super viewDidUnload];
 }
 - (IBAction)startButtonTap:(UIButton *)sender {
@@ -313,7 +318,7 @@
 
 -(void)showDialogs{
     if ([dialogsController.view superview] == nil) {
-        [self.view addSubview:dialogsController.view];
+        [self.displayView addSubview:dialogsController.view];
     }
     
 }

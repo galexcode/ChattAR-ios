@@ -37,6 +37,7 @@
 
 @property (nonatomic, retain) UINavigationController* dialogsController;
 @property (retain, nonatomic) IBOutlet UIActivityIndicatorView *loadingIndicator;
+@property (retain, nonatomic) IBOutlet UIView *displayView;
 
 @end
 enum TableSections {

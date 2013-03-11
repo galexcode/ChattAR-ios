@@ -117,11 +117,11 @@
         UINavigationController* arNavigationController = [[UINavigationController alloc] initWithRootViewController:arController];
         [arController release];
 
-        viewControllers = [NSArray arrayWithObjects: chatNavigationController,mapNavigationController,arNavigationController,chatRoomsController, settingsNavigationController, nil];
+        viewControllers = @[chatNavigationController,mapNavigationController,arNavigationController,chatRoomsNavigationController, settingsNavigationController];
         [arNavigationController release];
     }
     else
-        viewControllers = [NSArray arrayWithObjects: chatNavigationController,mapNavigationController,chatRoomsNavigationController, settingsNavigationController, nil];
+        viewControllers = @[chatNavigationController,mapNavigationController,chatRoomsNavigationController, settingsNavigationController];
 	_tabBarController.viewControllers = viewControllers;
 	
 	// release controllers

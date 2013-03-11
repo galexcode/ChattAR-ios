@@ -68,8 +68,7 @@
             if([cook.domain rangeOfString:@"facebook.com"].location != NSNotFound){
                 [cookiesStorage setCookie:cook];
             }
-        }
-
+        }   
     }
     else {
         [activityIndicator stopAnimating];
