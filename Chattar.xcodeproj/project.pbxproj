@@ -193,6 +193,13 @@
 		ED5250AD16EF2F8400D72F58 /* dialogsTab@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = ED5250A916EF2F8100D72F58 /* dialogsTab@2x.png */; };
 		ED5250AE16EF2F8400D72F58 /* mapTab@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = ED5250AA16EF2F8100D72F58 /* mapTab@2x.png */; };
 		ED5250AF16EF2F8400D72F58 /* settingsTab@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = ED5250AB16EF2F8100D72F58 /* settingsTab@2x.png */; };
+		ED5250B116EF329200D72F58 /* startConversationBg.png in Resources */ = {isa = PBXBuildFile; fileRef = ED5250B016EF329200D72F58 /* startConversationBg.png */; };
+		ED5250B316EF33D400D72F58 /* chatRoomBG.png in Resources */ = {isa = PBXBuildFile; fileRef = ED5250B216EF33D400D72F58 /* chatRoomBG.png */; };
+		ED5250BA16EF381F00D72F58 /* nearbyHeader.png in Resources */ = {isa = PBXBuildFile; fileRef = ED5250B616EF381F00D72F58 /* nearbyHeader.png */; };
+		ED5250BB16EF381F00D72F58 /* nearbyHeader@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = ED5250B716EF381F00D72F58 /* nearbyHeader@2x.png */; };
+		ED5250BD16EF382E00D72F58 /* trendingHeader@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = ED5250BC16EF382E00D72F58 /* trendingHeader@2x.png */; };
+		ED5250BF16EF3B2C00D72F58 /* mainHeader.png in Resources */ = {isa = PBXBuildFile; fileRef = ED5250BE16EF3B2C00D72F58 /* mainHeader.png */; };
+		ED5250C116EF3B6200D72F58 /* mainHeader@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = ED5250C016EF3B6200D72F58 /* mainHeader@2x.png */; };
 		ED55672916D37102009C385A /* CommonViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED55672816D37102009C385A /* CommonViewController.m */; };
 		ED55672F16D3DE12009C385A /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED55672E16D3DE12009C385A /* Accelerate.framework */; };
 		ED55673B16D4C8ED009C385A /* ChatRoomsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED55673916D4C8EA009C385A /* ChatRoomsViewController.m */; };
@@ -518,6 +525,13 @@
 		ED5250A916EF2F8100D72F58 /* dialogsTab@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "dialogsTab@2x.png"; sourceTree = "<group>"; };
 		ED5250AA16EF2F8100D72F58 /* mapTab@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mapTab@2x.png"; sourceTree = "<group>"; };
 		ED5250AB16EF2F8100D72F58 /* settingsTab@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "settingsTab@2x.png"; sourceTree = "<group>"; };
+		ED5250B016EF329200D72F58 /* startConversationBg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = startConversationBg.png; sourceTree = "<group>"; };
+		ED5250B216EF33D400D72F58 /* chatRoomBG.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = chatRoomBG.png; sourceTree = "<group>"; };
+		ED5250B616EF381F00D72F58 /* nearbyHeader.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = nearbyHeader.png; sourceTree = "<group>"; };
+		ED5250B716EF381F00D72F58 /* nearbyHeader@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "nearbyHeader@2x.png"; sourceTree = "<group>"; };
+		ED5250BC16EF382E00D72F58 /* trendingHeader@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "trendingHeader@2x.png"; sourceTree = "<group>"; };
+		ED5250BE16EF3B2C00D72F58 /* mainHeader.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mainHeader.png; sourceTree = "<group>"; };
+		ED5250C016EF3B6200D72F58 /* mainHeader@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mainHeader@2x.png"; sourceTree = "<group>"; };
 		ED55672716D37102009C385A /* CommonViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonViewController.h; sourceTree = "<group>"; };
 		ED55672816D37102009C385A /* CommonViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommonViewController.m; sourceTree = "<group>"; };
 		ED55672E16D3DE12009C385A /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
@@ -1191,6 +1205,13 @@
 		ED91256416DB70AE00B11902 /* ChatRooms */ = {
 			isa = PBXGroup;
 			children = (
+				ED5250C016EF3B6200D72F58 /* mainHeader@2x.png */,
+				ED5250BE16EF3B2C00D72F58 /* mainHeader.png */,
+				ED5250BC16EF382E00D72F58 /* trendingHeader@2x.png */,
+				ED5250B616EF381F00D72F58 /* nearbyHeader.png */,
+				ED5250B716EF381F00D72F58 /* nearbyHeader@2x.png */,
+				ED5250B216EF33D400D72F58 /* chatRoomBG.png */,
+				ED5250B016EF329200D72F58 /* startConversationBg.png */,
 				ED8749E516E6288F00D4EA19 /* seeAllExpanded.png */,
 				ED8749E616E6288F00D4EA19 /* seeAllExpanded@2x.png */,
 				ED91258616DBA97F00B11902 /* headerBGColor.png */,
@@ -1567,6 +1588,13 @@
 				ED5250AD16EF2F8400D72F58 /* dialogsTab@2x.png in Resources */,
 				ED5250AE16EF2F8400D72F58 /* mapTab@2x.png in Resources */,
 				ED5250AF16EF2F8400D72F58 /* settingsTab@2x.png in Resources */,
+				ED5250B116EF329200D72F58 /* startConversationBg.png in Resources */,
+				ED5250B316EF33D400D72F58 /* chatRoomBG.png in Resources */,
+				ED5250BA16EF381F00D72F58 /* nearbyHeader.png in Resources */,
+				ED5250BB16EF381F00D72F58 /* nearbyHeader@2x.png in Resources */,
+				ED5250BD16EF382E00D72F58 /* trendingHeader@2x.png in Resources */,
+				ED5250BF16EF3B2C00D72F58 /* mainHeader.png in Resources */,
+				ED5250C116EF3B6200D72F58 /* mainHeader@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

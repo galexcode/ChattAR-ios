@@ -24,6 +24,7 @@
 
 @interface ChatRoomsViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate,UINavigationControllerDelegate>{
     NSMutableIndexSet* expandedSections;
+    UITapGestureRecognizer* tapRecognizer;
 }
 
 @property (retain, nonatomic) IBOutlet UITableView *roomsTableView;
