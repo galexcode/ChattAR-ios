@@ -100,8 +100,7 @@ static BackgroundWorker* instance = nil;
     if ([DataManager shared].currentChatRoom.roomUsers.count) {
         NSMutableString* ids = [[[NSMutableString alloc] initWithString:@""] autorelease];
         
-        [[DataManager shared].currentChatRoom.roomUsers enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            QBUUser* user = (QBUUser*)obj;
+        [[DataManager shared].currentChatRoom.roomUsers enumerateObjectsUsingBlock:^(QBUUser* user, NSUInteger idx, BOOL *stop) {
             [ids appendString:user.facebookID];
             if (idx != [DataManager shared].currentChatRoom.roomUsers.count-1) {
                 [ids appendString:@","];
@@ -1217,6 +1216,7 @@ static BackgroundWorker* instance = nil;
                 }
 
             }
+                            // pictures of chat room occupants
             else if ([context isEqualToString:chatRoomUsersProfiles]){
                 numberOfUserPicturesRetrieved--;
                 NSArray* keys = [result.body allKeys];
@@ -1774,10 +1774,17 @@ static BackgroundWorker* instance = nil;
 -(void)calculateDistancesForEachRoom{
     CLLocationCoordinate2D currentLocation = locationManager.location.coordinate;
     for (ChatRoom* room in [DataManager shared].roomsWithAdditionalInfo) {
-        CLLocation* firstLocation = [[[CLLocation alloc] initWithLatitude:room.ownerLocation.latitude longitude:room.ownerLocation.longitude] autorelease];
-        CLLocation* secondLocation = [[[CLLocation alloc] initWithLatitude:currentLocation.latitude longitude:currentLocation.longitude] autorelease];
-        CLLocationDistance distance = [firstLocation distanceFromLocation:secondLocation];
-        [room setDistanceFromUser:distance];
+        if (room.ownerLocation.longitude == 0 && room.ownerLocation.latitude == 0) {
+            [room setDistanceFromUser:0];
+        }
+        else{
+            CLLocation* firstLocation = [[[CLLocation alloc] initWithLatitude:room.ownerLocation.latitude longitude:room.ownerLocation.longitude] autorelease];
+            CLLocation* secondLocation = [[[CLLocation alloc] initWithLatitude:currentLocation.latitude longitude:currentLocation.longitude] autorelease];
+            
+            CLLocationDistance distance = [firstLocation distanceFromLocation:secondLocation];
+            [room setDistanceFromUser:distance];
+
+        }
     }
 }
 

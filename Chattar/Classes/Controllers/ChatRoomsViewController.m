@@ -371,14 +371,13 @@
                 [accessoryView addSubview:counter];
                 [cell setAccessoryView:accessoryView];
                 [cell.textLabel setText:cellText];
-                
             }
             break;
         }
         case nearbySection:{
             if (indexPath.row < [DataManager shared].nearbyRooms.count) {
                 ChatRoom* room = [[DataManager shared].nearbyRooms objectAtIndex:indexPath.row];
-                NSString* cellText = [NSString stringWithFormat:@"%d miles",(int)room.distanceFromUser];
+                NSString* cellText = [NSString stringWithFormat:@"%d kms",(int)room.distanceFromUser/1000];
                 UIImageView* accessoryView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"occupantsCounter.png"]] autorelease];
                 UILabel* counter = [[[UILabel alloc] initWithFrame:CGRectMake(20, -1, 20, 20)] autorelease];
                 [counter setBackgroundColor:[UIColor clearColor]];

@@ -32,7 +32,7 @@
 }
 
 -(NSString*)description{
-    return [NSString stringWithFormat:@"room name - %@ \n room rating - %f \n number of room users - %d \n room messages - %@",roomName,roomRating,roomUsers.count,messagesHistory];
+    return [NSString stringWithFormat:@"room name - %@ \n room rating - %f \n number of room users - %d \n room messages - %@\n room location - %f %f",roomName,roomRating,roomUsers.count,messagesHistory, ownerLocation.latitude,ownerLocation.longitude];
 }
 +(ChatRoom*)createRoomWithAdditionalInfoWithName:(NSString*)_roomName coordinates:(CLLocationCoordinate2D)coordinates{
     ChatRoom* room = [[[ChatRoom alloc] init] autorelease];
