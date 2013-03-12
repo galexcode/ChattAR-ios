@@ -84,28 +84,28 @@
 	[settingsViewController.navigationController setValue:[[[FBNavigationBar alloc]init] autorelease] forKeyPath:@"navigationBar"];
     [settingsViewController release];
     
-    // Dialogs
-    MessagesViewController *messagesViewController = [[MessagesViewController alloc] initWithNibName:@"MessagesViewController" bundle:nil];
-	UINavigationController *messagesNavigationController = [[UINavigationController alloc] initWithRootViewController:messagesViewController];
-	[messagesViewController.navigationController setValue:[[[FBNavigationBar alloc]init] autorelease] forKeyPath:@"navigationBar"];
-    [messagesViewController release];
-    
     // Chat
     ChatViewController* chatViewController = [[ChatViewController alloc] initWithNibName:@"ChatViewController" bundle:nil];
+
     chatViewController.dataStorage = [[ChatPointsStorage alloc] init];
     chatViewController.controllerReuseIdentifier = [[NSString alloc] initWithString:chatViewControllerIdentifier];
     
     UINavigationController* chatNavigationController = [[UINavigationController alloc] initWithRootViewController:chatViewController];
+    [chatViewController.navigationController setValue:[[[FBNavigationBar alloc]init] autorelease] forKeyPath:@"navigationBar"];
     [chatViewController release];
     
     // Map
     MapViewController* mapViewController = [[MapViewController alloc] initWithNibName:@"MapViewController" bundle:nil];
     UINavigationController* mapNavigationController = [[UINavigationController alloc] initWithRootViewController:mapViewController];
+    [mapViewController.navigationController setValue:[[[FBNavigationBar alloc]init] autorelease] forKeyPath:@"navigationBar"];
+
     [mapViewController release];
     
     // Chat Rooms
     ChatRoomsViewController* chatRoomsController = [[ChatRoomsViewController alloc] initWithNibName:@"ChatRoomsViewController" bundle:nil];
     UINavigationController* chatRoomsNavigationController = [[UINavigationController alloc] initWithRootViewController:chatRoomsController];
+    [chatRoomsController.navigationController setValue:[[[FBNavigationBar alloc]init] autorelease] forKeyPath:@"navigationBar"];
+
     [chatRoomsController release];
     
 	// Tab Bar
@@ -115,6 +115,8 @@
         // Radar
         AugmentedRealityController* arController = [[AugmentedRealityController alloc] initWithNibName:@"ARViewController" bundle:nil];
         UINavigationController* arNavigationController = [[UINavigationController alloc] initWithRootViewController:arController];
+        [arController.navigationController setValue:[[[FBNavigationBar alloc]init] autorelease] forKeyPath:@"navigationBar"];
+
         [arController release];
 
         viewControllers = @[chatNavigationController,mapNavigationController,arNavigationController,chatRoomsNavigationController, settingsNavigationController];
@@ -126,7 +128,6 @@
 	
 	// release controllers
 	[settingsNavigationController release];
-    [messagesNavigationController release];
 	[chatNavigationController release];
     [chatRoomsNavigationController release];
     [mapNavigationController release];
@@ -141,20 +142,6 @@
     return YES;
 }
 
-- (void)showSplashWithAnimation:(BOOL) animated showLoginButton:(BOOL)isShow{
-    // show Splash
-    SplashController *splashViewController = [[SplashController alloc] initWithNibName:@"SplashController" bundle:nil];
-    splashViewController.openedAtStartApp = !animated;
-    [self.tabBarController presentModalViewController:splashViewController animated:animated];
-    [splashViewController release];
-    
-    // logout
-    if(animated){
-        [[FBService shared].facebook setSessionDelegate:splashViewController];
-        [splashViewController showLoginButton:isShow];
-    }
-}
-
 - (void)showSplashWithAnimation:(BOOL) animated{
     // show Splash
     SplashController *splashViewController = [[SplashController alloc] initWithNibName:@"SplashController" bundle:nil]; 
@@ -162,10 +149,6 @@
     [self.tabBarController presentModalViewController:splashViewController animated:animated];
     [splashViewController release];
     
-//    // logout
-//    if(animated){
-//        [[FBService shared].facebook setSessionDelegate:splashViewController];
-//    }
     [[FBService shared].facebook setSessionDelegate:splashViewController];
     
 }
