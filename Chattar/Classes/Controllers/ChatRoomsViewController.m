@@ -221,14 +221,14 @@
     UILabel* seeAllText = [[[UILabel alloc] initWithFrame:CGRectZero] autorelease];
     [seeAllText setBackgroundColor:[UIColor clearColor]];
     CGSize seeAllTextSize = [@"See All" sizeWithFont:seeAllText.font];
+    [seeAllText setTextColor:[UIColor redColor]];
 
-    [seeAllText setFrame:CGRectMake(_roomsTableView.bounds.size.width-95, 5, seeAllTextSize.width, seeAllTextSize.height)];
+    [seeAllText setFrame:CGRectMake(-30, 0, seeAllTextSize.width, seeAllTextSize.height)];
     [seeAllText setTextColor:[UIColor grayColor]];
     [seeAllText setText:@"See All"];
-    [viewForHeaderInSection addSubview:seeAllText];
 
     UIButton* seeAllButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [seeAllButton setFrame:CGRectMake(_roomsTableView.bounds.size.width-40, 5, 20, 20)];
+    [seeAllButton setFrame:CGRectMake(_roomsTableView.bounds.size.width-60, 5, seeAllText.frame.size.width + 20, seeAllText.frame.size.height)];
 
     [seeAllButton setImage:[UIImage imageNamed:@"seeAllButton.png"] forState:UIControlStateNormal];
 
@@ -240,6 +240,9 @@
     }
 
     [seeAllButton addTarget:self action:@selector(expandSection:) forControlEvents:UIControlEventTouchDown];
+    [seeAllButton addSubview:seeAllText];
+    [seeAllButton bringSubviewToFront:seeAllText];
+    
     [viewForHeaderInSection addSubview:seeAllButton];
     [viewForHeaderInSection bringSubviewToFront:seeAllButton];
     [viewForHeaderInSection setUserInteractionEnabled:YES];
