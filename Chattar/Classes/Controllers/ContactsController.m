@@ -23,6 +23,8 @@
 
 @synthesize friendListTableView = _friendListTableView;
 @synthesize searchField = _searchField;
+@synthesize controllerStyle = _controllerStyle;
+@synthesize delegate = _delegate;
 
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -421,12 +423,29 @@
     
     [DataManager shared].historyConversationAsArray = [[[[DataManager shared].historyConversation allValues] mutableCopy] autorelease];
 	
-    // show Chat
-    FBChatViewController *chatController = [[FBChatViewController alloc] initWithNibName:@"FBChatViewController" bundle:nil];
-	chatController.chatHistory = conversation;
-	[self.navigationController pushViewController:chatController animated:YES];
-	[chatController release];
-}    
+    
+    switch (self.controllerStyle)
+    {
+        case CAMessagesStyle:
+        {
+            if ([self.delegate respondsToSelector:@selector(showConversation:)]) {
+                [self.delegate showConversation:conversation];
+            }
+
+            break;
+        }
+
+        default:
+        {
+            // show Chat
+            FBChatViewController *chatController = [[FBChatViewController alloc] initWithNibName:@"FBChatViewController" bundle:nil];
+            chatController.chatHistory = conversation;
+            [self.navigationController pushViewController:chatController animated:YES];
+            [chatController release];
+            break;
+        }
+    }
+}
 
 
 #pragma mark -

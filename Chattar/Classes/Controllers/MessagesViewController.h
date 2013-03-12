@@ -14,18 +14,27 @@
 
 #import "FBChatViewController.h"
 
-@interface MessagesViewController : UIViewController<UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, MBProgressHUDDelegate>
+
+@class Conversation;
+@class ContactsController;
+
+@protocol MessagesNavigationDelegate <NSObject>
+
+-(void) showConversation:(Conversation*)conversation;
+
+@end
+
+
+
+@interface MessagesViewController : UIViewController<UITableViewDataSource, UITableViewDelegate,  MBProgressHUDDelegate , MessagesNavigationDelegate>
 {	
-	// data
-    NSMutableArray		*searchArray;
     
     ViewTouch				*backView;
     
     BOOL isInitialized;
 }
 
-
-@property (retain, nonatomic) IBOutlet UISearchBar				*searchField;
 @property (retain, nonatomic) IBOutlet UITableView				*messageTableView;
+@property (retain, nonatomic) ContactsController * contactsController;
 
 @end

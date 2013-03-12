@@ -7,11 +7,12 @@
 //
 
 #import "MessagesViewController.h"
+#import "ContactsController.h"
 
 @implementation MessagesViewController
 
 @synthesize messageTableView = _messageTableView;
-@synthesize searchField = _searchField;
+@synthesize contactsController = _contactsController;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -25,17 +26,12 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(logoutDone) name:kNotificationLogout object:nil];
         
         isInitialized = NO;
-        
-        // init search array
-        searchArray = [[NSMutableArray alloc] init];
 	}
     return self;
 }
 	
 -(void)dealloc
 {	
-	[searchArray release];
-	
 	[[NSNotificationCenter defaultCenter] removeObserver:self
 													name:kNewChatMessageCome 
 												  object:nil];
@@ -78,13 +74,11 @@
 
 - (void)logoutDone{
     isInitialized = NO;
-    [self.searchField setText:nil];
 }
 
 - (void)viewDidUnload
 {
     self.messageTableView = nil;
-    self.searchField = nil;
     
     [super viewDidUnload];
     // Release any retained subviews of the main view.
@@ -113,28 +107,38 @@
 #pragma mark -
 #pragma mark UITableViewDelegate
 
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    UIView *viewToDisplay = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 150)];
+    [viewToDisplay setBackgroundColor:[UIColor blackColor]];
+    
+    UIButton *startNewDialogButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    [startNewDialogButton addTarget:self action:@selector(startNewDialogButtonPress) forControlEvents:UIControlEventTouchUpInside];
+    [startNewDialogButton setFrame:CGRectMake(self.view.frame.size.width - 165  , 4,  150, 44)];
+    [startNewDialogButton setTitle:@"Start new dialog" forState:UIControlStateNormal];
+    [viewToDisplay addSubview:startNewDialogButton];
+    
+    return [viewToDisplay autorelease];
+    
+}
+
+
+
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView 
 {
     return 1;
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{    
-    if([[_searchField text] length] > 0)
-    {
-        return NSLocalizedString(@"Search Results", nil);
-    }
-    return 0;
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 50;
 }
+
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 {
-    if([[_searchField text] length] > 0)
-    {
-        return [searchArray count];
-    }else{
-        return [[DataManager shared].historyConversationAsArray count];
-    }
+    return [[DataManager shared].historyConversationAsArray count];
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -225,11 +229,8 @@
     // get conversation
     Conversation *conversation;
     //  search  mode
-    if([[_searchField text] length] > 0) {
-        conversation = [searchArray objectAtIndex:indexPath.row];
-    }else{
-        conversation = [[DataManager shared].historyConversationAsArray objectAtIndex:indexPath.row];
-    }
+
+    conversation = [[DataManager shared].historyConversationAsArray objectAtIndex:indexPath.row];
 	
     
 	if ([[[[DataManager shared].myFriendsAsDictionary objectForKey:[conversation.to objectForKey:kId]] objectForKey:kOnOffStatus] intValue] == 0) // offline status
@@ -304,11 +305,8 @@
     // get conversation
     Conversation *conversation;
     //  search  mode
-    if([[_searchField text] length] > 0) {
-        conversation = [searchArray objectAtIndex:indexPath.row];
-    }else{
-        conversation = [[DataManager shared].historyConversationAsArray objectAtIndex:indexPath.row];
-    }
+
+    conversation = [[DataManager shared].historyConversationAsArray objectAtIndex:indexPath.row];
     
     // set read state
     if(conversation.isUnRead){
@@ -321,12 +319,7 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     Conversation *conversation;
-    if([[_searchField text] length] > 0) {
-        conversation = [searchArray objectAtIndex:indexPath.row];
-    }else {
-        conversation = [[DataManager shared].historyConversationAsArray objectAtIndex:indexPath.row];
-    }
-    
+    conversation = [[DataManager shared].historyConversationAsArray objectAtIndex:indexPath.row];
     
     // show chat
     FBChatViewController *chatController = [[FBChatViewController alloc] initWithNibName:@"FBChatViewController" bundle:nil];
@@ -347,81 +340,42 @@
     [self tableView:_messageTableView didSelectRowAtIndexPath:cellIndexPath];
 }
 
-
-#pragma mark -
-#pragma mark UISearchBarDelegate
-
-- (void) searchBarTextDidBeginEditing:(UISearchBar *)theSearchBar 
-{
-    
-    // show back view
-    if(backView == nil)
-	{
-        backView = [[ViewTouch alloc] initWithFrame:CGRectMake(0, 45, 320, 175) selector:@selector(touchOnView:) target:self];
-        [self.view addSubview:backView];
-        [backView release];
-    }
-}
-
-- (void)searchBarTextDidEndEditing:(UISearchBar *)searchBar
-{
-    [backView removeFromSuperview];
-    backView = nil;
-}
-
-- (void)touchOnView:(UIView *)view
-{
-    [_searchField resignFirstResponder];
-}
-
-- (void) searchBarSearchButtonClicked:(UISearchBar *)theSearchBar
-{
-    [theSearchBar resignFirstResponder];
-}
-
-- (void)searchBar:(UISearchBar *)theSearchBar textDidChange:(NSString *)searchText 
-{
-	//Remove all objects first.
-	[searchArray removeAllObjects];
-	
-	if([searchText length] > 0) {
-        // search friends
-		[self searchTableView];
-	}
-    
-	[_messageTableView reloadData];
-}
-
-- (void) searchTableView 
-{
-	NSString *searchText = _searchField.text;
-
-	for (Conversation *conversation in [DataManager shared].historyConversationAsArray)
-	{
-        // patterns
-        NSMutableArray *patterns = [[NSMutableArray alloc] init];
-        [patterns addObject:[conversation.to objectForKey:kName]];
-        for(NSDictionary *comment in conversation.messages){
-            [patterns addObject:[[comment objectForKey:kFrom] objectForKey:kName]];
-        }
-
-	
-        // add to searcj array
-        for (NSString *pattern in patterns){
-            NSRange titleResultsRange = [pattern rangeOfString:searchText options:NSCaseInsensitiveSearch];
-            if (titleResultsRange.length > 0) {
-                [searchArray addObject:conversation];
-                break;
-            }    
-        }
-        
-		[patterns release];
-	}
-}
-
 - (void) backgroundMessageReceived:(NSNotification *)textMessage			
 {
 	// reload last message in table 
 	[_messageTableView reloadData];
 }
+
+
+#pragma mark-
+#pragma startNewDialogButtonPress 
+
+-(void) startNewDialogButtonPress
+{
+    self.contactsController = [[ContactsController alloc] init];
+    self.contactsController.delegate = self;
+    [self.contactsController setControllerStyle:CAMessagesStyle];
+    [self.navigationController pushViewController:self.contactsController animated:YES];
+    [self.contactsController release];
+}
+
+
+#pragma mar -
+#pragma MessagesNavigationDelegate
+
+-(void) showConversation:(Conversation*)conversation
+{
+    
+    [self.contactsController.navigationController popViewControllerAnimated:NO];
+    
+    // show chat
+    FBChatViewController *chatController = [[FBChatViewController alloc] initWithNibName:@"FBChatViewController" bundle:nil];
+    chatController.chatHistory = conversation;
+    UIViewController *topVC = (UIViewController *)self.navigationController.delegate;
+    [topVC.navigationController pushViewController:chatController animated:YES];
+    
+    [chatController release];
+}
+
+
 @end
