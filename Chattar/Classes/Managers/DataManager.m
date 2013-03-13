@@ -904,6 +904,8 @@ static DataManager *instance = nil;
     if (user) {
         NSString* qbUserFBID = user.facebookID;
         
+        [userAnnotation setFbUserId:qbUserFBID];
+        
         [self.currentChatRoom.usersPictures enumerateObjectsUsingBlock:^(NSDictionary* userDict, NSUInteger idx, BOOL *stop) {
             NSString* fbID = [userDict objectForKey:@"userFBId"];
             
