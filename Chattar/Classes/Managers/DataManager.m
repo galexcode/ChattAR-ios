@@ -936,12 +936,4 @@ static DataManager *instance = nil;
     return returnMessage;
 }
 
-#pragma mark -
-#pragma mark Setters
--(void)setCurrentQBUser:(QBUUser *)_currentQBUser{
-    [currentQBUser autorelease];
-    currentQBUser = [_currentQBUser retain];
-}
-
-
 @end
