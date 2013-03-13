@@ -431,7 +431,7 @@ cyBjb2RlIHNhbXBsZSB0byBhZGQgc29jaWFsIEFSIGNoYXQgaW50byB5b3VyIGlPUyBhcHApA</strin
 						<reference key="NSNextKeyView" ref="523234406"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<bool key="IBUIOpaque">NO</bool>
-						<int key="IBUITag">1</int>
+						<int key="IBUITag">2</int>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 						<int key="IBUIContentHorizontalAlignment">0</int>
 						<int key="IBUIContentVerticalAlignment">0</int>
