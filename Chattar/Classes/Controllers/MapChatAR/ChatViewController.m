@@ -57,7 +57,8 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveUserProfilePictures:) name:kDidReceiveUserProfilePicturesURL object:nil];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAddNewPointToChat:) name:kWillAddNewMessageToChat object:nil];
-
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doUpdateChatRoomsController:) name:kNeedToUpdateChatRoomController object:nil];
+        
         isPanelDisplayed = NO;
     }
     return self;
@@ -924,6 +925,12 @@
 #pragma mark -
 #pragma mark Notifications Reaction
 
+-(void)doUpdateChatRoomsController:(NSNotification*)notification{
+    NSString* context = [notification.userInfo objectForKey:@"context"];
+    if ([context isEqualToString:self.controllerReuseIdentifier]) {
+        [messagesTableView reloadData];
+    }
+}
 
 -(void)doClearCache{
     showAllUsers  = NO;
@@ -1010,7 +1017,10 @@
         }
         else
             [self showWorld];
-        
+    }
+    
+    if ([context isEqualToString:chatRoomsViewControllerIdentifier]) {
+        [[BackgroundWorker instance] requestMessagesRecipientsPictures];
     }
 }
 
