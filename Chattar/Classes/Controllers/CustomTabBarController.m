@@ -327,6 +327,13 @@
 #pragma mark -
 #pragma mark ChatRoomsDataDelegate methods
 
+-(void)refreshRecipientsPicturesWithControllerIdentifier:(NSString*)identifier{
+    NSMutableDictionary* context = [NSMutableDictionary dictionary];
+    [context setObject:identifier forKey:@"context"];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kNeedToUpdateChatRoomController object:nil userInfo:context];
+}
+
 -(void)didCreateNewChatRoom:(NSString *)roomName viewControllerWithIdentifier:(NSString *)identifier{
     NSMutableDictionary* data = [NSMutableDictionary dictionary];
     
