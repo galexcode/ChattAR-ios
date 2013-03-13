@@ -122,13 +122,22 @@
 }
 
 // Links actions
--(IBAction)linksAction:(id)sender{
+-(IBAction)linksAction:(id)sender
+{
     NSString *url;
-	if (((ButtonWithUnderlining*)sender).tag == 0){
+	if (((ButtonWithUnderlining*)sender).tag == 0)
+    {
 		url = @"http://injoit.com/";
-	}else {
+	}
+    else if(((ButtonWithUnderlining*)sender).tag == 1)
+    {
 		url = @"http://quickblox.com/";
 	}
+    else if(((ButtonWithUnderlining*)sender).tag == 2)
+    {
+        url = @"https://github.com/QuickBlox/ChattAR-ios";
+    }
+        
     
     WebViewController *webViewControleler = [[WebViewController alloc] init];
     webViewControleler.urlAdress = url;
@@ -204,6 +213,11 @@
         // logout
         case isLogoutAlert:
             if(buttonIndex == 0){
+                
+                [[DataManager shared] clearCache];
+                [[NSNotificationCenter defaultCenter] postNotificationName:kDidClearCache object:nil];
+
+                
                 // remove push subscription to this device
                 [QBMessages TUnregisterSubscriptionWithDelegate:nil];
             

@@ -29,6 +29,7 @@
 
 -(IBAction)switchValueDidChange:(UISwitch *)switchView;
 -(IBAction)linksAction:(id)sender;
+
 -(void)logoutButtonDidPress;
 - (IBAction)clearCache:(id)sender;
 

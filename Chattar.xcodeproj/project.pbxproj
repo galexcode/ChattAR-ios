@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1316270516EF7C4200C52A94 /* blueButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 1316270416EF7C4200C52A94 /* blueButton.png */; };
 		438B8EBC16392CC2003692E1 /* libFlurry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 438B8EBB16392CC2003692E1 /* libFlurry.a */; };
 		438B8EBE16392D54003692E1 /* libidn.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 438B8EBD16392D54003692E1 /* libidn.a */; };
 		43A387C316490725000C50C8 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 43A387B916490722000C50C8 /* Icon.png */; };
@@ -258,6 +259,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1316270416EF7C4200C52A94 /* blueButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = blueButton.png; sourceTree = "<group>"; };
 		438B8EBA16392CC2003692E1 /* Flurry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Flurry.h; sourceTree = "<group>"; };
 		438B8EBB16392CC2003692E1 /* libFlurry.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libFlurry.a; sourceTree = "<group>"; };
 		438B8EBD16392D54003692E1 /* libidn.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libidn.a; sourceTree = "<group>"; };
@@ -999,6 +1001,7 @@
 		ED4C8EF816BFEB5D000751D4 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				1316270416EF7C4200C52A94 /* blueButton.png */,
 				ED91256416DB70AE00B11902 /* ChatRooms */,
 				ED4C8EF916BFEB5D000751D4 /* 3item.png */,
 				ED4C8EFA16BFEB5D000751D4 /* 3item@2x.png */,
@@ -1551,6 +1554,7 @@
 				ED91258716DBA97F00B11902 /* headerBGColor.png in Resources */,
 				ED8749E716E6288F00D4EA19 /* seeAllExpanded.png in Resources */,
 				ED8749E816E6288F00D4EA19 /* seeAllExpanded@2x.png in Resources */,
+				1316270516EF7C4200C52A94 /* blueButton.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
