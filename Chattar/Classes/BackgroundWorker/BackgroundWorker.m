@@ -15,6 +15,7 @@
 #define chatFBUsers @"chatFBUsers"
 #define moreChatMessages @"getMoreChatMessages"
 #define chatRoomUsersProfiles @"chatRoomUsersProfiles"
+#define chatRoomMessagesRecipients @"chatRoomMessagesRecipients"
 #define kGetGeoDataCount 100
 
 @implementation BackgroundWorker
@@ -95,6 +96,28 @@ static BackgroundWorker* instance = nil;
 
 #pragma mark -
 #pragma mark Data Requests
+
+-(void)requestMessagesRecipientsPictures{
+    if ([DataManager shared].currentChatRoom.messagesHistory.count) {
+        NSMutableString* ids = [[[NSMutableString alloc] initWithString:@""] autorelease];
+        NSMutableArray* addedIds = [[[NSMutableArray alloc] init] autorelease];
+
+        [[DataManager shared].currentChatRoom.messagesHistory enumerateObjectsUsingBlock:^(QBChatMessage* message, NSUInteger idx, BOOL *stop) {
+            if (![addedIds containsObject:@(message.senderID)]) {
+                [addedIds addObject:@(message.senderID)];
+                [ids appendString:[NSString stringWithFormat:@"%d",message.senderID]];
+
+                if (idx != [DataManager shared].currentChatRoom.messagesHistory.count-1) {
+                    [ids appendString:@","];
+                }
+            }
+        }];
+
+        PagedRequest* pagedRequest = [[[PagedRequest alloc] init] autorelease];
+        pagedRequest.perPage = 20;
+        [QBUsers usersWithIDs:ids pagedRequest:pagedRequest delegate:self];
+    }
+}
 
 -(void)requestUsersPictures{
     if ([DataManager shared].currentChatRoom.roomUsers.count) {
@@ -1033,6 +1056,21 @@ static BackgroundWorker* instance = nil;
             [tabBarDelegate didReceiveAdditionalServerInfo:[NSArray arrayWithObject:getObjectResult.object]];
         }
     }
+    else if ([result isKindOfClass:[QBUUserPagedResult class]]){
+        QBUUserPagedResult* res = (QBUUserPagedResult*)result;
+        
+        NSMutableString* ids = [[[NSMutableString alloc] initWithString:@""] autorelease];
+        
+        [res.users enumerateObjectsUsingBlock:^(QBUUser* user, NSUInteger idx, BOOL *stop) {
+            [ids appendString:user.facebookID];
+            
+            if (idx != res.users.count-1) {
+                [ids appendString:@","];
+            }
+        }];
+        
+        [[FBService shared] usersProfilesWithIds:ids delegate:self context:chatRoomMessagesRecipients];
+    }
     else{
         NSString *message = [result.errors stringValue];
         if ([tabBarDelegate respondsToSelector:@selector(didReceiveError:)]) {
@@ -1243,23 +1281,71 @@ static BackgroundWorker* instance = nil;
                         
                         [[DataManager shared].currentChatRoom.usersPictures addObject:userData];
                     }];
+                                    // execute on main thread
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (numberOfUserPicturesRetrieved == 0) {
+                            // notify delegate that all photos are retrieved
+                            if ([tabBarDelegate respondsToSelector:@selector(didReceiveUserProfilePicturesForViewControllerWithIdentifier:)]) {
+                                [tabBarDelegate didReceiveUserProfilePicturesForViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+                            }
+                            
+                            if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:)]) {
+                                [tabBarDelegate chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+                            }
+                            
+                        }
+
+                    });
                 });
                 
                 dispatch_release(userPicturesQueue);
-                
-                                            // this should be executed in other thread
-                if (numberOfUserPicturesRetrieved == 0) {
-                    // notify delegate that all photos are retrieved
-                    if ([tabBarDelegate respondsToSelector:@selector(didReceiveUserProfilePicturesForViewControllerWithIdentifier:)]) {
-                        [tabBarDelegate didReceiveUserProfilePicturesForViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
-                    }
-                    
-                    if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:)]) {
-                        [tabBarDelegate chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
-                    }
-                    
-                }
             }
+            else if ([context isEqualToString:chatRoomMessagesRecipients]){
+                NSArray* keys = [result.body allKeys];
+                NSMutableArray* urls = [NSMutableArray array];
+                                        
+                dispatch_queue_t recipientsPicturesQueue = dispatch_queue_create("recipientsPicturesQueue", NULL);
+                dispatch_async(recipientsPicturesQueue, ^{
+                    
+                    [keys enumerateObjectsUsingBlock:^(NSString* key, NSUInteger idx, BOOL *stop) {
+                        NSDictionary* userInfo = [result.body objectForKey:key];
+                        NSLog(@"%@",userInfo);
+                        NSString* userFBId = [userInfo objectForKey:kId];
+                        
+                        NSDictionary* pictureDict = [userInfo objectForKey:kPicture];
+                        NSDictionary* pictData = [pictureDict objectForKey:kData];
+                        NSString* url = [pictData objectForKey:kUrl];
+                        
+                        
+                        
+                        NSMutableDictionary* userData = [NSMutableDictionary dictionary];
+                        [userData setObject:userFBId forKey:@"userFBId"];
+                        [userData setObject:url forKey:@"pictureURL"];
+                        [urls addObject:userData];
+                    }];
+                    
+                    for (UserAnnotation* userMessage in [DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying) {
+                        for (NSMutableDictionary*dict in urls) {
+                            NSString* pictureUrl = [dict objectForKey:@"pictureURL"];
+                            NSString* userFBId = [dict objectForKey:@"userFBId"];
+                            
+                            if ([userMessage.fbUserId isEqualToString:userFBId]) {
+                                [userMessage setUserPhotoUrl:pictureUrl];
+                            }                        
+                        }
+                    }
+                    
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if ([tabBarDelegate respondsToSelector:@selector(refreshRecipientsPicturesWithControllerIdentifier:)]) {
+                            [tabBarDelegate refreshRecipientsPicturesWithControllerIdentifier:chatRoomsViewControllerIdentifier];
+                        }
+                    });
+
+                });
+                
+                
+            }
+            
             else{
                 
                 if([result.body isKindOfClass:NSDictionary.class]){
