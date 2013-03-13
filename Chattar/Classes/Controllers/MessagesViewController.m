@@ -113,8 +113,9 @@
     [viewToDisplay setBackgroundColor:[UIColor blackColor]];
     
     UIButton *startNewDialogButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+//    [startNewDialogButton setBackgroundImage:[UIImage imageNamed:@"blueButton.png"] forState:UIControlStateNormal];
     [startNewDialogButton addTarget:self action:@selector(startNewDialogButtonPress) forControlEvents:UIControlEventTouchUpInside];
-    [startNewDialogButton setFrame:CGRectMake(self.view.frame.size.width - 165  , 4,  150, 44)];
+    [startNewDialogButton setFrame:CGRectMake(20 ,  4,  self.view.frame.size.width - 40 , 36 )];
     [startNewDialogButton setTitle:@"Start new dialog" forState:UIControlStateNormal];
     [viewToDisplay addSubview:startNewDialogButton];
     
@@ -132,7 +133,7 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
-    return 50;
+    return 44 ;
 }
 
 
@@ -355,7 +356,10 @@
     self.contactsController = [[ContactsController alloc] init];
     self.contactsController.delegate = self;
     [self.contactsController setControllerStyle:CAMessagesStyle];
-    [self.navigationController pushViewController:self.contactsController animated:YES];
+    
+    
+    UIViewController *topVC = (UIViewController *)self.navigationController.delegate;
+    [topVC.navigationController pushViewController:self.contactsController animated:YES];
     [self.contactsController release];
 }
 
