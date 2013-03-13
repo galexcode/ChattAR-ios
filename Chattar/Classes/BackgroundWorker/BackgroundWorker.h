@@ -96,6 +96,7 @@
 
 -(void)didReceiveMessageForViewControllerWithIdentifier:(NSString*)identifier;
 -(void)didCreateNewChatRoom:(NSString*)roomName viewControllerWithIdentifier:(NSString*)identifier;
+-(void)refreshRecipientsPicturesWithControllerIdentifier:(NSString*)identifier;
 @end
 
 
@@ -148,5 +149,7 @@
 -(void)requestDataForDataStorage:(Storage*)dataStorage;
 
 -(void)postInformationWithDataStorage:(Storage*)dataStorage;
+
+-(void)requestMessagesRecipientsPictures;
 
 @end

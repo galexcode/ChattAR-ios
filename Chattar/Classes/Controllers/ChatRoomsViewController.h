@@ -22,8 +22,11 @@
 #define NEARBY_SECTION_EXPANDED 4
 #define TRENDING_SECTION_EXPANDED 5
 
+#define SEE_ALL_IMAGE_TAG 12
+
 @interface ChatRoomsViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate,UINavigationControllerDelegate>{
     NSMutableIndexSet* expandedSections;
+    UITapGestureRecognizer* tapRecognizer;
 }
 
 @property (retain, nonatomic) IBOutlet UITableView *roomsTableView;

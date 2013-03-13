@@ -61,6 +61,7 @@
 
 #define kDidReceiveMessage @"kDidReceiveMessage"
 #define kNewChatRoomCreated @"kNewChatRoomCreated"
+#define kNeedToUpdateChatRoomController @"kNeedToUpdateChatRoomController"
 
 #define INDICATOR_TAG 23458
 // Strings
@@ -73,6 +74,7 @@
 #define FLURRY_EVENT_USER_DID_LOGIN @"User did login"
 #define chatViewControllerIdentifier @"chatViewControllerIdentifier"
 #define chatRoomsViewControllerIdentifier @"chatRoomsViewControllerIdentifier" 
+
 // Tab bar indexes enum
 enum TabbarIndexes {
     chatIndex = 0, mapIndex,radarIndex,dialogsIndex

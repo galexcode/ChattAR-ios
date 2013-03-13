@@ -59,7 +59,6 @@
     [messagesVC release];
     dialogsController.navigationBarHidden = YES;
     
-//    [self.navigationController setNavigationBarHidden:YES];
     [dialogsController setDelegate:self];
     
     expandedSections = [[NSMutableIndexSet alloc] init];
@@ -100,6 +99,7 @@
     [mainHeaderSection release];
     [trendingHeaderSection release];
     [nearbyHeaderSection release];
+    [tapRecognizer release];
     
     [_displayView release];
     [super dealloc];
@@ -126,6 +126,49 @@
 
 #pragma mark -
 #pragma mark Interface based methods
+
+-(void)addExpandedSeeAllButton:(UIButton*) seeAllButton isButtonExpanded:(BOOL)isExpanded {
+    // remove old button
+    [[seeAllButton viewWithTag:SEE_ALL_IMAGE_TAG] removeFromSuperview];
+    UIImage* seeAllButtonImage = nil;
+    
+    if (isExpanded) {
+        seeAllButtonImage = [UIImage imageNamed:@"seeAllExpanded.png"];
+    }
+    else
+        seeAllButtonImage = [UIImage imageNamed:@"seeAllButton"];
+    
+    UIImageView* seeAllButtonImageView = [[[UIImageView alloc] initWithImage:seeAllButtonImage] autorelease];
+    CGRect newFrame = seeAllButtonImageView.frame;
+    [seeAllButtonImageView setTag:SEE_ALL_IMAGE_TAG];
+    
+    newFrame.origin.x += 20;
+    newFrame.origin.y -= 5;
+    seeAllButtonImageView.frame = newFrame;
+    
+    [seeAllButton addSubview:seeAllButtonImageView];    
+}
+
+- (void) removeKeyBoard:(UITapGestureRecognizer*)recognizer {
+    [self animateTextField:_newConversationTextField up:NO];
+    [_newConversationTextField resignFirstResponder];
+    [self.displayView removeGestureRecognizer:recognizer];
+}
+
+- (void) animateTextField: (UITextField*) textField up: (BOOL) up
+{
+    const float movementDuration = 0.3f;
+    const int movementDistance = 170;
+    
+    int movement = (up ? -movementDistance : movementDistance);
+    
+    [UIView beginAnimations: @"anim" context: nil];
+    [UIView setAnimationBeginsFromCurrentState: YES];
+    [UIView setAnimationDuration: movementDuration];
+    self.view.frame = CGRectOffset(self.view.frame, 0, movement);
+    [UIView commitAnimations];
+}
+
 
 -(void)showChatController{
     ChatRoomsStorage* dataStorage = [[[ChatRoomsStorage alloc] init] autorelease];
@@ -171,14 +214,14 @@
     switch (section) {
         case mainChatSection:{
             if (!mainHeaderSection) {
-                mainHeaderSection = [[self createViewWithTitle:@"Main" forSection:section] retain];
+                mainHeaderSection = [[self createViewWithTitle:@"mainHeader.png" forSection:section] retain];
             }
             return mainHeaderSection;
         }
             break;
         case trendingSection:{
             if (!trendingHeaderSection) {
-                trendingHeaderSection = [[self createViewWithTitle:@"Trending" forSection:section] retain];
+                trendingHeaderSection = [[self createViewWithTitle:@"trendingHeader.png" forSection:section] retain];
             }
             return trendingHeaderSection;
         }
@@ -186,7 +229,7 @@
 
         case nearbySection:{
             if (!nearbyHeaderSection) {
-                nearbyHeaderSection = [[self createViewWithTitle:@"Nearby" forSection:section] retain];
+                nearbyHeaderSection = [[self createViewWithTitle:@"nearbyHeader.png" forSection:section] retain];
             }
             return nearbyHeaderSection;
         }
@@ -198,39 +241,31 @@
     return nil;
 }
 
--(UIImageView*)createViewWithTitle:(NSString*)title forSection:(NSInteger)section{
-    UILabel* header = [[[UILabel alloc] initWithFrame:CGRectZero] autorelease];
-    [header setBackgroundColor:[UIColor clearColor]];
-    [header setTextColor:[UIColor whiteColor]];
-    [header setText:title];
-    CGSize titleViewSize;
-
-    titleViewSize = [header.text sizeWithFont:header.font];
-    [header setFrame:CGRectMake(10, 5, titleViewSize.width, titleViewSize.height)];
-    UIView* sectionTitleView = [[[UIView alloc] initWithFrame:CGRectMake(20, 0, titleViewSize.width + 20, 30)] autorelease];
-
-
-    [sectionTitleView setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"headerBGColor"]]];
-    [sectionTitleView.layer setCornerRadius:8];
-
-    [sectionTitleView addSubview:header];
-
+-(UIImageView*)createViewWithTitle:(NSString*)headerTitle forSection:(NSInteger)section{
     UIImageView* viewForHeaderInSection = [[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.roomsTableView.bounds.size.width, 30)] autorelease];
-    [viewForHeaderInSection addSubview:sectionTitleView];
+        
+    UIImageView* headerView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:headerTitle]] autorelease];
+    CGRect newFrame = headerView.frame;
+    newFrame.origin.x = 15;
+    headerView.frame = newFrame;
+    [viewForHeaderInSection addSubview:headerView];
+
+    
 
     UILabel* seeAllText = [[[UILabel alloc] initWithFrame:CGRectZero] autorelease];
     [seeAllText setBackgroundColor:[UIColor clearColor]];
     CGSize seeAllTextSize = [@"See All" sizeWithFont:seeAllText.font];
+    [seeAllText setTextColor:[UIColor redColor]];
+    [seeAllText setFont:[UIFont fontWithName:@"Helvetica" size:15]];
 
-    [seeAllText setFrame:CGRectMake(_roomsTableView.bounds.size.width-95, 5, seeAllTextSize.width, seeAllTextSize.height)];
+    [seeAllText setFrame:CGRectMake(-28, 0, seeAllTextSize.width, seeAllTextSize.height)];
     [seeAllText setTextColor:[UIColor grayColor]];
     [seeAllText setText:@"See All"];
-    [viewForHeaderInSection addSubview:seeAllText];
 
     UIButton* seeAllButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [seeAllButton setFrame:CGRectMake(_roomsTableView.bounds.size.width-40, 5, 20, 20)];
-
-    [seeAllButton setImage:[UIImage imageNamed:@"seeAllButton.png"] forState:UIControlStateNormal];
+    [seeAllButton setFrame:CGRectMake(_roomsTableView.bounds.size.width-60, 5, seeAllText.frame.size.width + 20, seeAllText.frame.size.height)];
+    
+    [self addExpandedSeeAllButton:seeAllButton isButtonExpanded:NO];
 
     if (section == nearbySection) {
         [seeAllButton setTag:NEARBY_SECTION_INDEX];
@@ -240,6 +275,9 @@
     }
 
     [seeAllButton addTarget:self action:@selector(expandSection:) forControlEvents:UIControlEventTouchDown];
+    [seeAllButton addSubview:seeAllText];
+    [seeAllButton bringSubviewToFront:seeAllText];
+    
     [viewForHeaderInSection addSubview:seeAllButton];
     [viewForHeaderInSection bringSubviewToFront:seeAllButton];
     [viewForHeaderInSection setUserInteractionEnabled:YES];
@@ -297,12 +335,12 @@
         }
         
         if (currentlyExpanded) {
-            [sender setImage:[UIImage imageNamed:@"seeAllButton.png"] forState:UIControlStateNormal];
+            [self addExpandedSeeAllButton:sender isButtonExpanded:NO];
             [_roomsTableView deleteRowsAtIndexPaths:tmpArray withRowAnimation:UITableViewRowAnimationTop];
         }
         
         else{
-            [sender setImage:[UIImage imageNamed:@"seeAllExpanded.png"] forState:UIControlStateNormal];
+            [self addExpandedSeeAllButton:sender isButtonExpanded:YES];
             [_roomsTableView insertRowsAtIndexPaths:tmpArray withRowAnimation:UITableViewRowAnimationTop];
         }
         
@@ -368,14 +406,13 @@
                 [accessoryView addSubview:counter];
                 [cell setAccessoryView:accessoryView];
                 [cell.textLabel setText:cellText];
-                
             }
             break;
         }
         case nearbySection:{
             if (indexPath.row < [DataManager shared].nearbyRooms.count) {
                 ChatRoom* room = [[DataManager shared].nearbyRooms objectAtIndex:indexPath.row];
-                NSString* cellText = [NSString stringWithFormat:@"%d miles",(int)room.distanceFromUser];
+                NSString* cellText = [NSString stringWithFormat:@"%d kms",(int)room.distanceFromUser/1000];
                 UIImageView* accessoryView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"occupantsCounter.png"]] autorelease];
                 UILabel* counter = [[[UILabel alloc] initWithFrame:CGRectMake(20, -1, 20, 20)] autorelease];
                 [counter setBackgroundColor:[UIColor clearColor]];
@@ -464,13 +501,23 @@
 #pragma mark UITextField Delegate
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField{
+    [self animateTextField:textField up:YES];
     [textField becomeFirstResponder];
+    
+    if (!tapRecognizer) {
+        tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(removeKeyBoard:)];
+    }
+    
+    [self.displayView addGestureRecognizer:tapRecognizer];
 }
 
-- (BOOL)textFieldShouldReturn:(UITextField *)textField{
-    [_newConversationTextField resignFirstResponder];
+-(BOOL)textFieldShouldReturn:(UITextField *)textField{
+    [self animateTextField:textField up:NO];
+    [textField resignFirstResponder];
+    [self.displayView removeGestureRecognizer:tapRecognizer];
     return YES;
 }
+
 
 #pragma mark - 
 #pragma mark UINavigationControllerDelegate methods
