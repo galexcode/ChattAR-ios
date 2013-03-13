@@ -59,7 +59,6 @@
     [messagesVC release];
     dialogsController.navigationBarHidden = YES;
     
-//    [self.navigationController setNavigationBarHidden:YES];
     [dialogsController setDelegate:self];
     
     expandedSections = [[NSMutableIndexSet alloc] init];
@@ -128,6 +127,28 @@
 #pragma mark -
 #pragma mark Interface based methods
 
+-(void)addExpandedSeeAllButton:(UIButton*) seeAllButton isButtonExpanded:(BOOL)isExpanded {
+    // remove old button
+    [[seeAllButton viewWithTag:SEE_ALL_IMAGE_TAG] removeFromSuperview];
+    UIImage* seeAllButtonImage = nil;
+    
+    if (isExpanded) {
+        seeAllButtonImage = [UIImage imageNamed:@"seeAllExpanded.png"];
+    }
+    else
+        seeAllButtonImage = [UIImage imageNamed:@"seeAllButton"];
+    
+    UIImageView* seeAllButtonImageView = [[[UIImageView alloc] initWithImage:seeAllButtonImage] autorelease];
+    CGRect newFrame = seeAllButtonImageView.frame;
+    [seeAllButtonImageView setTag:SEE_ALL_IMAGE_TAG];
+    
+    newFrame.origin.x += 20;
+    newFrame.origin.y -= 5;
+    seeAllButtonImageView.frame = newFrame;
+    
+    [seeAllButton addSubview:seeAllButtonImageView];    
+}
+
 - (void) removeKeyBoard:(UITapGestureRecognizer*)recognizer {
     [self animateTextField:_newConversationTextField up:NO];
     [_newConversationTextField resignFirstResponder];
@@ -137,7 +158,7 @@
 - (void) animateTextField: (UITextField*) textField up: (BOOL) up
 {
     const float movementDuration = 0.3f;
-    const int movementDistance = 130;
+    const int movementDistance = 170;
     
     int movement = (up ? -movementDistance : movementDistance);
     
@@ -243,8 +264,8 @@
 
     UIButton* seeAllButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [seeAllButton setFrame:CGRectMake(_roomsTableView.bounds.size.width-60, 5, seeAllText.frame.size.width + 20, seeAllText.frame.size.height)];
-
-    [seeAllButton setImage:[UIImage imageNamed:@"seeAllButton.png"] forState:UIControlStateNormal];
+    
+    [self addExpandedSeeAllButton:seeAllButton isButtonExpanded:NO];
 
     if (section == nearbySection) {
         [seeAllButton setTag:NEARBY_SECTION_INDEX];
@@ -314,12 +335,12 @@
         }
         
         if (currentlyExpanded) {
-            [sender setImage:[UIImage imageNamed:@"seeAllButton.png"] forState:UIControlStateNormal];
+            [self addExpandedSeeAllButton:sender isButtonExpanded:NO];
             [_roomsTableView deleteRowsAtIndexPaths:tmpArray withRowAnimation:UITableViewRowAnimationTop];
         }
         
         else{
-            [sender setImage:[UIImage imageNamed:@"seeAllExpanded.png"] forState:UIControlStateNormal];
+            [self addExpandedSeeAllButton:sender isButtonExpanded:YES];
             [_roomsTableView insertRowsAtIndexPaths:tmpArray withRowAnimation:UITableViewRowAnimationTop];
         }
         
