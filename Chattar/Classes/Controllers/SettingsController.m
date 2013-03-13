@@ -135,7 +135,9 @@
 	}
     else if(((ButtonWithUnderlining*)sender).tag == 2)
     {
-        url = @"https://github.com/QuickBlox/ChattAR-ios";
+        NSURL *url = [NSURL URLWithString:@"https://github.com/QuickBlox/ChattAR-ios"];
+        [[UIApplication sharedApplication] openURL:url];
+        return;
     }
         
     
