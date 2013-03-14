@@ -598,10 +598,10 @@ static FBService *instance = nil;
     // ++ badge
     if(!conversation.isUnRead){
         UITabBarController *tabBarController = ((AppDelegate *)[[UIApplication sharedApplication] delegate]).tabBarController;
-        int badge = [((UITabBarItem *)[tabBarController.tabBar.items objectAtIndex:0]).badgeValue intValue];
+        int badge = [((UITabBarItem *)[tabBarController.tabBar.items objectAtIndex:2]).badgeValue intValue];
         ++badge;
         //
-        ((UITabBarItem *)[tabBarController.tabBar.items objectAtIndex:0]).badgeValue = [NSString stringWithFormat:@"%d", badge];
+        ((UITabBarItem *)[tabBarController.tabBar.items objectAtIndex:2]).badgeValue = [NSString stringWithFormat:@"%d", badge];
         
         conversation.isUnRead = YES;
     }
