@@ -1300,6 +1300,7 @@ static BackgroundWorker* instance = nil;
                 
                 dispatch_release(userPicturesQueue);
             }
+            
             else if ([context isEqualToString:chatRoomMessagesRecipients]){
                 NSArray* keys = [result.body allKeys];
                 NSMutableArray* urls = [NSMutableArray array];

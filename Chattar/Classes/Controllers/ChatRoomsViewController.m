@@ -127,7 +127,42 @@
 #pragma mark -
 #pragma mark Interface based methods
 
--(void)addExpandedSeeAllButton:(UIButton*) seeAllButton isButtonExpanded:(BOOL)isExpanded {
+- (UIImageView*)viewWithLastActiveUsers{
+    UIImageView* viewWithLastActiveUsers = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 100, 40)];
+    NSSortDescriptor* sortOrder = [NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:NO];
+    
+    NSArray* sortedByDateChatMessages = [[DataManager shared].allChatPoints sortedArrayUsingDescriptors:[NSArray arrayWithObject:sortOrder]];
+    __block int userViewXPosition = -10;
+    __block NSMutableArray* usedURLsArray = [[[NSMutableArray alloc] init] autorelease];
+    
+    [sortedByDateChatMessages enumerateObjectsUsingBlock:^(UserAnnotation* obj, NSUInteger idx, BOOL *stop) {        
+        NSString* userImageURL = nil;
+        if ([obj.userPhotoUrl isKindOfClass:[NSString class]]){
+            userImageURL = obj.userPhotoUrl;
+        }else{
+            NSDictionary* pic = (NSDictionary*)obj.userPhotoUrl;
+            userImageURL = [[pic objectForKey:kData] objectForKey:kUrl];
+        }
+
+        
+        if (![usedURLsArray containsObject:userImageURL]) {
+            AsyncImageView* activeUserView = [[[AsyncImageView alloc] initWithFrame:CGRectMake(userViewXPosition, 5, 30, 30)] autorelease];
+            [activeUserView loadImageFromURL:[NSURL URLWithString:userImageURL]];
+            [viewWithLastActiveUsers addSubview:activeUserView];
+            userViewXPosition += activeUserView.frame.size.width + 5;
+            [usedURLsArray addObject:userImageURL];
+        }
+        
+        if (usedURLsArray.count == NUMBER_OF_USERS_TO_DISPLAY) {
+            *stop = YES;
+        }
+
+    }];
+    
+    return viewWithLastActiveUsers;
+}
+
+- (void)addExpandedSeeAllButton:(UIButton*) seeAllButton isButtonExpanded:(BOOL)isExpanded {
     // remove old button
     [[seeAllButton viewWithTag:SEE_ALL_IMAGE_TAG] removeFromSuperview];
     UIImage* seeAllButtonImage = nil;
@@ -178,7 +213,7 @@
     
     chatViewController.controllerReuseIdentifier = [[NSString alloc] initWithString:chatRoomsViewControllerIdentifier];
     chatViewController.title = NSLocalizedString([DataManager shared].currentChatRoom.roomName, nil);
-    [self.navigationController pushViewController:chatViewController animated:NO];
+    [self.navigationController pushViewController:chatViewController animated:YES];
 
 }
 
@@ -241,7 +276,7 @@
     return nil;
 }
 
--(UIImageView*)createViewWithTitle:(NSString*)headerTitle forSection:(NSInteger)section{
+- (UIImageView*)createViewWithTitle:(NSString*)headerTitle forSection:(NSInteger)section{
     UIImageView* viewForHeaderInSection = [[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.roomsTableView.bounds.size.width, 30)] autorelease];
         
     UIImageView* headerView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:headerTitle]] autorelease];
@@ -262,25 +297,27 @@
     [seeAllText setTextColor:[UIColor grayColor]];
     [seeAllText setText:@"See All"];
 
-    UIButton* seeAllButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [seeAllButton setFrame:CGRectMake(_roomsTableView.bounds.size.width-60, 5, seeAllText.frame.size.width + 20, seeAllText.frame.size.height)];
-    
-    [self addExpandedSeeAllButton:seeAllButton isButtonExpanded:NO];
-
-    if (section == nearbySection) {
-        [seeAllButton setTag:NEARBY_SECTION_INDEX];
+    if (section != mainChatSection) {
+        UIButton* seeAllButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [seeAllButton setFrame:CGRectMake(_roomsTableView.bounds.size.width-60, 5, seeAllText.frame.size.width + 20, seeAllText.frame.size.height)];
+        
+        [self addExpandedSeeAllButton:seeAllButton isButtonExpanded:NO];
+        
+        if (section == nearbySection) {
+            [seeAllButton setTag:NEARBY_SECTION_INDEX];
+        }
+        else if (section == trendingSection){
+            [seeAllButton setTag:TRENDING_SECTION_INDEX];
+        }
+        
+        [seeAllButton addTarget:self action:@selector(expandSection:) forControlEvents:UIControlEventTouchDown];
+        [seeAllButton addSubview:seeAllText];
+        [seeAllButton bringSubviewToFront:seeAllText];
+        
+        [viewForHeaderInSection addSubview:seeAllButton];
+        [viewForHeaderInSection bringSubviewToFront:seeAllButton];
+        [viewForHeaderInSection setUserInteractionEnabled:YES];
     }
-    else if (section == trendingSection){
-        [seeAllButton setTag:TRENDING_SECTION_INDEX];
-    }
-
-    [seeAllButton addTarget:self action:@selector(expandSection:) forControlEvents:UIControlEventTouchDown];
-    [seeAllButton addSubview:seeAllText];
-    [seeAllButton bringSubviewToFront:seeAllText];
-    
-    [viewForHeaderInSection addSubview:seeAllButton];
-    [viewForHeaderInSection bringSubviewToFront:seeAllButton];
-    [viewForHeaderInSection setUserInteractionEnabled:YES];
     
     return viewForHeaderInSection;
 }
@@ -423,6 +460,13 @@
             }
             break;
         }
+            
+        case mainChatSection:{
+            [cell.textLabel setText:@"Public Chat"];
+            [cell setAccessoryView:[self viewWithLastActiveUsers]];
+        }
+        break;
+            
         default:
             break;
     }
