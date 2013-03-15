@@ -110,12 +110,19 @@
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
     UIView *viewToDisplay = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 150)];
-    [viewToDisplay setBackgroundColor:[UIColor blackColor]];
+    [viewToDisplay setBackgroundColor:[UIColor blueColor]];
     
-    UIButton *startNewDialogButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-//    [startNewDialogButton setBackgroundImage:[UIImage imageNamed:@"blueButton.png"] forState:UIControlStateNormal];
+    UIButton *startNewDialogButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    
+    UIImage *blueBackImage = [UIImage imageNamed:@"blueButton.png"];
+    blueBackImage = [blueBackImage stretchableImageWithLeftCapWidth:15.0 topCapHeight:0.0];
+    
+    [startNewDialogButton setBackgroundImage:blueBackImage forState:UIControlStateNormal];
+    //[blueBackImage release];
+    
     [startNewDialogButton addTarget:self action:@selector(startNewDialogButtonPress) forControlEvents:UIControlEventTouchUpInside];
-    [startNewDialogButton setFrame:CGRectMake(20 ,  4,  self.view.frame.size.width - 40 , 36 )];
+    [startNewDialogButton setTintColor:[UIColor blueColor]];
+    [startNewDialogButton setFrame:CGRectMake(0 ,  0,  self.view.frame.size.width , 44 )];
     [startNewDialogButton setTitle:@"Start new dialog" forState:UIControlStateNormal];
     [viewToDisplay addSubview:startNewDialogButton];
     
