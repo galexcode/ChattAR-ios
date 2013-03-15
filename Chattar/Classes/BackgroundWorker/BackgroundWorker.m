@@ -98,6 +98,10 @@ static BackgroundWorker* instance = nil;
 #pragma mark -
 #pragma mark Data Requests
 
+-(void)sendPresenceToQBChat{
+    [[QBChat instance] sendPresence];
+}
+
 -(void)requestMessagesRecipientsPictures{
     if ([DataManager shared].currentChatRoom.messagesHistory.count) {
         NSMutableString* ids = [[[NSMutableString alloc] initWithString:@""] autorelease];

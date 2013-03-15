@@ -18,6 +18,8 @@
 #import "Storage.h"
 #import "ChatPointsStorage.h"
 #import "ChatRoomsStorage.h"
+#import "XMPPPresence.h"
+
                         // delegates
 @protocol ChatControllerDelegate <NSObject>
 
@@ -153,5 +155,7 @@
 -(void)requestMessagesRecipientsPictures;
 
 -(void)exitChatRoom:(QBChatRoom*)room;
+
+-(void)sendPresenceToQBChat;
 
 @end
