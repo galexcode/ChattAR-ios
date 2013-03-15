@@ -25,7 +25,8 @@
 #define SEE_ALL_IMAGE_TAG 12
 
 #define NUMBER_OF_USERS_TO_DISPLAY 3
-
+#define SIZE_OF_USER_PICTURE 30
+#define PADDING 5
 @interface ChatRoomsViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate,UINavigationControllerDelegate>{
     NSMutableIndexSet* expandedSections;
     UITapGestureRecognizer* tapRecognizer;

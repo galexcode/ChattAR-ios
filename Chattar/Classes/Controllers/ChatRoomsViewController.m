@@ -26,7 +26,7 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        self.title = NSLocalizedString(@"Chat Rooms", @"Chat Rooms");
+        self.title = NSLocalizedString(@"Chats", @"Chats");
         self.tabBarItem.image = [UIImage imageNamed:@"dialogsTab.png"];
 
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveChatRooms) name:kDataIsReadyForDisplaying object:nil];
@@ -43,12 +43,15 @@
     [_newConversationTextField setDelegate:self];
     NSArray* segments = @[@"Pick up your chat", @"Dialogs"];
     
+    [self.navigationItem.backBarButtonItem setAction:@selector(exitChatRoom:)];
+    
     UISegmentedControl* segmentControl = [[UISegmentedControl alloc] initWithItems:segments];
     [segmentControl setSegmentedControlStyle:UISegmentedControlStyleBar];
     [segmentControl setFrame:CGRectMake(20, 7, 280, 30)];
     [segmentControl addTarget:self action:@selector(segmentValueDidChanged:) forControlEvents:UIControlEventValueChanged];
     [segmentControl setSelectedSegmentIndex:0];
     self.navigationItem.titleView = segmentControl;
+    
     
     [segmentControl release];
 
@@ -62,6 +65,9 @@
     [dialogsController setDelegate:self];
     
     expandedSections = [[NSMutableIndexSet alloc] init];
+    
+    UIBarButtonItem* btn = [[[UIBarButtonItem alloc] initWithTitle:@"Chat Rooms" style:UIBarButtonItemStyleBordered target:nil action:@selector(exitChatRoom:)] autorelease];
+    self.navigationItem.backBarButtonItem = btn;
 }
 
 -(void)viewWillAppear:(BOOL)animated{
@@ -146,10 +152,10 @@
 
         
         if (![usedURLsArray containsObject:userImageURL]) {
-            AsyncImageView* activeUserView = [[[AsyncImageView alloc] initWithFrame:CGRectMake(userViewXPosition, 5, 30, 30)] autorelease];
+            AsyncImageView* activeUserView = [[[AsyncImageView alloc] initWithFrame:CGRectMake(userViewXPosition, 5, SIZE_OF_USER_PICTURE, SIZE_OF_USER_PICTURE)] autorelease];
             [activeUserView loadImageFromURL:[NSURL URLWithString:userImageURL]];
             [viewWithLastActiveUsers addSubview:activeUserView];
-            userViewXPosition += activeUserView.frame.size.width + 5;
+            userViewXPosition += activeUserView.frame.size.width + PADDING;
             [usedURLsArray addObject:userImageURL];
         }
         
@@ -572,5 +578,4 @@
 - (void)navigationController:(UINavigationController *)navigationController didShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
     [viewController viewDidAppear:animated];
 }
-
 @end
