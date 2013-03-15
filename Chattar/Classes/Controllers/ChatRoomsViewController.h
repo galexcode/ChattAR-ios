@@ -30,6 +30,7 @@
 @interface ChatRoomsViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate,UINavigationControllerDelegate>{
     NSMutableIndexSet* expandedSections;
     UITapGestureRecognizer* tapRecognizer;
+    NSTimer* presenceTimer;
 }
 
 @property (retain, nonatomic) IBOutlet UITableView *roomsTableView;

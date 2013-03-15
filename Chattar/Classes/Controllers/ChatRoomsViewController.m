@@ -68,6 +68,10 @@
     
     UIBarButtonItem* btn = [[[UIBarButtonItem alloc] initWithTitle:@"Chat Rooms" style:UIBarButtonItemStyleBordered target:nil action:@selector(exitChatRoom:)] autorelease];
     self.navigationItem.backBarButtonItem = btn;
+    
+    presenceTimer = [[NSTimer scheduledTimerWithTimeInterval:30 target:self
+                                                    selector:@selector(sendPresenceToChat)
+                                                    userInfo:nil repeats:YES] retain];
 }
 
 -(void)viewWillAppear:(BOOL)animated{
@@ -77,7 +81,6 @@
         
         NSLog(@"%@",self.navigationItem.titleView);
 
-        
         // additional request for checkins
         if ([DataManager shared].allCheckins.count == 0) {
             [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
@@ -108,6 +111,8 @@
     [tapRecognizer release];
     
     [_displayView release];
+    [presenceTimer invalidate];
+    [presenceTimer release];
     [super dealloc];
 }
 
@@ -578,4 +583,11 @@
 - (void)navigationController:(UINavigationController *)navigationController didShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
     [viewController viewDidAppear:animated];
 }
+
+#pragma mark -
+#pragma mark Sending presence
+- (void)sendPresenceToChat{
+    [[BackgroundWorker instance] sendPresenceToQBChat];
+}
+
 @end
