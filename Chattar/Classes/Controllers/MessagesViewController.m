@@ -333,8 +333,7 @@
     FBChatViewController *chatController = [[FBChatViewController alloc] initWithNibName:@"FBChatViewController" bundle:nil];
     chatController.chatHistory = conversation;
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    UIViewController *topVC = (UIViewController *)self.navigationController.delegate;
-    [topVC.navigationController pushViewController:chatController animated:YES];
+    [self.navigationController pushViewController:chatController animated:YES];
     
     [chatController release];
 }
@@ -364,10 +363,7 @@
     self.contactsController.delegate = self;
     [self.contactsController setControllerStyle:CAMessagesStyle];
     
-    
-    UIViewController *topVC = (UIViewController *)self.navigationController.delegate;
-    [topVC.navigationController pushViewController:self.contactsController animated:YES];
-    [self.contactsController release];
+    [self.navigationController pushViewController:self.contactsController animated:YES];
 }
 
 
@@ -382,8 +378,7 @@
     // show chat
     FBChatViewController *chatController = [[FBChatViewController alloc] initWithNibName:@"FBChatViewController" bundle:nil];
     chatController.chatHistory = conversation;
-    UIViewController *topVC = (UIViewController *)self.navigationController.delegate;
-    [topVC.navigationController pushViewController:chatController animated:YES];
+    [self.navigationController pushViewController:chatController animated:YES];
     
     [chatController release];
 }
