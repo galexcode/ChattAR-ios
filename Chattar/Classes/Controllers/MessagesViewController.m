@@ -30,7 +30,7 @@
     return self;
 }
 	
--(void)dealloc
+- (void)dealloc
 {	
 	[[NSNotificationCenter defaultCenter] removeObserver:self
 													name:kNewChatMessageCome 
@@ -149,7 +149,7 @@
     return [[DataManager shared].historyConversationAsArray count];
 }
 
--(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	return 50;
 }
@@ -324,7 +324,7 @@
     }
 }
 
--(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     Conversation *conversation;
     conversation = [[DataManager shared].historyConversationAsArray objectAtIndex:indexPath.row];
@@ -357,7 +357,7 @@
 #pragma mark-
 #pragma startNewDialogButtonPress 
 
--(void) startNewDialogButtonPress
+- (void)startNewDialogButtonPress
 {
     self.contactsController = [[ContactsController alloc] init];
     self.contactsController.delegate = self;
@@ -370,7 +370,7 @@
 #pragma mar -
 #pragma MessagesNavigationDelegate
 
--(void) showConversation:(Conversation*)conversation
+- (void)showConversation:(Conversation*)conversation
 {
     
     [self.contactsController.navigationController popViewControllerAnimated:NO];
