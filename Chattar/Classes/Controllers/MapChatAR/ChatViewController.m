@@ -60,6 +60,7 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doUpdateChatRoomsController:) name:kNeedToUpdateChatRoomController object:nil];
         
         isPanelDisplayed = NO;
+        
     }
     return self;
 }
@@ -86,6 +87,18 @@
     // YES when is getting new messages
 	isLoadingMoreMessages = NO;    
 }
+
+-(void) viewWillDisappear:(BOOL)animated {
+    if ([self.navigationController.viewControllers indexOfObject:self]==NSNotFound) {
+        // back button was pressed.  We know this is true because self is no longer
+        // in the navigation stack.
+        QBChatRoom* currentChatRoom = [[DataManager shared] findQBRoomWithName:[DataManager shared].currentChatRoom.roomName];
+        [[BackgroundWorker instance] exitChatRoom:currentChatRoom];
+    }
+    
+    [super viewWillDisappear:animated];
+}
+
 
 - (void)removeQuote
 {
@@ -218,8 +231,9 @@
             [self showWorld];
         
         if ([dataStorage isKindOfClass:[ChatRoomsStorage class]] && !isPanelDisplayed) {
+            NSLog(@"%@",self.navigationItem.leftBarButtonItem);
             [self addUserPicturesToPanel];
-            isPanelDisplayed = YES;
+            isPanelDisplayed = YES;            
         }
     }
 }
@@ -1181,5 +1195,4 @@
     
     [super actionSheet:actionSheet clickedButtonAtIndex:buttonIndex];
 }
-
 @end
