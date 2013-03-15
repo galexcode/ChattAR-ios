@@ -14,6 +14,7 @@
 #import "ChatRoomsStorage.h"
 #import "Storage.h"
 #import "ChatViewController.h"
+#import "FBNavigationBar.h"
 
 #define NUMBER_OF_ROWS_BY_DEFAULT 2
 #define NEARBY_SECTION_INDEX 1 
@@ -42,7 +43,6 @@
 
 - (IBAction)startButtonTap:(UIButton *)sender;
 
-@property (nonatomic, retain) UINavigationController* dialogsController;
 @property (retain, nonatomic) IBOutlet UIActivityIndicatorView *loadingIndicator;
 @property (retain, nonatomic) IBOutlet UIView *displayView;
 

@@ -16,7 +16,6 @@
 @end
 
 @implementation ChatRoomsViewController
-@synthesize dialogsController;
 @synthesize loadingIndicator = _loadingIndicator;
 @synthesize mainHeaderSection;
 @synthesize nearbyHeaderSection;
@@ -26,8 +25,8 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        self.title = NSLocalizedString(@"Chats", @"Chats");
-        self.tabBarItem.image = [UIImage imageNamed:@"dialogsTab.png"];
+        self.title = NSLocalizedString(@"Chat", @"Chat");
+        self.tabBarItem.image = [UIImage imageNamed:@"chatTab.png"];
 
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveChatRooms) name:kDataIsReadyForDisplaying object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doNeedDisplayChatRoomsController) name:kNeedToDisplayChatRoomController object:nil];
@@ -41,32 +40,32 @@
 
     [super viewDidLoad];
     [_newConversationTextField setDelegate:self];
-    NSArray* segments = @[@"Pick up your chat", @"Dialogs"];
-    
-    [self.navigationItem.backBarButtonItem setAction:@selector(exitChatRoom:)];
-    
-    UISegmentedControl* segmentControl = [[UISegmentedControl alloc] initWithItems:segments];
-    [segmentControl setSegmentedControlStyle:UISegmentedControlStyleBar];
-    [segmentControl setFrame:CGRectMake(20, 7, 280, 30)];
-    [segmentControl addTarget:self action:@selector(segmentValueDidChanged:) forControlEvents:UIControlEventValueChanged];
-    [segmentControl setSelectedSegmentIndex:0];
-    self.navigationItem.titleView = segmentControl;
-    
-    
-    [segmentControl release];
-
-    MessagesViewController* messagesVC = [[MessagesViewController alloc] initWithNibName:@"MessagesViewController" bundle:nil];
-    
-    dialogsController = [[UINavigationController alloc] initWithRootViewController:messagesVC];
-    
-    [messagesVC release];
-    dialogsController.navigationBarHidden = YES;
-    
-    [dialogsController setDelegate:self];
+//    NSArray* segments = @[@"Pick up your chat", @"Dialogs"];
+//    
+//    [self.navigationItem.backBarButtonItem setAction:@selector(exitChatRoom:)];
+//    
+//    UISegmentedControl* segmentControl = [[UISegmentedControl alloc] initWithItems:segments];
+//    [segmentControl setSegmentedControlStyle:UISegmentedControlStyleBar];
+//    [segmentControl setFrame:CGRectMake(20, 7, 280, 30)];
+//    [segmentControl addTarget:self action:@selector(segmentValueDidChanged:) forControlEvents:UIControlEventValueChanged];
+//    [segmentControl setSelectedSegmentIndex:0];
+//    self.navigationItem.titleView = segmentControl;
+//    
+//    
+//    [segmentControl release];
+//
+//    MessagesViewController* messagesVC = [[MessagesViewController alloc] initWithNibName:@"MessagesViewController" bundle:nil];
+//    
+//    dialogsController = [[UINavigationController alloc] initWithRootViewController:messagesVC];
+//
+//    [messagesVC release];
+//    dialogsController.navigationBarHidden = YES;
+//    
+//    [dialogsController setDelegate:self];
     
     expandedSections = [[NSMutableIndexSet alloc] init];
     
-    UIBarButtonItem* btn = [[[UIBarButtonItem alloc] initWithTitle:@"Chat Rooms" style:UIBarButtonItemStyleBordered target:nil action:@selector(exitChatRoom:)] autorelease];
+    UIBarButtonItem* btn = [[[UIBarButtonItem alloc] initWithTitle:@"Chats" style:UIBarButtonItemStyleBordered target:nil action:@selector(exitChatRoom:)] autorelease];
     self.navigationItem.backBarButtonItem = btn;
     
     presenceTimer = [[NSTimer scheduledTimerWithTimeInterval:30 target:self
@@ -101,7 +100,6 @@
 - (void)dealloc {
     [_roomsTableView release];
     [_newConversationTextField release];
-    [dialogsController release];
     [_loadingIndicator release];
     [expandedSections release];
     
@@ -333,21 +331,6 @@
     return viewForHeaderInSection;
 }
 
--(void)segmentValueDidChanged:(UISegmentedControl*)sender{
-    switch (sender.selectedSegmentIndex) {
-        case 0:
-            [self showChats];
-            break;
-            
-        case 1:
-            [self showDialogs];
-            break;
-            
-        default:
-            break;
-    }
-}
-
 -(void)expandSection:(UIButton*)sender{
     NSInteger currentSection = -1;
                     // determine section
@@ -393,20 +376,6 @@
         }
         
     }
-}
-
--(void)showChats{
-    if ([dialogsController.view superview]) {
-        [dialogsController.view removeFromSuperview];
-    }
-    
-}
-
--(void)showDialogs{
-    if ([dialogsController.view superview] == nil) {
-        [self.displayView addSubview:dialogsController.view];
-    }
-    
 }
 
 #pragma mark -
@@ -499,9 +468,20 @@
 
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    
 
     ChatRoom* selectedChatRoomWithAdditionalInfo = nil;
     switch (indexPath.section) {
+        case mainChatSection:{
+            // Chat
+            ChatViewController* chatViewController = [[[ChatViewController alloc] initWithNibName:@"ChatViewController" bundle:nil] autorelease];
+            
+            chatViewController.dataStorage = [[ChatPointsStorage alloc] init];
+            chatViewController.controllerReuseIdentifier = [[NSString alloc] initWithString:chatViewControllerIdentifier];
+            
+            [self.navigationController pushViewController:chatViewController animated:YES];
+        }
+           break;
         case nearbySection:
             selectedChatRoomWithAdditionalInfo = [[DataManager shared].nearbyRooms objectAtIndex:indexPath.row];
             break;
