@@ -1866,10 +1866,13 @@ static BackgroundWorker* instance = nil;
     if (chatRoom) {
         if (!chatRoom.roomUsers) {
             chatRoom.roomUsers = [[NSMutableArray alloc] init];
+            chatRoom.roomRating = 0;
         }
     
         [chatRoom.roomUsers removeAllObjects];
         [chatRoom.roomUsers addObjectsFromArray:users];
+                        // calculate room rating depending on number of users in room
+        chatRoom.roomRating = RATING_USER_VALUE * users.count;
     }
     
 }
