@@ -84,7 +84,7 @@
     if (![[DataManager shared] persistentStoreCoordinator]) {
         if (!hud) {
             hud = [[MBProgressHUD alloc] initWithView:self.view];
-            hud.labelText = @"Please wait - your application is updating";
+            hud.labelText = @"Please wait - application update";
             [hud show:YES];
             [self.view addSubview:hud];
         }
@@ -93,6 +93,7 @@
 
 -(void)persistentStorageInitEnded:(NSNotification*)notification{
     [hud removeFromSuperview];
+    
 }
 
 - (void)showLoginButton:(BOOL)isShow{
@@ -115,7 +116,7 @@
     activityIndicator = nil;
     loginButton = nil;
     
-    [[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:@"persistentStorageInitSuccess"];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self setBackgroundImage:nil];
     [super viewDidUnload];
 }

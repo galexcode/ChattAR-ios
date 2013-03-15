@@ -417,8 +417,7 @@ static DataManager *instance = nil;
 		 * The schema for the persistent store is incompatible with current managed object model
 		 Check the error message to determine what the actual problem was.
 		 */
-//		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-//		abort();
+		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
         return nil;
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:@"persistentStorageInitSuccess" object:self];
