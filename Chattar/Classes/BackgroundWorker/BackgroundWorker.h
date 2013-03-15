@@ -152,4 +152,6 @@
 
 -(void)requestMessagesRecipientsPictures;
 
+-(void)exitChatRoom:(QBChatRoom*)room;
+
 @end
