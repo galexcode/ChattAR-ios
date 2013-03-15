@@ -158,7 +158,7 @@
         __block BOOL addedToCurrentChatState = NO;
         NSArray *friendsIds = [[DataManager shared].myFriendsAsDictionary allKeys];
         
-        dispatch_async( dispatch_get_main_queue(), ^{
+    //    dispatch_sync( dispatch_get_main_queue(), ^{
             
             // New messages
             if (toTop){
@@ -192,11 +192,11 @@
                 [self.messagesTableView reloadData];
                 
             }
-        });
+     //   });
     }
     
     else if ([self.controllerReuseIdentifier isEqualToString:chatRoomsViewControllerIdentifier]){
-        dispatch_async(dispatch_get_main_queue(), ^{
+      //  dispatch_async(dispatch_get_main_queue(), ^{
             if (toTop) {
                 [dataStorage insertObjectToAllData:message atIndex:0];
                 [dataStorage insertObjectToPartialData:message atIndex:0];
@@ -210,7 +210,7 @@
             }
             
             [self.messagesTableView reloadData];
-        });
+       // });
     }
     
 
@@ -1078,18 +1078,25 @@
         BOOL reloadTable = [[notification.userInfo objectForKey:@"reloadTable"] boolValue];
         BOOL isFBCheckin = [[notification.userInfo objectForKey:@"isFBCheckin"] boolValue];
         self.messagesTableView.tag = tableIsUpdating;
+
+        
+        
+        [self addMessageToChatTable:message toTableTop:toTop withReloadTable:reloadTable];
+
+        
         
         if(message.geoDataID != -1 && [self.controllerReuseIdentifier isEqualToString:chatViewControllerIdentifier]){
             [[DataManager shared].chatMessagesIDs addObject:[NSString stringWithFormat:@"%d", message.geoDataID]];
         }
         
-        [self addMessageToChatTable:message toTableTop:toTop withReloadTable:reloadTable];
         
         // Save to cache
         //
         if(!isFBCheckin && [dataStorage needsCaching] && [dataStorage isKindOfClass:[ChatPointsStorage class]]){
             [[DataManager shared] addChatMessageToStorage:message];
         }
+
+
         
         self.messagesTableView.tag = 0;
         [self.messagesTableView reloadData];
