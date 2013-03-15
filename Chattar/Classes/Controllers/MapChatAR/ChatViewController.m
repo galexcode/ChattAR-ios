@@ -89,7 +89,7 @@
 }
 
 -(void) viewWillDisappear:(BOOL)animated {
-    if ([self.navigationController.viewControllers indexOfObject:self]==NSNotFound) {
+    if ([self.navigationController.viewControllers indexOfObject:self] == NSNotFound && [self.controllerReuseIdentifier isEqualToString:chatRoomsViewControllerIdentifier]) {
         // back button was pressed.  We know this is true because self is no longer
         // in the navigation stack.
         QBChatRoom* currentChatRoom = [[DataManager shared] findQBRoomWithName:[DataManager shared].currentChatRoom.roomName];
@@ -97,6 +97,12 @@
     }
     
     [super viewWillDisappear:animated];
+}
+
+-(void)viewDidDisappear:(BOOL)animated{
+    if ([self.controllerReuseIdentifier isEqualToString:chatRoomsViewControllerIdentifier]) {
+        [self cleanData];
+    }
 }
 
 
@@ -152,65 +158,67 @@
 #pragma mark -
 #pragma mark Interface based methods
 
--(void)addMessageToChatTable: (UserAnnotation*)message toTableTop:(BOOL)toTop withReloadTable:(BOOL)reloadTable{
+- (void)cleanData{
+    // clean data
+    [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying removeAllObjects];
+    [[DataManager shared].currentChatRoom.messagesHistory removeAllObjects];
+    [messagesTableView reloadData];
+
+}
+
+- (void)addMessageToChatTable: (UserAnnotation*)message toTableTop:(BOOL)toTop withReloadTable:(BOOL)reloadTable{
 
     if ([self.controllerReuseIdentifier isEqualToString:chatViewControllerIdentifier]) {
         __block BOOL addedToCurrentChatState = NO;
         NSArray *friendsIds = [[DataManager shared].myFriendsAsDictionary allKeys];
         
-    //    dispatch_sync( dispatch_get_main_queue(), ^{
+        // New messages
+        if (toTop){
+            [dataStorage insertObjectToAllData:message atIndex:0];
+            if([self isAllShowed] || [friendsIds containsObject:message.fbUserId] ||
+               
+               [message.fbUserId isEqualToString:[DataManager shared].currentFBUserId]){
+                
+                [dataStorage insertObjectToPartialData:message atIndex:0];
+                addedToCurrentChatState = YES;
+            }
             
-            // New messages
-            if (toTop){
-                [dataStorage insertObjectToAllData:message atIndex:0];
-                if([self isAllShowed] || [friendsIds containsObject:message.fbUserId] ||
-                   
-                   [message.fbUserId isEqualToString:[DataManager shared].currentFBUserId]){
-                    
-                    [dataStorage insertObjectToPartialData:message atIndex:0];
-                    addedToCurrentChatState = YES;
-                }
+            // old messages
+        }
+        else {
+            [dataStorage insertObjectToAllData:message atIndex:([dataStorage allDataCount] > 0) ?
+             ([dataStorage allDataCount]-1):
+             0];
+            
+            if([self isAllShowed] || [friendsIds containsObject:message.fbUserId] ||
+               [message.fbUserId isEqualToString:[DataManager shared].currentFBUserId]){
                 
-                // old messages
+                [dataStorage insertObjectToPartialData:message atIndex:[dataStorage storageCount] > 0 ? ([dataStorage storageCount]-1): 0];
+                addedToCurrentChatState = YES;
             }
-            else {
-                [dataStorage insertObjectToAllData:message atIndex:([dataStorage allDataCount] > 0) ?
-                 ([dataStorage allDataCount]-1):
-                 0];
-                
-                if([self isAllShowed] || [friendsIds containsObject:message.fbUserId] ||
-                   [message.fbUserId isEqualToString:[DataManager shared].currentFBUserId]){
-                    
-                    [dataStorage insertObjectToPartialData:message atIndex:[dataStorage storageCount] > 0 ? ([dataStorage storageCount]-1): 0];
-                    addedToCurrentChatState = YES;
-                }
-            }
-            //
-            if(addedToCurrentChatState && reloadTable){
-                // on main thread
-                
-                [self.messagesTableView reloadData];
-                
-            }
-     //   });
+        }
+        if(addedToCurrentChatState && reloadTable){
+            // on main thread
+            
+            [self.messagesTableView reloadData];
+            
+        }
     }
     
     else if ([self.controllerReuseIdentifier isEqualToString:chatRoomsViewControllerIdentifier]){
-      //  dispatch_async(dispatch_get_main_queue(), ^{
-            if (toTop) {
-                [dataStorage insertObjectToAllData:message atIndex:0];
-                [dataStorage insertObjectToPartialData:message atIndex:0];
-            }
-            else{
-                int index =  ([dataStorage allDataCount] > 0) ? ([dataStorage allDataCount]-1) : 0;
-                [dataStorage insertObjectToAllData:message atIndex:index];
-                
-                index = ([dataStorage storageCount] > 0) ? ([dataStorage storageCount]-1) : 0;
-                [dataStorage insertObjectToPartialData:message atIndex:index];
-            }
+        if (toTop) {
+            [dataStorage insertObjectToAllData:message atIndex:0];
+            [dataStorage insertObjectToPartialData:message atIndex:0];
+        }
+        else{
+            int index =  ([dataStorage allDataCount] > 0) ? ([dataStorage allDataCount]-1) : 0;
+            [dataStorage insertObjectToAllData:message atIndex:index];
             
-            [self.messagesTableView reloadData];
-       // });
+            index = ([dataStorage storageCount] > 0) ? ([dataStorage storageCount]-1) : 0;
+            [dataStorage insertObjectToPartialData:message atIndex:index];
+        }
+        
+        [self.messagesTableView reloadData];
     }
     
 
@@ -227,6 +235,7 @@
         if ([[self allFriendsSwitch] value] == friendsValue) {
             [self showFriends];
         }
+        
         else
             [self showWorld];
         

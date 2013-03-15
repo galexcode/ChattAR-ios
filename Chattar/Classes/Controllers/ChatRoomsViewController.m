@@ -153,7 +153,6 @@
             userImageURL = [[pic objectForKey:kData] objectForKey:kUrl];
         }
 
-        
         if (![usedURLsArray containsObject:userImageURL]) {
             AsyncImageView* activeUserView = [[[AsyncImageView alloc] initWithFrame:CGRectMake(userViewXPosition, 5, SIZE_OF_USER_PICTURE, SIZE_OF_USER_PICTURE)] autorelease];
             [activeUserView loadImageFromURL:[NSURL URLWithString:userImageURL]];
@@ -165,7 +164,6 @@
         if (usedURLsArray.count == NUMBER_OF_USERS_TO_DISPLAY) {
             *stop = YES;
         }
-
     }];
     
     return viewWithLastActiveUsers;
@@ -223,7 +221,6 @@
     chatViewController.controllerReuseIdentifier = [[NSString alloc] initWithString:chatRoomsViewControllerIdentifier];
     chatViewController.title = NSLocalizedString([DataManager shared].currentChatRoom.roomName, nil);
     [self.navigationController pushViewController:chatViewController animated:YES];
-
 }
 
 - (BOOL)canCollapseSection:(NSInteger)section

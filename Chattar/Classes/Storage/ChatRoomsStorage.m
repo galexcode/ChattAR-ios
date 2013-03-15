@@ -110,7 +110,7 @@
 
 -(void)insertObjectToAllData:(UserAnnotation*)object atIndex:(NSInteger)index{
         
-    if (index >= 0 && index < [DataManager shared].currentChatRoom.messagesHistory.count) {
+    if (((index >= 0 && index < [DataManager shared].currentChatRoom.messagesHistory.count) || !index)) {
         QBChatMessage* message = [[DataManager shared] convertUserAnnotationToQBChatMessage:object];
         
         if (![[DataManager shared].currentChatRoom.messagesHistory containsObject:message]) {
@@ -125,7 +125,7 @@
         [DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying = [[NSMutableArray alloc] init];
     }
     
-    if (index >= 0 && index < [DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying.count && object != nil) {
+    if (((index >= 0 && index < [DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying.count) || !index)) {
         if (![[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying containsObject:object]) {
             [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying insertObject:object atIndex:index];
         }
