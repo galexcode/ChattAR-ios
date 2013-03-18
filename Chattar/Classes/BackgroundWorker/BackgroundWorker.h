@@ -21,7 +21,7 @@
 #import "XMPPPresence.h"
 
 #define RATING_USER_VALUE 10
-                        // delegates
+                                                // delegates
 @protocol ChatControllerDelegate <NSObject>
 
 @optional
