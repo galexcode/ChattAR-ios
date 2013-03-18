@@ -213,6 +213,14 @@
     [mapView doClustering];
 }
 
+
+- (void) showConversation{
+ 
+    [[DataManager shared].mapPoints addObjectsFromArray:[DataManager shared].allmapPoints];
+    [self refreshWithNewPoints:[DataManager shared].mapPoints];
+}
+
+
 - (void) showWorld{
     
     // Map/AR points
@@ -619,11 +627,16 @@
 
 -(void)doMapNotReceiveNewFBMapUsers{
     [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
+
     if ([self.allFriendsSwitch value] == friendsValue) {
         [self showFriends];
     }
     else
         [self showWorld];
+
+    [self showConversation];
+
+    
     [DataManager shared].currentRequestingDataControllerTitle = @"";
 }
 
