@@ -111,7 +111,7 @@
     }
     
     NSString* objectID = [NSString stringWithFormat:@"%d",object.geoDataID];
-    if (((index >= 0 && index < [DataManager shared].allChatPoints.count) || !index) && ![[DataManager shared].chatMessagesIDs containsObject:objectID]) {
+    if (((index >= 0 && index < [DataManager shared].allChatPoints.count) ) && ![[DataManager shared].chatMessagesIDs containsObject:objectID]) {
         [[DataManager shared].allChatPoints insertObject:object atIndex:index];
     }
 }
@@ -122,8 +122,6 @@
     }
 
     NSString* objectID = [NSString stringWithFormat:@"%d",object.geoDataID];
-
-    
     if ( (index >= 0 && index < [DataManager shared].chatPoints.count)  &&  ![[DataManager shared].chatMessagesIDs containsObject:objectID]  ) {
         [[DataManager shared].chatPoints insertObject:object atIndex:index];
     }
