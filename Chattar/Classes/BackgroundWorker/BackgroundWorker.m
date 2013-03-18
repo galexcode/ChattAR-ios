@@ -59,6 +59,7 @@ static BackgroundWorker* instance = nil;
 }
 
 
+
 -(void)dealloc{
     [FBfriends release];
     dispatch_release(getMoreMessagesWorkQueue);
@@ -96,6 +97,10 @@ static BackgroundWorker* instance = nil;
 
 #pragma mark -
 #pragma mark Data Requests
+
+-(void)sendPresenceToQBChat{
+    [[QBChat instance] sendPresence];
+}
 
 -(void)requestMessagesRecipientsPictures{
     if ([DataManager shared].currentChatRoom.messagesHistory.count) {
@@ -155,6 +160,10 @@ static BackgroundWorker* instance = nil;
 
 -(void)requestAllChatRooms{
     [[QBChat instance] requestAllRooms];
+}
+
+-(void)exitChatRoom:(QBChatRoom*)currentChatRoom{
+    [[QBChat instance] leaveRoom:currentChatRoom];
 }
 
 -(void)requestFriendWithFacebookID:(NSString*)fbUserID andMessageText:(NSString*)message{
@@ -1743,6 +1752,24 @@ static BackgroundWorker* instance = nil;
 
 #pragma mark -
 #pragma mark QBChatDelegate methods
+
+-(void)chatRoomDidLeave:(NSString *)roomName{
+    ChatRoom* leavedChatRoom = [[DataManager shared] findRoomWithAdditionalInfo:roomName];
+    if (leavedChatRoom) {
+        int roomIndex = [[DataManager shared].trendingRooms indexOfObject:leavedChatRoom];
+        if (roomIndex != NSNotFound) {
+            NSMutableArray* users = [[[DataManager shared].trendingRooms objectAtIndex:roomIndex] roomUsers];
+            [users removeObject:[DataManager shared].currentQBUser];
+        }
+        
+        roomIndex = [[DataManager shared].nearbyRooms indexOfObject:leavedChatRoom];
+        if (roomIndex != NSNotFound) {
+            NSMutableArray* users = [[[DataManager shared].nearbyRooms objectAtIndex:roomIndex] roomUsers];
+            [users removeObject:[DataManager shared].currentQBUser];
+        }
+    }
+}
+
 -(void)chatDidReceiveListOfRooms:(NSArray *)rooms{
             // retain rooms
     [rooms retain];
@@ -1780,9 +1807,7 @@ static BackgroundWorker* instance = nil;
                 [room.messagesHistory addObject:message];
 
         }
-
     }
-    
 }
 
 -(void)chatRoomDidEnter:(QBChatRoom *)room{
@@ -1841,10 +1866,13 @@ static BackgroundWorker* instance = nil;
     if (chatRoom) {
         if (!chatRoom.roomUsers) {
             chatRoom.roomUsers = [[NSMutableArray alloc] init];
+            chatRoom.roomRating = 0;
         }
     
         [chatRoom.roomUsers removeAllObjects];
         [chatRoom.roomUsers addObjectsFromArray:users];
+                        // calculate room rating depending on number of users in room
+        chatRoom.roomRating = RATING_USER_VALUE * users.count;
     }
     
 }

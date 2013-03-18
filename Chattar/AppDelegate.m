@@ -84,22 +84,19 @@
 	[settingsViewController.navigationController setValue:[[[FBNavigationBar alloc]init] autorelease] forKeyPath:@"navigationBar"];
     [settingsViewController release];
     
-    // Chat
-    ChatViewController* chatViewController = [[ChatViewController alloc] initWithNibName:@"ChatViewController" bundle:nil];
-
-    chatViewController.dataStorage = [[ChatPointsStorage alloc] init];
-    chatViewController.controllerReuseIdentifier = [[NSString alloc] initWithString:chatViewControllerIdentifier];
-    
-    UINavigationController* chatNavigationController = [[UINavigationController alloc] initWithRootViewController:chatViewController];
-    [chatViewController.navigationController setValue:[[[FBNavigationBar alloc]init] autorelease] forKeyPath:@"navigationBar"];
-    [chatViewController release];
-    
     // Map
     MapViewController* mapViewController = [[MapViewController alloc] initWithNibName:@"MapViewController" bundle:nil];
     UINavigationController* mapNavigationController = [[UINavigationController alloc] initWithRootViewController:mapViewController];
     [mapViewController.navigationController setValue:[[[FBNavigationBar alloc]init] autorelease] forKeyPath:@"navigationBar"];
 
     [mapViewController release];
+    
+    // Messages
+    MessagesViewController* messagesViewController = [[MessagesViewController alloc] initWithNibName:@"MessagesViewController" bundle:nil];
+    UINavigationController* messagesNavigationController = [[UINavigationController alloc] initWithRootViewController:messagesViewController];
+    [messagesViewController.navigationController setValue:[[[FBNavigationBar alloc]init] autorelease] forKeyPath:@"navigationBar"];
+    
+    [messagesViewController release];
     
     // Chat Rooms
     ChatRoomsViewController* chatRoomsController = [[ChatRoomsViewController alloc] initWithNibName:@"ChatRoomsViewController" bundle:nil];
@@ -119,21 +116,21 @@
 
         [arController release];
 
-        viewControllers = @[chatNavigationController,mapNavigationController,arNavigationController,chatRoomsNavigationController, settingsNavigationController];
+        viewControllers = @[chatRoomsNavigationController,mapNavigationController,messagesNavigationController,arNavigationController,settingsNavigationController];
         [arNavigationController release];
     }
     else
-        viewControllers = @[chatNavigationController,mapNavigationController,chatRoomsNavigationController, settingsNavigationController];
+        viewControllers = @[chatRoomsNavigationController,mapNavigationController,messagesNavigationController,settingsNavigationController];
+    // show window
+	self.window.rootViewController = self.tabBarController;
+    [self.window makeKeyAndVisible];
+
 	_tabBarController.viewControllers = viewControllers;
 	
 	// release controllers
 	[settingsNavigationController release];
-	[chatNavigationController release];
     [chatRoomsNavigationController release];
     [mapNavigationController release];
-    // show window
-	self.window.rootViewController = self.tabBarController;
-    [self.window makeKeyAndVisible];
     
     
     // shpw splash

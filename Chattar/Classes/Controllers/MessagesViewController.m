@@ -30,7 +30,7 @@
     return self;
 }
 	
--(void)dealloc
+- (void)dealloc
 {	
 	[[NSNotificationCenter defaultCenter] removeObserver:self
 													name:kNewChatMessageCome 
@@ -149,7 +149,7 @@
     return [[DataManager shared].historyConversationAsArray count];
 }
 
--(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	return 50;
 }
@@ -324,7 +324,7 @@
     }
 }
 
--(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     Conversation *conversation;
     conversation = [[DataManager shared].historyConversationAsArray objectAtIndex:indexPath.row];
@@ -333,8 +333,7 @@
     FBChatViewController *chatController = [[FBChatViewController alloc] initWithNibName:@"FBChatViewController" bundle:nil];
     chatController.chatHistory = conversation;
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    UIViewController *topVC = (UIViewController *)self.navigationController.delegate;
-    [topVC.navigationController pushViewController:chatController animated:YES];
+    [self.navigationController pushViewController:chatController animated:YES];
     
     [chatController release];
 }
@@ -358,23 +357,20 @@
 #pragma mark-
 #pragma startNewDialogButtonPress 
 
--(void) startNewDialogButtonPress
+- (void)startNewDialogButtonPress
 {
     self.contactsController = [[ContactsController alloc] init];
     self.contactsController.delegate = self;
     [self.contactsController setControllerStyle:CAMessagesStyle];
     
-    
-    UIViewController *topVC = (UIViewController *)self.navigationController.delegate;
-    [topVC.navigationController pushViewController:self.contactsController animated:YES];
-    [self.contactsController release];
+    [self.navigationController pushViewController:self.contactsController animated:YES];
 }
 
 
 #pragma mar -
 #pragma MessagesNavigationDelegate
 
--(void) showConversation:(Conversation*)conversation
+- (void)showConversation:(Conversation*)conversation
 {
     
     [self.contactsController.navigationController popViewControllerAnimated:NO];
@@ -382,8 +378,7 @@
     // show chat
     FBChatViewController *chatController = [[FBChatViewController alloc] initWithNibName:@"FBChatViewController" bundle:nil];
     chatController.chatHistory = conversation;
-    UIViewController *topVC = (UIViewController *)self.navigationController.delegate;
-    [topVC.navigationController pushViewController:chatController animated:YES];
+    [self.navigationController pushViewController:chatController animated:YES];
     
     [chatController release];
 }

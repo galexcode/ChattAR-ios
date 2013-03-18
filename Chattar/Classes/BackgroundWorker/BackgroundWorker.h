@@ -18,6 +18,9 @@
 #import "Storage.h"
 #import "ChatPointsStorage.h"
 #import "ChatRoomsStorage.h"
+#import "XMPPPresence.h"
+
+#define RATING_USER_VALUE 10
                         // delegates
 @protocol ChatControllerDelegate <NSObject>
 
@@ -151,5 +154,9 @@
 -(void)postInformationWithDataStorage:(Storage*)dataStorage;
 
 -(void)requestMessagesRecipientsPictures;
+
+-(void)exitChatRoom:(QBChatRoom*)room;
+
+-(void)sendPresenceToQBChat;
 
 @end

@@ -14,6 +14,7 @@
 #import "ChatRoomsStorage.h"
 #import "Storage.h"
 #import "ChatViewController.h"
+#import "FBNavigationBar.h"
 
 #define NUMBER_OF_ROWS_BY_DEFAULT 2
 #define NEARBY_SECTION_INDEX 1 
@@ -25,10 +26,12 @@
 #define SEE_ALL_IMAGE_TAG 12
 
 #define NUMBER_OF_USERS_TO_DISPLAY 3
-
+#define SIZE_OF_USER_PICTURE 30
+#define PADDING 5
 @interface ChatRoomsViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate,UINavigationControllerDelegate>{
     NSMutableIndexSet* expandedSections;
     UITapGestureRecognizer* tapRecognizer;
+    NSTimer* presenceTimer;
 }
 
 @property (retain, nonatomic) IBOutlet UITableView *roomsTableView;
@@ -40,7 +43,6 @@
 
 - (IBAction)startButtonTap:(UIButton *)sender;
 
-@property (nonatomic, retain) UINavigationController* dialogsController;
 @property (retain, nonatomic) IBOutlet UIActivityIndicatorView *loadingIndicator;
 @property (retain, nonatomic) IBOutlet UIView *displayView;
 

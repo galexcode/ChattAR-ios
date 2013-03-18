@@ -376,8 +376,6 @@
         
         // sort depending on rating value
         
-        #warning TODO:implement calculating rooms ratings
-        
         [self retrieveTrendingRoomsStorage];
         
         [[NSNotificationCenter defaultCenter] postNotificationName:kDataIsReadyForDisplaying object:nil userInfo:context];
