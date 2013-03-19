@@ -1851,6 +1851,7 @@ static BackgroundWorker* instance = nil;
                 [DataManager shared].currentChatRoom.roomUsers = [[NSMutableArray alloc] init];
             }
             
+            QBUUser *us = [DataManager shared].currentQBUser;
             [[DataManager shared].currentChatRoom.roomUsers addObject:[DataManager shared].currentQBUser];
         }
         

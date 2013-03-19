@@ -85,6 +85,13 @@ static DataManager *instance = nil;
     return self;
 }
 
+
+-(void) setCurrentQBUser:(QBUUser *)aCurrentQBUser
+{
+    [currentQBUser release];
+    currentQBUser = [aCurrentQBUser retain];
+   // NSLog(@"//=// set current user");
+}
 -(void) dealloc 
 {
     [accessToken release];
