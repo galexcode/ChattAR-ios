@@ -826,8 +826,8 @@
 		ED4C8E8916BFEB5D000751D4 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				ED55672516D370E8009C385A /* CommonViewController */,
 				ED4C8FF816BFEC6C000751D4 /* BackgroundWorker */,
+				ED55672516D370E8009C385A /* CommonViewController */,
 				ED4C8E8A16BFEB5D000751D4 /* ContactsController.h */,
 				ED4C8E8B16BFEB5D000751D4 /* ContactsController.m */,
 				ED4C8E8C16BFEB5D000751D4 /* FBChatViewController.h */,
@@ -1787,8 +1787,8 @@
 		636735FB1552CF590061BF75 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Taras Filatov (BV2558G6T9)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Taras Filatov (6AVH4TA956)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/Externals\"",
@@ -1811,8 +1811,8 @@
 					"-lstdc++",
 				);
 				PRODUCT_NAME = Chattar;
-				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PROVISIONING_PROFILE = "C6112AC4-DCEB-4C60-BDF9-D7717DAD395D";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "9945B46A-1261-4181-A7D8-B6AB55692D6C";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
