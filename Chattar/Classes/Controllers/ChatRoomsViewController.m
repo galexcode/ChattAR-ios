@@ -31,6 +31,9 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveChatRooms) name:kDataIsReadyForDisplaying object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doNeedDisplayChatRoomsController) name:kNeedToDisplayChatRoomController object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doCreateNewRoom) name:kNewChatRoomCreated object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChatEndRetrievingData:) name:kChatEndOfRetrievingInitialData object:nil ];
+
     }
     return self;
 }
@@ -40,29 +43,7 @@
 
     [super viewDidLoad];
     [_newConversationTextField setDelegate:self];
-//    NSArray* segments = @[@"Pick up your chat", @"Dialogs"];
-//    
-//    [self.navigationItem.backBarButtonItem setAction:@selector(exitChatRoom:)];
-//    
-//    UISegmentedControl* segmentControl = [[UISegmentedControl alloc] initWithItems:segments];
-//    [segmentControl setSegmentedControlStyle:UISegmentedControlStyleBar];
-//    [segmentControl setFrame:CGRectMake(20, 7, 280, 30)];
-//    [segmentControl addTarget:self action:@selector(segmentValueDidChanged:) forControlEvents:UIControlEventValueChanged];
-//    [segmentControl setSelectedSegmentIndex:0];
-//    self.navigationItem.titleView = segmentControl;
-//    
-//    
-//    [segmentControl release];
-//
-//    MessagesViewController* messagesVC = [[MessagesViewController alloc] initWithNibName:@"MessagesViewController" bundle:nil];
-//    
-//    dialogsController = [[UINavigationController alloc] initWithRootViewController:messagesVC];
-//
-//    [messagesVC release];
-//    dialogsController.navigationBarHidden = YES;
-//    
-//    [dialogsController setDelegate:self];
-    
+   
     expandedSections = [[NSMutableIndexSet alloc] init];
     
     UIBarButtonItem* btn = [[[UIBarButtonItem alloc] initWithTitle:@"Chats" style:UIBarButtonItemStyleBordered target:nil action:@selector(exitChatRoom:)] autorelease];
@@ -75,14 +56,15 @@
 
 -(void)viewWillAppear:(BOOL)animated{
     if ([DataManager shared].qbChatRooms.count == 0 && [DataManager shared].roomsWithAdditionalInfo.count == 0) {
+                // request chat rooms info
         [[BackgroundWorker instance] requestAdditionalChatRoomsInfo];
         [self addSpinner];
         
-        NSLog(@"%@",self.navigationItem.titleView);
-
-        // additional request for checkins
-        if ([DataManager shared].allCheckins.count == 0) {
+        // additional requests for checkins and public chat data
+        if ([DataManager shared].allCheckins.count == 0 && [DataManager shared].allChatPoints.count == 0 ) {
             [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
+            
+            [[BackgroundWorker instance] retrieveCachedChatDataAndRequestNewData];
         }        
     }
     else
@@ -125,6 +107,7 @@
     NSString* roomName = _newConversationTextField.text;
     if ([Helper isStringCorrect:roomName]) {
         [[BackgroundWorker instance] createChatRoom:roomName];
+        [_newConversationTextField setText:@""];
     }
     else{
         UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Incorrect chat room name" message:@"Please enter valid chat room name" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
@@ -136,7 +119,33 @@
 #pragma mark -
 #pragma mark Interface based methods
 
+- (UIImageView*)createAccessoryViewWithPeopleCounter:(NSInteger)numberOfPeople{
+    
+    UIImageView* accessoryView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"occupantsCounter.png"]] autorelease];
+    UILabel* counter = [[[UILabel alloc] initWithFrame:CGRectMake(20, -1, 20, 20)] autorelease];
+    [counter setText:[NSString stringWithFormat:@"%d",numberOfPeople]];
+    [counter setBackgroundColor:[UIColor clearColor]];
+    [accessoryView addSubview:counter];
+    return accessoryView;
+}
+
+- (UIImageView*)createAccessoryViewWithPeopleCounter:(NSInteger)numberOfPeople distance:(NSInteger)distance{
+    UIImageView* accessoryView = [self createAccessoryViewWithPeopleCounter:numberOfPeople];
+    
+    NSString* distanceString = [NSString stringWithFormat:@"%d kms",distance];
+    CGSize sizeOfDistanceLabel = [distanceString sizeWithFont:[UIFont fontWithName:@"Helvetica" size:10]];
+    
+    UILabel* distanceLabel = [[[UILabel alloc] initWithFrame:CGRectMake(accessoryView.frame.size.width-sizeOfDistanceLabel.width/2 -20, -10, sizeOfDistanceLabel.width, sizeOfDistanceLabel.height)] autorelease];
+    [distanceLabel setBackgroundColor:[UIColor clearColor]];
+    [distanceLabel setText:distanceString];
+    [distanceLabel setFont:[UIFont fontWithName:@"Helvetica" size:10]];
+    
+    [accessoryView addSubview:distanceLabel];
+    return accessoryView;
+}
+
 - (UIImageView*)viewWithLastActiveUsers{
+    
     UIImageView* viewWithLastActiveUsers = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 100, 40)];
     NSSortDescriptor* sortOrder = [NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:NO];
     
@@ -200,7 +209,7 @@
 - (void) animateTextField: (UITextField*) textField up: (BOOL) up
 {
     const float movementDuration = 0.3f;
-    const int movementDistance = 170;
+    const int movementDistance = 160;
     
     int movement = (up ? -movementDistance : movementDistance);
     
@@ -356,7 +365,7 @@
             rows = [self tableView:_roomsTableView numberOfRowsInSection:currentSection];
         }
         
-        for (int i = NUMBER_OF_ROWS_BY_DEFAULT; i < rows; i++){
+        for (int i = NUMBER_OF_ROOM_DISPLAYED_BY_DEFAULT; i < rows; i++){
             NSIndexPath *tmpIndexPath = [NSIndexPath indexPathForRow:i
                                                            inSection:currentSection];
             [tmpArray addObject:tmpIndexPath];
@@ -382,18 +391,21 @@
     {
         if ([expandedSections containsIndex:section])
         {
+                                                // display only MAX_NUMBER_OF_ROOMS
             if (section == nearbySection) {
-                return [DataManager shared].nearbyRooms.count;
+                return ([DataManager shared].nearbyRooms.count > MAX_NUMBER_OF_ROOMS_TO_DISPLAY) ? MAX_NUMBER_OF_ROOMS_TO_DISPLAY :
+                                                                                                   [DataManager shared].nearbyRooms.count;
             }
             else if (section == trendingSection){
-                return [DataManager shared].trendingRooms.count;
+                return ([DataManager shared].trendingRooms.count > MAX_NUMBER_OF_ROOMS_TO_DISPLAY) ? MAX_NUMBER_OF_ROOMS_TO_DISPLAY :
+                                                                                                     [DataManager shared].trendingRooms.count;
             }
         }
         
-        return NUMBER_OF_ROWS_BY_DEFAULT; 
+        return NUMBER_OF_ROOM_DISPLAYED_BY_DEFAULT;
     }
     
-    return (section == mainChatSection) ? 1 : NUMBER_OF_ROWS_BY_DEFAULT;
+    return (section == mainChatSection) ? 1 : NUMBER_OF_ROOM_DISPLAYED_BY_DEFAULT;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
@@ -413,11 +425,7 @@
             if (indexPath.row < [DataManager shared].trendingRooms.count) {
                 ChatRoom* room = [[DataManager shared].trendingRooms objectAtIndex:indexPath.row];
                 NSString* cellText = [NSString stringWithFormat:@"%@",room.roomName];
-                UIImageView* accessoryView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"occupantsCounter.png"]] autorelease];
-                UILabel* counter = [[[UILabel alloc] initWithFrame:CGRectMake(20, -1, 20, 20)] autorelease];
-                [counter setText:[NSString stringWithFormat:@"%d",room.roomUsers.count]];
-                [counter setBackgroundColor:[UIColor clearColor]];
-                [accessoryView addSubview:counter];
+                UIImageView* accessoryView = [self createAccessoryViewWithPeopleCounter:room.roomUsers.count];
                 [cell setAccessoryView:accessoryView];
                 [cell.textLabel setText:cellText];
             }
@@ -426,12 +434,8 @@
         case nearbySection:{
             if (indexPath.row < [DataManager shared].nearbyRooms.count) {
                 ChatRoom* room = [[DataManager shared].nearbyRooms objectAtIndex:indexPath.row];
-                NSString* cellText = [NSString stringWithFormat:@"%d kms",(int)room.distanceFromUser/1000];
-                UIImageView* accessoryView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"occupantsCounter.png"]] autorelease];
-                UILabel* counter = [[[UILabel alloc] initWithFrame:CGRectMake(20, -1, 20, 20)] autorelease];
-                [counter setBackgroundColor:[UIColor clearColor]];
-                [counter setText:[NSString stringWithFormat:@"%d",room.roomUsers.count]];
-                [accessoryView addSubview:counter];
+                NSString* cellText = [NSString stringWithFormat:@"%@",room.roomName];
+                UIImageView* accessoryView = [self createAccessoryViewWithPeopleCounter:room.roomUsers.count distance:(int)room.distanceFromUser/1000];
                 [cell setAccessoryView:accessoryView];
                 [cell.textLabel setText:cellText];
             }
@@ -519,9 +523,13 @@
     [self showChatController];
 }
 
--(void)doReceiveChatRooms{
+-(void)doReceiveChatRooms{   
+    [_roomsTableView reloadData];
+}
+
+-(void)doChatEndRetrievingData:(NSNotification*)notification{
     [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
-    
+
     [_roomsTableView reloadData];
 }
 

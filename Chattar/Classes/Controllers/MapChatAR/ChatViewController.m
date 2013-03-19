@@ -47,7 +47,7 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doSuccessfulMessageSending:) name:kDidSuccessfulMessageSending object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doShowAllFriends) name:kWillShowAllFriends object:nil ];
 
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChatEndRetrievingData:) name:kChatEndOfRetrievingInitialData object:nil ];
+//        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChatEndRetrievingData:) name:kChatEndOfRetrievingInitialData object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetAllFriendsSwitchEnabled:) name:kWillSetAllFriendsSwitchEnabled object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetMessageFieldEnabled:) name:kWillSetMessageFieldEnabled object:nil ];
         
@@ -1088,12 +1088,9 @@
         BOOL isFBCheckin = [[notification.userInfo objectForKey:@"isFBCheckin"] boolValue];
         self.messagesTableView.tag = tableIsUpdating;
 
-        
-        
         [self addMessageToChatTable:message toTableTop:toTop withReloadTable:reloadTable];
 
-        
-        
+            
         if(message.geoDataID != -1 && [self.controllerReuseIdentifier isEqualToString:chatViewControllerIdentifier]){
             [[DataManager shared].chatMessagesIDs addObject:[NSString stringWithFormat:@"%d", message.geoDataID]];
         }

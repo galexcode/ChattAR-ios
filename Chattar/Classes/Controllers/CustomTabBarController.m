@@ -71,9 +71,7 @@
     }
     
     [BackgroundWorker instance].numberOfCheckinsRetrieved = ceil([[[DataManager shared].myPopularFriends allObjects] count]/fmaxRequestsInBatch);
-    [[NSNotificationCenter defaultCenter] postNotificationName:kGeneralDataEndRetrieving object:nil];
-    
-//    [self requestControllerData];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kGeneralDataEndRetrieving object:nil];    
 }
 
 -(void)didReceiveInboxMessages:(NSDictionary *)inboxMessages andPopularFriends:(NSSet *)popFriends{
@@ -373,9 +371,7 @@
         [[BackgroundWorker instance] calculateDistancesForEachRoom];
         
         [self retrieveNearbyRoomsStorage];
-        
-        // sort depending on rating value
-        
+                
         [self retrieveTrendingRoomsStorage];
         
         [[NSNotificationCenter defaultCenter] postNotificationName:kDataIsReadyForDisplaying object:nil userInfo:context];

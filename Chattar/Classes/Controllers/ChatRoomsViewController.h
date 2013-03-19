@@ -16,7 +16,7 @@
 #import "ChatViewController.h"
 #import "FBNavigationBar.h"
 
-#define NUMBER_OF_ROWS_BY_DEFAULT 2
+#define NUMBER_OF_ROOM_DISPLAYED_BY_DEFAULT 2
 #define NEARBY_SECTION_INDEX 1 
 #define TRENDING_SECTION_INDEX 2
 
@@ -28,6 +28,10 @@
 #define NUMBER_OF_USERS_TO_DISPLAY 3
 #define SIZE_OF_USER_PICTURE 30
 #define PADDING 5
+
+
+#define MAX_NUMBER_OF_ROOMS_TO_DISPLAY 15
+
 @interface ChatRoomsViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate,UINavigationControllerDelegate>{
     NSMutableIndexSet* expandedSections;
     UITapGestureRecognizer* tapRecognizer;

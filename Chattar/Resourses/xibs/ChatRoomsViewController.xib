@@ -156,7 +156,7 @@
 									<object class="IBUITextField" id="955003602">
 										<reference key="NSNextResponder" ref="545774062"/>
 										<int key="NSvFlags">296</int>
-										<string key="NSFrame">{{49, 46}, {185, 15}}</string>
+										<string key="NSFrame">{{39, 46}, {185, 15}}</string>
 										<reference key="NSSuperview" ref="545774062"/>
 										<reference key="NSNextKeyView" ref="409656794"/>
 										<string key="NSReuseIdentifierKey">_NS:9</string>
@@ -166,6 +166,10 @@
 										<int key="IBUIContentVerticalAlignment">0</int>
 										<string key="IBUIText"/>
 										<string key="IBUIPlaceholder">Chat name</string>
+										<object class="NSColor" key="IBUITextColor">
+											<int key="NSColorSpace">3</int>
+											<bytes key="NSWhite">MAA</bytes>
+										</object>
 										<bool key="IBUIAdjustsFontSizeToFit">YES</bool>
 										<float key="IBUIMinimumFontSize">17</float>
 										<object class="IBUITextInputTraits" key="IBUITextInputTraits">
