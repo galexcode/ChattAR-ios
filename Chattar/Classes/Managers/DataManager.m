@@ -925,8 +925,8 @@ static DataManager *instance = nil;
     return userAnnotation;
 }
 
--(QBUUser*)findQBUserByID:(NSInteger)qbID{
-    for (QBUUser* user in self.currentChatRoom.roomUsers) {
+- (QBUUser*)findQBUserByID:(NSInteger)qbID{
+    for (QBUUser* user in self.currentChatRoom.allRoomUsers) {
         if (user.ID == qbID) {
             return user;
         }

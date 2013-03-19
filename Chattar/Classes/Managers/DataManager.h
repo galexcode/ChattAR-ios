@@ -136,8 +136,9 @@
 -(void)addPhotosWithLocationsToStorage:(NSArray*)photos;
 -(BOOL)addPhotoWithLocationsToStorage:(id)photo;
 
--(NSArray*)photosWithLocationsFromStorageFromUserWithId:(NSDecimalNumber*)userId;
--(UserAnnotation*)convertQBMessageToUserAnnotation:(QBChatMessage*)message;
--(QBChatMessage*)convertUserAnnotationToQBChatMessage:(UserAnnotation*)annotation;
+- (NSArray*)photosWithLocationsFromStorageFromUserWithId:(NSDecimalNumber*)userId;
+- (UserAnnotation*)convertQBMessageToUserAnnotation:(QBChatMessage*)message;
+- (QBChatMessage*)convertUserAnnotationToQBChatMessage:(UserAnnotation*)annotation;
+- (QBUUser*)findQBUserByID:(NSInteger)qbID;
 
 @end

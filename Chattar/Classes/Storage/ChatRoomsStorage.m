@@ -33,7 +33,11 @@
     }
 
     [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying removeAllObjects];
-    [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying addObjectsFromArray:[DataManager shared].currentChatRoom.messagesHistory];
+    
+    for (QBChatMessage*message in [DataManager shared].currentChatRoom.messagesHistory) {
+        UserAnnotation* messageAnnotation = [[DataManager shared] convertQBMessageToUserAnnotation:message];
+        [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying addObject:messageAnnotation];
+    }
 }
 
 

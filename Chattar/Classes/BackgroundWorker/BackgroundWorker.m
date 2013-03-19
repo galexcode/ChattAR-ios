@@ -15,7 +15,8 @@
 #define chatFBUsers @"chatFBUsers"
 #define moreChatMessages @"getMoreChatMessages"
 #define chatRoomUsersProfiles @"chatRoomUsersProfiles"
-#define chatRoomMessagesRecipients @"chatRoomMessagesRecipients"
+#define chatRoomMessagesSenders @"chatRoomMessagesSenders"
+#define qbUserFBPhoto @"qbUserFBPhoto"
 #define kGetGeoDataCount 100
 
 @implementation BackgroundWorker
@@ -76,11 +77,12 @@ static BackgroundWorker* instance = nil;
 
 #pragma mark -
 #pragma mark Posting methods
--(void)postGeoData:(QBLGeoData*)geoData{
+
+- (void)postGeoData:(QBLGeoData*)geoData{
 	[QBLocation createGeoData:geoData delegate:self];
 }
 
--(void)postInformationWithDataStorage:(Storage*)dataStorage{
+- (void)postInformationWithDataStorage:(Storage*)dataStorage{
     if ([dataStorage isKindOfClass:[ChatPointsStorage class]]) {
         [self postGeoData:((ChatPointsStorage*)dataStorage).geoData];
 
@@ -90,7 +92,7 @@ static BackgroundWorker* instance = nil;
     }
 }
 
--(void)sendMessage:(NSString*)message{
+- (void)sendMessage:(NSString*)message{
     QBChatRoom* room = [[DataManager shared] findQBRoomWithName:[DataManager shared].currentChatRoom.roomName];
     [[QBChat instance] sendMessage:message toRoom:room];
 }
@@ -98,46 +100,47 @@ static BackgroundWorker* instance = nil;
 #pragma mark -
 #pragma mark Data Requests
 
--(void)sendPresenceToQBChat{
-    [[QBChat instance] sendPresence];
-}
-
--(void)requestMessagesRecipientsPictures{
-    if ([DataManager shared].currentChatRoom.messagesHistory.count) {
-        NSMutableString* ids = [[[NSMutableString alloc] initWithString:@""] autorelease];
-        NSMutableArray* addedIds = [[[NSMutableArray alloc] init] autorelease];
-
-        [[DataManager shared].currentChatRoom.messagesHistory enumerateObjectsUsingBlock:^(QBChatMessage* message, NSUInteger idx, BOOL *stop) {
-            if (![addedIds containsObject:@(message.senderID)]) {
-                [addedIds addObject:@(message.senderID)];
-                [ids appendString:[NSString stringWithFormat:@"%d",message.senderID]];
-
-                if (idx != [DataManager shared].currentChatRoom.messagesHistory.count-1) {
-                    [ids appendString:@","];
-                }
-            }
-        }];
-
-        PagedRequest* pagedRequest = [[[PagedRequest alloc] init] autorelease];
-        pagedRequest.perPage = 20;
-        [QBUsers usersWithIDs:ids pagedRequest:pagedRequest delegate:self];
-    }
-}
-
--(void)requestUsersPictures{
-    if ([DataManager shared].currentChatRoom.roomUsers.count) {
-        NSMutableString* ids = [[[NSMutableString alloc] initWithString:@""] autorelease];
-        
-        [[DataManager shared].currentChatRoom.roomUsers enumerateObjectsUsingBlock:^(QBUUser* user, NSUInteger idx, BOOL *stop) {
-            [ids appendString:user.facebookID];
-            if (idx != [DataManager shared].currentChatRoom.roomUsers.count-1) {
+- (void)requestUsersPicturesOfCurrentRoom{
+    NSMutableString* ids = [[[NSMutableString alloc] initWithString:@""] autorelease];
+    NSMutableArray* usedIDs = [[[NSMutableArray alloc] init] autorelease];
+    
+    [[DataManager shared].currentChatRoom.messagesHistory enumerateObjectsUsingBlock:^(QBChatMessage* message, NSUInteger idx, BOOL *stop) {
+        if (![usedIDs containsObject:@(message.senderID)]) {
+            [usedIDs addObject:@(message.senderID)];
+            [ids appendFormat:@"%d",message.senderID];
+            
+            if (idx != [DataManager shared].currentChatRoom.messagesHistory.count-1) {
                 [ids appendString:@","];
             }
-        }];
-        
-        numberOfUserPicturesRetrieved = [DataManager shared].currentChatRoom.roomUsers.count;
-        [[FBService shared] usersProfilesWithIds:ids delegate:self context:chatRoomUsersProfiles];
+        }
+    }];
+    PagedRequest* pagedRequest = [[[PagedRequest alloc] init] autorelease];
+    pagedRequest.perPage = 100;
+    
+    [QBUsers usersWithIDs:ids pagedRequest:pagedRequest delegate:self context:chatRoomMessagesSenders];
+}
+
+- (void)requestPhotosOfQBUsers:(NSArray *)qbUsers withContext:(NSString*)context{
+    NSMutableString* ids = [[[NSMutableString alloc] initWithString:@""] autorelease];
+    
+    [qbUsers enumerateObjectsUsingBlock:^(QBUUser* user, NSUInteger idx, BOOL *stop) {
+        [ids appendString:user.facebookID];
+        if (idx != qbUsers.count-1) {
+            [ids appendString:@","];
+        }
+    }];
+    
+    [[FBService shared] usersProfilesWithIds:ids delegate:self context:context];
+}
+
+- (void)retrieveOnlineUsersInEachRoom{
+    for (QBChatRoom* room in [DataManager shared].qbChatRooms) {
+        [[QBChat instance] requestRoomOnlineUsers:room];
     }
+}
+
+-(void)sendPresenceToQBChat{
+    [[QBChat instance] sendPresence];
 }
 
 -(void)requestDataForDataStorage:(Storage *)dataStorage{
@@ -146,7 +149,7 @@ static BackgroundWorker* instance = nil;
         [self retrieveCachedFBCheckinsAndRequestNewCheckins];
     }
     else if([dataStorage isKindOfClass:[ChatRoomsStorage class]]){
-        [self requestUsersPictures];
+        [self requestPhotosOfQBUsers:[DataManager shared].currentChatRoom.onlineRoomUsers withContext:chatRoomUsersProfiles];
     }
 }
 
@@ -944,31 +947,43 @@ static BackgroundWorker* instance = nil;
            }
             
         }
-        else     // search QB user by FB ID result
-            if([result isKindOfClass:QBUUserResult.class]){
-                if(result.success){
-                    
-                    QBUUser *qbUser = ((QBUUserResult *)result).user;
-                    
-                    // Create push message
-                    
-                    NSMutableDictionary *payload = [NSMutableDictionary dictionary];
-                    NSMutableDictionary *aps = [NSMutableDictionary dictionary];
-                    [aps setObject:@"default" forKey:QBMPushMessageSoundKey];
-                    [aps setObject:[NSString stringWithFormat:@"%@: %@", [[DataManager shared].currentFBUser objectForKey:kName], (NSString *)contextInfo] forKey:QBMPushMessageAlertKey];
-                    [payload setObject:aps forKey:QBMPushMessageApsKey];
-                    //
-                    QBMPushMessage *message = [[QBMPushMessage alloc] initWithPayload:payload];
-                    
-                    // Send push
-                    [QBMessages TSendPush:message
-                                  toUsers:[NSString stringWithFormat:@"%d",  qbUser.ID]
-                                 delegate:self];
-                    
-                    [message release];
-                }
+    }
+    else     // search QB user by FB ID result
+        if([result isKindOfClass:QBUUserResult.class]){
+            if(result.success){
+                
+                QBUUser *qbUser = ((QBUUserResult *)result).user;
+                
+                // Create push message
+                
+                NSMutableDictionary *payload = [NSMutableDictionary dictionary];
+                NSMutableDictionary *aps = [NSMutableDictionary dictionary];
+                [aps setObject:@"default" forKey:QBMPushMessageSoundKey];
+                [aps setObject:[NSString stringWithFormat:@"%@: %@", [[DataManager shared].currentFBUser objectForKey:kName], (NSString *)contextInfo] forKey:QBMPushMessageAlertKey];
+                [payload setObject:aps forKey:QBMPushMessageApsKey];
+                //
+                QBMPushMessage *message = [[QBMPushMessage alloc] initWithPayload:payload];
+                
+                // Send push
+                [QBMessages TSendPush:message
+                              toUsers:[NSString stringWithFormat:@"%d",  qbUser.ID]
+                             delegate:self];
+                
+                [message release];
             }
-        
+        }
+        else if ([result isKindOfClass:[QBUUserPagedResult class]]){
+            QBUUserPagedResult* res = (QBUUserPagedResult*)result;
+            
+            if (![DataManager shared].currentChatRoom.allRoomUsers) {
+                [DataManager shared].currentChatRoom.allRoomUsers = [[NSMutableArray alloc] init];
+            }
+
+            [[DataManager shared].currentChatRoom.allRoomUsers addObjectsFromArray:res.users];
+            
+            [self requestPhotosOfQBUsers:res.users withContext:chatRoomUsersProfiles];
+        }
+    
         else{
             NSString* errorMessage = [result.errors stringValue];
             if ([tabBarDelegate respondsToSelector:@selector(didReceiveError:)]) {
@@ -976,7 +991,7 @@ static BackgroundWorker* instance = nil;
             }
             
         }
-    }
+
 }
 
 - (void)completedWithResult:(Result *)result {
@@ -1064,21 +1079,6 @@ static BackgroundWorker* instance = nil;
         if ([tabBarDelegate respondsToSelector:@selector(didReceiveAdditionalServerInfo:)]) {
             [tabBarDelegate didReceiveAdditionalServerInfo:[NSArray arrayWithObject:getObjectResult.object]];
         }
-    }
-    else if ([result isKindOfClass:[QBUUserPagedResult class]]){
-        QBUUserPagedResult* res = (QBUUserPagedResult*)result;
-        
-        NSMutableString* ids = [[[NSMutableString alloc] initWithString:@""] autorelease];
-        
-        [res.users enumerateObjectsUsingBlock:^(QBUUser* user, NSUInteger idx, BOOL *stop) {
-            [ids appendString:user.facebookID];
-            
-            if (idx != res.users.count-1) {
-                [ids appendString:@","];
-            }
-        }];
-        
-        [[FBService shared] usersProfilesWithIds:ids delegate:self context:chatRoomMessagesRecipients];
     }
     else{
         NSString *message = [result.errors stringValue];
@@ -1265,95 +1265,27 @@ static BackgroundWorker* instance = nil;
             }
                             // pictures of chat room occupants
             else if ([context isEqualToString:chatRoomUsersProfiles]){
-                numberOfUserPicturesRetrieved--;
-                NSArray* keys = [result.body allKeys];
                 
-                dispatch_queue_t userPicturesQueue = dispatch_queue_create("userPicturesQueue", NULL);
-                dispatch_async(userPicturesQueue, ^{
-                    [keys enumerateObjectsUsingBlock:^(NSString* key, NSUInteger idx, BOOL *stop) {
-                        NSDictionary* userInfo = [result.body objectForKey:key];
-                        NSLog(@"%@",userInfo);
-                        NSString* userFBId = [userInfo objectForKey:kId];
-
-                        NSDictionary* pictureDict = [userInfo objectForKey:kPicture];
-                        NSDictionary* pictData = [pictureDict objectForKey:kData];
-                        NSString* url = [pictData objectForKey:kUrl];
-                        
-                        
-                        if (![DataManager shared].currentChatRoom.usersPictures) {
-                            [DataManager shared].currentChatRoom.usersPictures = [[NSMutableArray alloc] init];
-                        }
-                        
-                        NSMutableDictionary* userData = [NSMutableDictionary dictionary];
-                        [userData setObject:userFBId forKey:@"userFBId"];
-                        [userData setObject:url forKey:@"pictureURL"];
-                        
-                        [[DataManager shared].currentChatRoom.usersPictures addObject:userData];
-                    }];
-                                    // execute on main thread
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        if (numberOfUserPicturesRetrieved == 0) {
-                            // notify delegate that all photos are retrieved
-                            if ([tabBarDelegate respondsToSelector:@selector(didReceiveUserProfilePicturesForViewControllerWithIdentifier:)]) {
-                                [tabBarDelegate didReceiveUserProfilePicturesForViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
-                            }
-                            
-                            if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:)]) {
-                                [tabBarDelegate chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
-                            }
-                            
-                        }
-
-                    });
-                });
+                if (![DataManager shared].currentChatRoom.usersPictures) {
+                    [DataManager shared].currentChatRoom.usersPictures = [[NSMutableArray alloc] init];
+                }
                 
-                dispatch_release(userPicturesQueue);
-            }
-            
-            else if ([context isEqualToString:chatRoomMessagesRecipients]){
-                NSArray* keys = [result.body allKeys];
-                NSMutableArray* urls = [NSMutableArray array];
-                                        
-                dispatch_queue_t recipientsPicturesQueue = dispatch_queue_create("recipientsPicturesQueue", NULL);
-                dispatch_async(recipientsPicturesQueue, ^{
-                    
-                    [keys enumerateObjectsUsingBlock:^(NSString* key, NSUInteger idx, BOOL *stop) {
-                        NSDictionary* userInfo = [result.body objectForKey:key];
-                        NSLog(@"%@",userInfo);
-                        NSString* userFBId = [userInfo objectForKey:kId];
-                        
-                        NSDictionary* pictureDict = [userInfo objectForKey:kPicture];
-                        NSDictionary* pictData = [pictureDict objectForKey:kData];
-                        NSString* url = [pictData objectForKey:kUrl];
-                        
-                        
-                        
-                        NSMutableDictionary* userData = [NSMutableDictionary dictionary];
-                        [userData setObject:userFBId forKey:@"userFBId"];
-                        [userData setObject:url forKey:@"pictureURL"];
-                        [urls addObject:userData];
-                    }];
-                    
-                    for (UserAnnotation* userMessage in [DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying) {
-                        for (NSMutableDictionary*dict in urls) {
-                            NSString* pictureUrl = [dict objectForKey:@"pictureURL"];
-                            NSString* userFBId = [dict objectForKey:@"userFBId"];
-                            
-                            if ([userMessage.fbUserId isEqualToString:userFBId]) {
-                                [userMessage setUserPhotoUrl:pictureUrl];
-                            }                        
-                        }
-                    }
-                    
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        if ([tabBarDelegate respondsToSelector:@selector(refreshRecipientsPicturesWithControllerIdentifier:)]) {
-                            [tabBarDelegate refreshRecipientsPicturesWithControllerIdentifier:chatRoomsViewControllerIdentifier];
-                        }
-                    });
-
-                });
+//                dispatch_queue_t queue = dispatch_queue_create("parsingQueue", NULL);
+//                
+//                dispatch_async(queue, ^{
+                    NSArray* response = [self parseAsyncResponse:result];
+                    [[DataManager shared].currentChatRoom.usersPictures addObjectsFromArray:response];
+//                });
+//                dispatch_release(queue);
                 
+                // notify delegate that all photos are retrieved
+                if ([tabBarDelegate respondsToSelector:@selector(didReceiveUserProfilePicturesForViewControllerWithIdentifier:)]) {
+                    [tabBarDelegate didReceiveUserProfilePicturesForViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+                }
                 
+                if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:)]) {
+                    [tabBarDelegate chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+                }
             }
             
             else{
@@ -1753,24 +1685,24 @@ static BackgroundWorker* instance = nil;
 #pragma mark -
 #pragma mark QBChatDelegate methods
 
--(void)chatRoomDidLeave:(NSString *)roomName{
+- (void)chatRoomDidLeave:(NSString *)roomName{
     ChatRoom* leavedChatRoom = [[DataManager shared] findRoomWithAdditionalInfo:roomName];
     if (leavedChatRoom) {
         int roomIndex = [[DataManager shared].trendingRooms indexOfObject:leavedChatRoom];
         if (roomIndex != NSNotFound) {
-            NSMutableArray* users = [[[DataManager shared].trendingRooms objectAtIndex:roomIndex] roomUsers];
+            NSMutableArray* users = [[[DataManager shared].trendingRooms objectAtIndex:roomIndex] onlineRoomUsers];
             [users removeObject:[DataManager shared].currentQBUser];
         }
         
         roomIndex = [[DataManager shared].nearbyRooms indexOfObject:leavedChatRoom];
         if (roomIndex != NSNotFound) {
-            NSMutableArray* users = [[[DataManager shared].nearbyRooms objectAtIndex:roomIndex] roomUsers];
+            NSMutableArray* users = [[[DataManager shared].nearbyRooms objectAtIndex:roomIndex] onlineRoomUsers];
             [users removeObject:[DataManager shared].currentQBUser];
         }
     }
 }
 
--(void)chatDidReceiveListOfRooms:(NSArray *)rooms{
+- (void)chatDidReceiveListOfRooms:(NSArray *)rooms{
             // retain rooms
     [rooms retain];
     if ([tabBarDelegate respondsToSelector:@selector(didReceiveChatRooms:forViewControllerWithIdentifier:)]) {
@@ -1803,8 +1735,18 @@ static BackgroundWorker* instance = nil;
                 
                 room.isSendingMessage = NO;
             }
-            else
+            else{
                 [room.messagesHistory addObject:message];
+            }
+            
+            if (room.usersPictures.count == 0) {
+                dispatch_queue_t chatRoomsUsersPicturesQueue = dispatch_queue_create("chatRoomsUsersPicturesQueue", NULL);
+                dispatch_async(chatRoomsUsersPicturesQueue, ^{
+                    [self requestUsersPicturesOfCurrentRoom];
+                });
+                dispatch_release(chatRoomsUsersPicturesQueue);
+            }
+
 
         }
     }
@@ -1847,12 +1789,11 @@ static BackgroundWorker* instance = nil;
         NSString* nonXMPPRoomName = [Helper createTitleFromXMPPTitle:room.roomName];
         if ([[DataManager shared].currentChatRoom.roomName isEqualToString:nonXMPPRoomName]) {
             
-            if (![DataManager shared].currentChatRoom.roomUsers) {
-                [DataManager shared].currentChatRoom.roomUsers = [[NSMutableArray alloc] init];
+            if (![DataManager shared].currentChatRoom.onlineRoomUsers) {
+                [DataManager shared].currentChatRoom.onlineRoomUsers = [[NSMutableArray alloc] init];
             }
             
-            QBUUser *us = [DataManager shared].currentQBUser;
-            [[DataManager shared].currentChatRoom.roomUsers addObject:[DataManager shared].currentQBUser];
+            [[DataManager shared].currentChatRoom.onlineRoomUsers addObject:[DataManager shared].currentQBUser];
         }
         
         if ([tabBarDelegate respondsToSelector:@selector(didEnterExistingRoomForViewControllerWithIdentifier:)]) {
@@ -1861,31 +1802,26 @@ static BackgroundWorker* instance = nil;
     }
 }
 
--(void)chatRoomDidReceiveListOfUsers:(NSArray *)users room:(NSString *)roomName{
+-(void)chatRoomDidReceiveListOfOnlineUsers:(NSArray *)users room:(NSString *)roomName{
     ChatRoom* chatRoom = [[DataManager shared] findRoomWithAdditionalInfo:roomName];
     
     if (chatRoom) {
-        if (!chatRoom.roomUsers) {
-            chatRoom.roomUsers = [[NSMutableArray alloc] init];
+        if (!chatRoom.onlineRoomUsers) {
+            chatRoom.onlineRoomUsers = [[NSMutableArray alloc] init];
             chatRoom.roomRating = 0;
         }
     
-        [chatRoom.roomUsers removeAllObjects];
-        [chatRoom.roomUsers addObjectsFromArray:users];
+        [chatRoom.onlineRoomUsers removeAllObjects];
+        [chatRoom.onlineRoomUsers addObjectsFromArray:users];
                         // calculate room rating depending on number of users in room
         chatRoom.roomRating = RATING_USER_VALUE * users.count;
+                
     }
     
 }
 
 #pragma mark -
 #pragma mark ChatRooms helper methods
-
--(void)retrieveNumberOfUsersInEachRoom{
-    for (QBChatRoom* room in [DataManager shared].qbChatRooms) {
-        [[QBChat instance] requestRoomOnlineUsers:room];
-    }
-}
 
 -(void)calculateDistancesForEachRoom{
     CLLocationCoordinate2D currentLocation = locationManager.location.coordinate;
@@ -1918,6 +1854,28 @@ static BackgroundWorker* instance = nil;
     }
     
     return nil;
+}
+
+- (NSMutableArray*)parseAsyncResponse:(FBServiceResult*)result{
+    NSArray* keys = [result.body allKeys];
+
+    NSMutableArray* urls = [NSMutableArray array];
+    [keys enumerateObjectsUsingBlock:^(NSString* key, NSUInteger idx, BOOL *stop) {
+        NSDictionary* userInfo = [result.body objectForKey:key];
+        NSLog(@"%@",userInfo);
+        NSString* userFBId = [userInfo objectForKey:kId];
+        
+        NSDictionary* pictureDict = [userInfo objectForKey:kPicture];
+        NSDictionary* pictData = [pictureDict objectForKey:kData];
+        NSString* url = [pictData objectForKey:kUrl];
+        
+        NSMutableDictionary* userData = [NSMutableDictionary dictionary];
+        [userData setObject:userFBId forKey:@"userFBId"];
+        [userData setObject:url forKey:@"pictureURL"];
+        [urls addObject:userData];
+    }];
+    
+    return urls;
 }
 
 #pragma mark -

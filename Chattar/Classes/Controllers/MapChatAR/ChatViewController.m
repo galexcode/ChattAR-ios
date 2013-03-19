@@ -47,7 +47,7 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doSuccessfulMessageSending:) name:kDidSuccessfulMessageSending object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doShowAllFriends) name:kWillShowAllFriends object:nil ];
 
-//        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChatEndRetrievingData:) name:kChatEndOfRetrievingInitialData object:nil ];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChatEndRetrievingData:) name:kChatEndOfRetrievingInitialData object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetAllFriendsSwitchEnabled:) name:kWillSetAllFriendsSwitchEnabled object:nil ];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doWillSetMessageFieldEnabled:) name:kWillSetMessageFieldEnabled object:nil ];
         
@@ -88,23 +88,17 @@
 	isLoadingMoreMessages = NO;    
 }
 
--(void) viewWillDisappear:(BOOL)animated {
+- (void)viewWillDisappear:(BOOL)animated {
     if ([self.navigationController.viewControllers indexOfObject:self] == NSNotFound && [self.controllerReuseIdentifier isEqualToString:chatRoomsViewControllerIdentifier]) {
         // back button was pressed.  We know this is true because self is no longer
         // in the navigation stack.
         QBChatRoom* currentChatRoom = [[DataManager shared] findQBRoomWithName:[DataManager shared].currentChatRoom.roomName];
         [[BackgroundWorker instance] exitChatRoom:currentChatRoom];
+        [self cleanData];
     }
     
     [super viewWillDisappear:animated];
 }
-
--(void)viewDidDisappear:(BOOL)animated{
-    if ([self.controllerReuseIdentifier isEqualToString:chatRoomsViewControllerIdentifier]) {
-        [self cleanData];
-    }
-}
-
 
 - (void)removeQuote
 {
@@ -158,12 +152,21 @@
 #pragma mark -
 #pragma mark Interface based methods
 
+- (void)showPictures{
+    [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying removeAllObjects];
+    
+    for (QBChatMessage* message in [DataManager shared].currentChatRoom.messagesHistory) {
+        UserAnnotation* annotation = [[DataManager shared] convertQBMessageToUserAnnotation:message];
+        [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying addObject:annotation];
+    }
+    
+    [self.messagesTableView reloadData];
+}
+
 - (void)cleanData{
     // clean data
     [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying removeAllObjects];
     [[DataManager shared].currentChatRoom.messagesHistory removeAllObjects];
-    [messagesTableView reloadData];
-
 }
 
 - (void)addMessageToChatTable: (UserAnnotation*)message toTableTop:(BOOL)toTop withReloadTable:(BOOL)reloadTable{
@@ -220,8 +223,6 @@
         
         [self.messagesTableView reloadData];
     }
-    
-
 }
 
 -(void)checkForShowingData{
@@ -239,11 +240,6 @@
         else
             [self showWorld];
         
-        if ([dataStorage isKindOfClass:[ChatRoomsStorage class]] && !isPanelDisplayed) {
-            NSLog(@"%@",self.navigationItem.leftBarButtonItem);
-            [self addUserPicturesToPanel];
-            isPanelDisplayed = YES;            
-        }
     }
 }
 
@@ -980,16 +976,20 @@
     }
     
 }
-
+                // this means user pictures are loaded
 -(void)doReceiveUserProfilePictures:(NSNotification*)notification{
     NSString* context = [notification.userInfo objectForKey:@"context"];
     
-    if ([context isEqualToString:self.controllerReuseIdentifier] &&
-                        [self.controllerReuseIdentifier isEqualToString:chatRoomsViewControllerIdentifier]
-                        && !isPanelDisplayed) {
+    
+    if ([context isEqualToString:self.controllerReuseIdentifier] && [self.controllerReuseIdentifier isEqualToString:chatRoomsViewControllerIdentifier] ) {
+        [self showPictures];
+    }
+    
+    if (!isPanelDisplayed) {
         [self addUserPicturesToPanel];
         isPanelDisplayed = YES;
     }
+
 }
 
 -(void)doWillSetAllFriendsSwitchEnabled:(NSNotification*)notification{
@@ -1040,11 +1040,7 @@
         }
         else
             [self showWorld];
-    }
-    
-    if ([context isEqualToString:chatRoomsViewControllerIdentifier]) {
-        [[BackgroundWorker instance] requestMessagesRecipientsPictures];
-    }
+    }    
 }
 
 -(void)doUpdate:(NSNotification*)notification{

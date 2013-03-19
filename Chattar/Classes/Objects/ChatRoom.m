@@ -15,26 +15,29 @@
 @synthesize roomName;
 @synthesize roomRating;
 @synthesize distanceFromUser;
-@synthesize roomUsers;
+@synthesize onlineRoomUsers;
 @synthesize messagesHistory;
 @synthesize usersPictures;
 @synthesize messagesAsUserAnnotationForDisplaying;
 @synthesize isSendingMessage;
+@synthesize allRoomUsers;
 
--(void)dealloc{
-    [roomUsers release];
+- (void)dealloc{
+    [onlineRoomUsers release];
     [messagesHistory release];
     [usersPictures release];
     [roomID release];
     [roomName release];
     [createdAt release];
+    [allRoomUsers release];
+    
     [super dealloc];
 }
 
--(NSString*)description{
-    return [NSString stringWithFormat:@"room name - %@ \n room rating - %f \n number of room users - %d \n room messages - %@\n room location - %f %f",roomName,roomRating,roomUsers.count,messagesHistory, ownerLocation.latitude,ownerLocation.longitude];
+- (NSString*)description{
+    return [NSString stringWithFormat:@"room name - %@ \n room rating - %f \n number of room users - %d \n room messages - %@\n room location - %f %f",roomName,roomRating,onlineRoomUsers.count,messagesHistory, ownerLocation.latitude,ownerLocation.longitude];
 }
-+(ChatRoom*)createRoomWithAdditionalInfoWithName:(NSString*)_roomName coordinates:(CLLocationCoordinate2D)coordinates{
++ (ChatRoom*)createRoomWithAdditionalInfoWithName:(NSString*)_roomName coordinates:(CLLocationCoordinate2D)coordinates{
     ChatRoom* room = [[[ChatRoom alloc] init] autorelease];
     [room setOwnerLocation:coordinates];
     [room setCreatedAt:[NSDate date]];

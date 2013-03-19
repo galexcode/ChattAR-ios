@@ -60,7 +60,7 @@
         [[BackgroundWorker instance] requestAdditionalChatRoomsInfo];
         [self addSpinner];
         
-        // additional requests for checkins and public chat data
+                // additional requests for checkins and public chat data
         if ([DataManager shared].allCheckins.count == 0 && [DataManager shared].allChatPoints.count == 0 ) {
             [[BackgroundWorker instance] retrieveCachedFBCheckinsAndRequestNewCheckins];
             
@@ -76,7 +76,6 @@
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 - (void)dealloc {
@@ -425,7 +424,7 @@
             if (indexPath.row < [DataManager shared].trendingRooms.count) {
                 ChatRoom* room = [[DataManager shared].trendingRooms objectAtIndex:indexPath.row];
                 NSString* cellText = [NSString stringWithFormat:@"%@",room.roomName];
-                UIImageView* accessoryView = [self createAccessoryViewWithPeopleCounter:room.roomUsers.count];
+                UIImageView* accessoryView = [self createAccessoryViewWithPeopleCounter:room.onlineRoomUsers.count];
                 [cell setAccessoryView:accessoryView];
                 [cell.textLabel setText:cellText];
             }
@@ -435,7 +434,7 @@
             if (indexPath.row < [DataManager shared].nearbyRooms.count) {
                 ChatRoom* room = [[DataManager shared].nearbyRooms objectAtIndex:indexPath.row];
                 NSString* cellText = [NSString stringWithFormat:@"%@",room.roomName];
-                UIImageView* accessoryView = [self createAccessoryViewWithPeopleCounter:room.roomUsers.count distance:(int)room.distanceFromUser/1000];
+                UIImageView* accessoryView = [self createAccessoryViewWithPeopleCounter:room.onlineRoomUsers.count distance:(int)room.distanceFromUser/1000];
                 [cell setAccessoryView:accessoryView];
                 [cell.textLabel setText:cellText];
             }

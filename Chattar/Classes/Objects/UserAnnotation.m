@@ -134,7 +134,8 @@
                       \n\tgeoDataID:%d\
                       \n\tfbCheckinID:%@\
                       \n\tfbPlaceID:%@\
-                      \n\tcreatedAt:%@",
+                      \n\tcreatedAt:%@\
+                      \n\tuserPhotoUrl:%@",
                       
                       [super description],
                       userName,
@@ -144,7 +145,8 @@
                       geoDataID,
                       fbCheckinID,
                       fbPlaceID,
-                      createdAt];
+                      createdAt,
+                      userPhotoUrl];
     
     return desc;
 }
