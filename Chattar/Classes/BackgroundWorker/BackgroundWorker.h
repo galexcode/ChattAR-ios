@@ -141,22 +141,22 @@
 -(void)requestAdditionalChatRoomsInfo;
 -(void)createChatRoom:(NSString*)chatRoomName;
 
--(void)retrieveNumberOfUsersInEachRoom;
+-(void)retrieveOnlineUsersInEachRoom;
 
--(void)calculateDistancesForEachRoom;
+- (void)calculateDistancesForEachRoom;
 
--(void)joinRoom:(QBChatRoom*)room;
+- (void)joinRoom:(QBChatRoom*)room;
 
--(void)requestUsersPictures;
+- (void)requestDataForDataStorage:(Storage*)dataStorage;
 
--(void)requestDataForDataStorage:(Storage*)dataStorage;
+- (void)postInformationWithDataStorage:(Storage*)dataStorage;
 
--(void)postInformationWithDataStorage:(Storage*)dataStorage;
+- (void)exitChatRoom:(QBChatRoom*)room;
 
--(void)requestMessagesRecipientsPictures;
+- (void)sendPresenceToQBChat;
 
--(void)exitChatRoom:(QBChatRoom*)room;
+- (void)requestPhotosOfQBUsers:(NSArray*)qbUsers withContext:(NSString*)context;
 
--(void)sendPresenceToQBChat;
+- (void)requestUsersPicturesOfCurrentRoom;
 
 @end
