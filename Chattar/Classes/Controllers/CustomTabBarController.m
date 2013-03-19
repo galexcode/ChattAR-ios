@@ -364,9 +364,9 @@
             }
         }
 
-        // get number of users for all rooms
-        [[BackgroundWorker instance] retrieveNumberOfUsersInEachRoom];
-        
+        // get online users for all rooms
+        [[BackgroundWorker instance] retrieveOnlineUsersInEachRoom];
+                
         // get distances from rooms to current user location
         [[BackgroundWorker instance] calculateDistancesForEachRoom];
         
@@ -378,14 +378,14 @@
     }
 }
 
--(void)didEnterExistingRoomForViewControllerWithIdentifier:(NSString *)identifier{
+- (void)didEnterExistingRoomForViewControllerWithIdentifier:(NSString *)identifier{
     NSMutableDictionary* context = [NSMutableDictionary dictionary];
     [context setObject:identifier forKey:@"context"];
 
     [[NSNotificationCenter defaultCenter] postNotificationName:kNeedToDisplayChatRoomController object:nil userInfo:context];
 }
 
--(void)didReceiveRoomsOccupantsNumberForViewControllerWithIdentifier:(NSString *)identifier{
+- (void)didReceiveRoomsOccupantsNumberForViewControllerWithIdentifier:(NSString *)identifier{
     
 }
 
