@@ -16,6 +16,7 @@
 @end
 
 @implementation ChatRoomsViewController
+
 @synthesize loadingIndicator = _loadingIndicator;
 @synthesize mainHeaderSection;
 @synthesize nearbyHeaderSection;
@@ -32,8 +33,11 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doNeedDisplayChatRoomsController) name:kNeedToDisplayChatRoomController object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doCreateNewRoom) name:kNewChatRoomCreated object:nil];
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChatEndRetrievingData:) name:kChatEndOfRetrievingInitialData object:nil ];
-
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChatEndRetrievingData:) name:kChatEndOfRetrievingInitialData object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChangeRatingOfRoom:) name:kDidChangeRatingOfRoom object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(logoutDone) name:kNotificationLogout object:nil];
     }
     return self;
 }
@@ -104,6 +108,13 @@
 }
 - (IBAction)startButtonTap:(UIButton *)sender {
     NSString* roomName = _newConversationTextField.text;
+    [self newRoomCreationWithChecking:roomName];
+}
+
+#pragma mark -
+#pragma mark Interface based methods
+
+- (void)newRoomCreationWithChecking:(NSString*)roomName {
     if ([Helper isStringCorrect:roomName]) {
         [[BackgroundWorker instance] createChatRoom:roomName];
         [_newConversationTextField setText:@""];
@@ -113,23 +124,30 @@
         [alert show];
         [alert release];
     }
+
 }
 
-#pragma mark -
-#pragma mark Interface based methods
+- (void)changeRatingForCell:(UITableViewCell*)cell withRoomRating:(double)rating{
+    UIView* accessoryView = cell.accessoryView;
+    UILabel* counterLabel = (UILabel*)[accessoryView viewWithTag:COUNTER_TAG];
+    [counterLabel setText:[NSString stringWithFormat:@"%f",rating]];
+}
 
-- (UIImageView*)createAccessoryViewWithPeopleCounter:(NSInteger)numberOfPeople{
+- (UIImageView*)createAccessoryViewWithRating:(double)rating{
     
     UIImageView* accessoryView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"occupantsCounter.png"]] autorelease];
     UILabel* counter = [[[UILabel alloc] initWithFrame:CGRectMake(20, -1, 20, 20)] autorelease];
-    [counter setText:[NSString stringWithFormat:@"%d",numberOfPeople]];
+    [counter setFont:[UIFont fontWithName:@"Helvetica" size:10]];
+    [counter setText:[NSString stringWithFormat:@"%f",rating]];
+    
     [counter setBackgroundColor:[UIColor clearColor]];
+    [counter setTag:COUNTER_TAG];
     [accessoryView addSubview:counter];
     return accessoryView;
 }
 
-- (UIImageView*)createAccessoryViewWithPeopleCounter:(NSInteger)numberOfPeople distance:(NSInteger)distance{
-    UIImageView* accessoryView = [self createAccessoryViewWithPeopleCounter:numberOfPeople];
+- (UIImageView*)createAccessoryViewWithRating:(double)rating distance:(NSInteger)distance{
+    UIImageView* accessoryView = [self createAccessoryViewWithRating:rating];
     
     NSString* distanceString = [NSString stringWithFormat:@"%d kms",distance];
     CGSize sizeOfDistanceLabel = [distanceString sizeWithFont:[UIFont fontWithName:@"Helvetica" size:10]];
@@ -239,7 +257,6 @@
     else if (section == trendingSection){
         return ([DataManager shared].trendingRooms.count > 2);
     }
-    
     return NO;
 }
 
@@ -269,7 +286,7 @@
         }
             break;
         case trendingSection:{
-            if (!trendingHeaderSection) {
+            if (!trendingHeaderSection && [DataManager shared].trendingRooms.count) {
                 trendingHeaderSection = [[self createViewWithTitle:@"trendingHeader.png" forSection:section] retain];
             }
             return trendingHeaderSection;
@@ -277,7 +294,7 @@
             break;
 
         case nearbySection:{
-            if (!nearbyHeaderSection) {
+            if (!nearbyHeaderSection && [DataManager shared].nearbyRooms.count) {
                 nearbyHeaderSection = [[self createViewWithTitle:@"nearbyHeader.png" forSection:section] retain];
             }
             return nearbyHeaderSection;
@@ -386,25 +403,33 @@
 #pragma mark -
 #pragma mark UITableViewDataSource 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    int numberOfRowsSection = 1;
+        
     if ([self canCollapseSection:section])
     {
         if ([expandedSections containsIndex:section])
         {
                                                 // display only MAX_NUMBER_OF_ROOMS
             if (section == nearbySection) {
-                return ([DataManager shared].nearbyRooms.count > MAX_NUMBER_OF_ROOMS_TO_DISPLAY) ? MAX_NUMBER_OF_ROOMS_TO_DISPLAY :
-                                                                                                   [DataManager shared].nearbyRooms.count;
+                numberOfRowsSection = ([DataManager shared].nearbyRooms.count > MAX_NUMBER_OF_ROOMS_TO_DISPLAY) ? MAX_NUMBER_OF_ROOMS_TO_DISPLAY :
+                                                                                                                   [DataManager shared].nearbyRooms.count;
+                
             }
             else if (section == trendingSection){
-                return ([DataManager shared].trendingRooms.count > MAX_NUMBER_OF_ROOMS_TO_DISPLAY) ? MAX_NUMBER_OF_ROOMS_TO_DISPLAY :
+                numberOfRowsSection = ([DataManager shared].trendingRooms.count > MAX_NUMBER_OF_ROOMS_TO_DISPLAY) ? MAX_NUMBER_OF_ROOMS_TO_DISPLAY :
                                                                                                      [DataManager shared].trendingRooms.count;
             }
         }
-        
-        return NUMBER_OF_ROOM_DISPLAYED_BY_DEFAULT;
+    }
+    else{
+        if (section == mainChatSection) {
+            numberOfRowsSection = 1;
+        }
+        else
+            numberOfRowsSection = [DataManager shared].qbChatRooms.count;
     }
     
-    return (section == mainChatSection) ? 1 : NUMBER_OF_ROOM_DISPLAYED_BY_DEFAULT;
+    return numberOfRowsSection;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
@@ -424,7 +449,7 @@
             if (indexPath.row < [DataManager shared].trendingRooms.count) {
                 ChatRoom* room = [[DataManager shared].trendingRooms objectAtIndex:indexPath.row];
                 NSString* cellText = [NSString stringWithFormat:@"%@",room.roomName];
-                UIImageView* accessoryView = [self createAccessoryViewWithPeopleCounter:room.onlineRoomUsers.count];
+                UIImageView* accessoryView = [self createAccessoryViewWithRating:room.roomRating];
                 [cell setAccessoryView:accessoryView];
                 [cell.textLabel setText:cellText];
             }
@@ -434,7 +459,7 @@
             if (indexPath.row < [DataManager shared].nearbyRooms.count) {
                 ChatRoom* room = [[DataManager shared].nearbyRooms objectAtIndex:indexPath.row];
                 NSString* cellText = [NSString stringWithFormat:@"%@",room.roomName];
-                UIImageView* accessoryView = [self createAccessoryViewWithPeopleCounter:room.onlineRoomUsers.count distance:(int)room.distanceFromUser/1000];
+                UIImageView* accessoryView = [self createAccessoryViewWithRating:room.roomRating distance:(int)(room.distanceFromUser/1000)];
                 [cell setAccessoryView:accessoryView];
                 [cell.textLabel setText:cellText];
             }
@@ -490,6 +515,7 @@
         default:
             break;
     }
+    
     QBChatRoom* selectedChatRoom = [[DataManager shared] findQBRoomWithName:selectedChatRoomWithAdditionalInfo.roomName];
     
     if (selectedChatRoomWithAdditionalInfo) {
@@ -518,7 +544,25 @@
 #pragma mark -
 #pragma mark Notifications Reactions
 
--(void)doCreateNewRoom{
+- (void)logoutDone{
+    [[QBChat instance] logout];
+}
+
+- (void)doChangeRatingOfRoom:(NSNotification*)notification {
+    ChatRoom* room = [notification.userInfo objectForKey:@"changingChatRoom"];
+    
+    UITableViewCell* roomCell = [self retrieveCellForChatRoom:room];
+    if (roomCell) {
+        [self changeRatingForCell:roomCell withRoomRating:room.roomRating];
+    }
+    [[DataManager shared] sortChatRooms];
+    
+    [_roomsTableView reloadData];
+}
+
+- (void)doCreateNewRoom{
+    [[DataManager shared] sortChatRooms];
+    [self.roomsTableView reloadData];
     [self showChatController];
 }
 
@@ -535,6 +579,8 @@
 -(void)doNeedDisplayChatRoomsController{
     [self showChatController];
 }
+
+
 
 #pragma mark -
 #pragma mark UITextField Delegate
@@ -554,6 +600,7 @@
     [self animateTextField:textField up:NO];
     [textField resignFirstResponder];
     [self.displayView removeGestureRecognizer:tapRecognizer];
+    [self newRoomCreationWithChecking:textField.text];
     return YES;
 }
 
@@ -572,6 +619,24 @@
 #pragma mark Sending presence
 - (void)sendPresenceToChat{
     [[BackgroundWorker instance] sendPresenceToQBChat];
+}
+
+#pragma mark -
+#pragma mark Helpers
+- (UITableViewCell*)retrieveCellForChatRoom:(ChatRoom*)room{
+    int nearbyIndex = [[DataManager shared].nearbyRooms indexOfObject:room];
+    int trendingIndex = [[DataManager shared].trendingRooms indexOfObject:room];
+    
+    NSIndexPath* indexPath = nil;
+    if (nearbyIndex != NSNotFound) {
+        indexPath = [NSIndexPath indexPathForRow:nearbyIndex inSection:nearbySection];
+    }
+    
+    else if (trendingIndex != NSNotFound){
+        indexPath = [NSIndexPath indexPathForRow:trendingIndex inSection:trendingSection];
+    }
+    
+    return [_roomsTableView cellForRowAtIndexPath:indexPath];
 }
 
 @end
