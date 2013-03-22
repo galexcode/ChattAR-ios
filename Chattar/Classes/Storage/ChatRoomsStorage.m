@@ -11,6 +11,7 @@
 @implementation ChatRoomsStorage
 @synthesize messageToSend;
 
+
 -(void)dealloc{
     [messageToSend release];
     [super dealloc];
@@ -77,42 +78,42 @@
     }
 }
 
--(void)addDataToStorage:(UserAnnotation*)newData{
+- (void)addDataToStorage:(UserAnnotation*)newData{
     if (![[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying containsObject:newData]) {
         [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying addObject:newData];
     }
 }
--(void)removeLastObjectFromStorage{
+- (void)removeLastObjectFromStorage{
     if ([DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying.count) {
         [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying removeLastObject];
     }
 }
--(void)clearStorage{
+- (void)clearStorage{
     [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying removeAllObjects];
     [[DataManager shared].currentChatRoom.messagesHistory removeAllObjects];
 }
--(BOOL)storageContainsObject:(UserAnnotation*)object{
+- (BOOL)storageContainsObject:(UserAnnotation*)object{
     if ([[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying containsObject:object]) {
         return YES;
     }
     return NO;
 }
--(UserAnnotation*)retrieveDataFromStorageWithIndex:(NSInteger)index{
+- (UserAnnotation*)retrieveDataFromStorageWithIndex:(NSInteger)index{
     if (index >= 0 && index < [DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying.count) {
        return [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying objectAtIndex:index];
     }
     return nil;
 }
 
--(NSInteger)storageCount{
+- (NSInteger)storageCount{
     return [DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying.count;
 }
 
--(NSInteger)allDataCount{
+- (NSInteger)allDataCount{
     return [DataManager shared].currentChatRoom.messagesHistory.count;
 }
 
--(void)insertObjectToAllData:(UserAnnotation*)object atIndex:(NSInteger)index{
+- (void)insertObjectToAllData:(UserAnnotation*)object atIndex:(NSInteger)index{
         
     if (((index >= 0 && index < [DataManager shared].currentChatRoom.messagesHistory.count) || !index)) {
         QBChatMessage* message = [[DataManager shared] convertUserAnnotationToQBChatMessage:object];
@@ -142,9 +143,19 @@
 
 -(void)createDataInStorage:(NSDictionary *)data{
     NSString* messageText = [data objectForKey:@"messageText"];
-//    NSString* quoteMark = [data objectForKey:@"quoteMark"];
+    NSString* quoteMark = [data objectForKey:@"quoteMark"];
+    
+    NSMutableString* resultMessageText = [[[NSMutableString alloc] initWithString:@""] autorelease];
+                    // if quotation is added to message
+    if (quoteMark) {
+        [resultMessageText appendString:QUOTE_IDENTIFIER];
+        [resultMessageText appendString:quoteMark];
+    }
+    
+    [resultMessageText appendString:messageText];
+    
     messageToSend = [[QBChatMessage alloc] init];
-    [messageToSend setText:messageText];
+    [messageToSend setText:resultMessageText];
 }
 
 @end
