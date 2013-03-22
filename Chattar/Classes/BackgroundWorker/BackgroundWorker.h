@@ -72,34 +72,36 @@
 @protocol MapControllerDelegate <NSObject>
 
 @optional
--(void) willUpdatePointStatus:(UserAnnotation*)newPoint;
--(void)willSetAllFriendsSwitchEnabled:(BOOL)switchEnabled;
--(void)mapEndOfRetrievingInitialData;
--(void)mapDidReceiveAllCachedData:(NSDictionary*)allMapData;
--(void)didNotReceiveNewFBMapUsers;
+- (void) willUpdatePointStatus:(UserAnnotation*)newPoint;
+- (void)willSetAllFriendsSwitchEnabled:(BOOL)switchEnabled;
+- (void)mapEndOfRetrievingInitialData;
+- (void)mapDidReceiveAllCachedData:(NSDictionary*)allMapData;
+- (void)didNotReceiveNewFBMapUsers;
 @end
 
 @protocol ARControllerDelegate <NSObject>
 @optional
--(void)willUpdateMarkersForCenterLocation;
--(void)willAddMarker;
--(void)willSetEnabledDistanceSlider:(BOOL)sliderEnabled;
--(void)willSetAllFriendsSwitchEnabled:(BOOL)switchEnabled;
--(void)didNotReceiveNewARUsers;
+- (void)willUpdateMarkersForCenterLocation;
+- (void)willAddMarker;
+- (void)willSetEnabledDistanceSlider:(BOOL)sliderEnabled;
+- (void)willSetAllFriendsSwitchEnabled:(BOOL)switchEnabled;
+- (void)didNotReceiveNewARUsers;
 @end
 
 @protocol ChatRoomDataDelegate <NSObject>
 
 @optional
--(void)didReceiveChatRooms:(NSArray*)chatRooms forViewControllerWithIdentifier:(NSString*)identifier;
--(void)didReceiveAdditionalServerInfo:(NSArray*)additionalInfo;
--(void)didReceiveRoomsOccupantsNumberForViewControllerWithIdentifier:(NSString*)identifier;
--(void)didEnterExistingRoomForViewControllerWithIdentifier:(NSString*)identifier;
--(void)didReceiveUserProfilePicturesForViewControllerWithIdentifier:(NSString*)identifier;
+- (void)didReceiveChatRooms:(NSArray*)chatRooms forViewControllerWithIdentifier:(NSString*)identifier;
+- (void)didReceiveAdditionalServerInfo:(NSArray*)additionalInfo;
+- (void)didReceiveRoomsOccupantsNumberForViewControllerWithIdentifier:(NSString*)identifier;
+- (void)didEnterExistingRoomForViewControllerWithIdentifier:(NSString*)identifier;
+- (void)didReceiveUserProfilePicturesForViewControllerWithIdentifier:(NSString*)identifier;
 
--(void)didReceiveMessageForViewControllerWithIdentifier:(NSString*)identifier;
--(void)didCreateNewChatRoom:(NSString*)roomName viewControllerWithIdentifier:(NSString*)identifier;
--(void)refreshRecipientsPicturesWithControllerIdentifier:(NSString*)identifier;
+- (void)didReceiveMessageForViewControllerWithIdentifier:(NSString*)identifier;
+- (void)didCreateNewChatRoom:(NSString*)roomName viewControllerWithIdentifier:(NSString*)identifier;
+- (void)refreshRecipientsPicturesWithControllerIdentifier:(NSString*)identifier;
+
+- (void)didChangeRatingOfRoom:(ChatRoom*)room;
 @end
 
 
@@ -127,21 +129,21 @@
 
 +(BackgroundWorker*)instance;
 
--(void)requestFBHistory;
--(void)requestFriends;
--(void)requestPopularFriends;
--(void)retrieveCachedChatDataAndRequestNewData;
--(void)retrieveCachedMapDataAndRequestNewData;
--(void)retrieveMoreChatMessages:(NSInteger)page;
--(void)requestFriendWithFacebookID:(NSString*)fbID andMessageText:(NSString*)message;
--(void)postGeoData:(QBLGeoData*)geoData;
+- (void)requestFBHistory;
+- (void)requestFriends;
+- (void)requestPopularFriends;
+- (void)retrieveCachedChatDataAndRequestNewData;
+- (void)retrieveCachedMapDataAndRequestNewData;
+- (void)retrieveMoreChatMessages:(NSInteger)page;
+- (void)requestFriendWithFacebookID:(NSString*)fbID andMessageText:(NSString*)message;
+- (void)postGeoData:(QBLGeoData*)geoData;
 - (void)retrieveCachedFBCheckinsAndRequestNewCheckins;
 
--(void)requestAllChatRooms;
--(void)requestAdditionalChatRoomsInfo;
--(void)createChatRoom:(NSString*)chatRoomName;
+- (void)requestAllChatRooms;
+- (void)requestAdditionalChatRoomsInfo;
+- (void)createChatRoom:(NSString*)chatRoomName;
 
--(void)retrieveOnlineUsersInEachRoom;
+- (void)retrieveOnlineUsersInEachRoom;
 
 - (void)calculateDistancesForEachRoom;
 
@@ -157,6 +159,6 @@
 
 - (void)requestPhotosOfQBUsers:(NSArray*)qbUsers withContext:(NSString*)context;
 
-- (void)requestUsersPicturesOfCurrentRoom;
+- (void)saveCurrentChatRoomInfoOnServer;
 
 @end

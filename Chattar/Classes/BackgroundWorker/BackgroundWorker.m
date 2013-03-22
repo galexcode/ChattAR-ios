@@ -70,7 +70,8 @@ static BackgroundWorker* instance = nil;
 
 #pragma mark -
 #pragma mark ChatRooms methods
--(void)createChatRoom:(NSString*)chatRoomName{
+
+- (void)createChatRoom:(NSString*)chatRoomName{
     [[QBChat instance] createOrJoinRoomWithName:chatRoomName membersOnly:NO persistent:YES];
 }
 
@@ -95,29 +96,30 @@ static BackgroundWorker* instance = nil;
 - (void)sendMessage:(NSString*)message{
     QBChatRoom* room = [[DataManager shared] findQBRoomWithName:[DataManager shared].currentChatRoom.roomName];
     [[QBChat instance] sendMessage:message toRoom:room];
+    
 }
 
 #pragma mark -
 #pragma mark Data Requests
 
-- (void)requestUsersPicturesOfCurrentRoom{
-    NSMutableString* ids = [[[NSMutableString alloc] initWithString:@""] autorelease];
-    NSMutableArray* usedIDs = [[[NSMutableArray alloc] init] autorelease];
+- (void)saveCurrentChatRoomInfoOnServer{
+    QBCOCustomObject* chatRoomUpdate = [QBCOCustomObject customObject];
+    chatRoomUpdate.className = @"Room";
     
-    [[DataManager shared].currentChatRoom.messagesHistory enumerateObjectsUsingBlock:^(QBChatMessage* message, NSUInteger idx, BOOL *stop) {
-        if (![usedIDs containsObject:@(message.senderID)]) {
-            [usedIDs addObject:@(message.senderID)];
-            [ids appendFormat:@"%d",message.senderID];
-            
-            if (idx != [DataManager shared].currentChatRoom.messagesHistory.count-1) {
-                [ids appendString:@","];
-            }
-        }
-    }];
-    PagedRequest* pagedRequest = [[[PagedRequest alloc] init] autorelease];
-    pagedRequest.perPage = 100;
+    double latitude = [DataManager shared].currentChatRoom.ownerLocation.latitude;
+    double longitude = [DataManager shared].currentChatRoom.ownerLocation.longitude;
+    double rating = [DataManager shared].currentChatRoom.roomRating;
     
-    [QBUsers usersWithIDs:ids pagedRequest:pagedRequest delegate:self context:chatRoomMessagesSenders];
+    [chatRoomUpdate.fields setObject:[NSNumber numberWithDouble:latitude] forKey:@"latitude"];
+    [chatRoomUpdate.fields setObject:[NSNumber numberWithDouble:longitude] forKey:@"longitude"];
+    [chatRoomUpdate.fields setObject:[NSNumber numberWithDouble:rating] forKey:@"roomRating"];
+    chatRoomUpdate.ID = [DataManager shared].currentChatRoom.roomID;
+    
+    [QBCustomObjects updateObject:chatRoomUpdate delegate:self];
+}
+
+- (void)requestUserWithQBID:(NSInteger)qbID{
+    [QBUsers userWithID:qbID delegate:self context:chatRoomMessagesSenders];
 }
 
 - (void)requestPhotosOfQBUsers:(NSArray *)qbUsers withContext:(NSString*)context{
@@ -147,9 +149,6 @@ static BackgroundWorker* instance = nil;
     if ([dataStorage isKindOfClass:[ChatPointsStorage class]]) {
         [self retrieveCachedChatDataAndRequestNewData];
         [self retrieveCachedFBCheckinsAndRequestNewCheckins];
-    }
-    else if([dataStorage isKindOfClass:[ChatRoomsStorage class]]){
-        [self requestPhotosOfQBUsers:[DataManager shared].currentChatRoom.onlineRoomUsers withContext:chatRoomUsersProfiles];
     }
 }
 
@@ -636,7 +635,7 @@ static BackgroundWorker* instance = nil;
         if ([geodata.status length] >= 6){
             if ([[geodata.status substringToIndex:6] isEqualToString:fbidIdentifier]){
                 // add Quote
-                [self addQuoteDataToAnnotation:chatAnnotation geoData:geodata];
+                [Helper addQuoteDataToAnnotation:chatAnnotation quotationText:geodata.status];
                 
             }else {
                 chatAnnotation.userStatus = geodata.status;
@@ -952,36 +951,44 @@ static BackgroundWorker* instance = nil;
         if([result isKindOfClass:QBUUserResult.class]){
             if(result.success){
                 
-                QBUUser *qbUser = ((QBUUserResult *)result).user;
+                if ([((NSString*)contextInfo) isEqualToString:chatRoomMessagesSenders]) {
+                    QBUUserResult* res = (QBUUserResult*)result;
+                    
+                    if (![DataManager shared].currentChatRoom.allRoomUsers) {
+                        [DataManager shared].currentChatRoom.allRoomUsers = [[NSMutableArray alloc] init];
+                    }
+                    
+                    if (![[DataManager shared].currentChatRoom.allRoomUsers containsObject:res.user]) {
+                        [[DataManager shared].currentChatRoom.allRoomUsers addObject:res.user];
+                    }
+                    
+                    NSArray* users = [NSArray arrayWithObject:res.user];
+                    [self requestPhotosOfQBUsers:users withContext:chatRoomUsersProfiles];
+                }
                 
-                // Create push message
-                
-                NSMutableDictionary *payload = [NSMutableDictionary dictionary];
-                NSMutableDictionary *aps = [NSMutableDictionary dictionary];
-                [aps setObject:@"default" forKey:QBMPushMessageSoundKey];
-                [aps setObject:[NSString stringWithFormat:@"%@: %@", [[DataManager shared].currentFBUser objectForKey:kName], (NSString *)contextInfo] forKey:QBMPushMessageAlertKey];
-                [payload setObject:aps forKey:QBMPushMessageApsKey];
-                //
-                QBMPushMessage *message = [[QBMPushMessage alloc] initWithPayload:payload];
-                
-                // Send push
-                [QBMessages TSendPush:message
-                              toUsers:[NSString stringWithFormat:@"%d",  qbUser.ID]
-                             delegate:self];
-                
-                [message release];
+                else{
+                    QBUUser *qbUser = ((QBUUserResult *)result).user;
+                    
+                    // Create push message
+                    
+                    NSMutableDictionary *payload = [NSMutableDictionary dictionary];
+                    NSMutableDictionary *aps = [NSMutableDictionary dictionary];
+                    [aps setObject:@"default" forKey:QBMPushMessageSoundKey];
+                    [aps setObject:[NSString stringWithFormat:@"%@: %@", [[DataManager shared].currentFBUser objectForKey:kName], (NSString *)contextInfo] forKey:QBMPushMessageAlertKey];
+                    [payload setObject:aps forKey:QBMPushMessageApsKey];
+                    //
+                    QBMPushMessage *message = [[QBMPushMessage alloc] initWithPayload:payload];
+                    
+                    // Send push
+                    [QBMessages TSendPush:message
+                                  toUsers:[NSString stringWithFormat:@"%d",  qbUser.ID]
+                                 delegate:self];
+                    
+                    [message release];
+                }
             }
-        }
-        else if ([result isKindOfClass:[QBUUserPagedResult class]]){
-            QBUUserPagedResult* res = (QBUUserPagedResult*)result;
             
-            if (![DataManager shared].currentChatRoom.allRoomUsers) {
-                [DataManager shared].currentChatRoom.allRoomUsers = [[NSMutableArray alloc] init];
-            }
-
-            [[DataManager shared].currentChatRoom.allRoomUsers addObjectsFromArray:res.users];
             
-            [self requestPhotosOfQBUsers:res.users withContext:chatRoomUsersProfiles];
         }
     
         else{
@@ -1065,6 +1072,8 @@ static BackgroundWorker* instance = nil;
     else if ([result isKindOfClass:[QBCOCustomObjectResult class]]){
         if (result.success) {
             NSLog(@"SUCCESSFUL CREATION OF OBJECT %@",((QBCOCustomObjectResult*)result).object);
+            QBCOCustomObject* res = ((QBCOCustomObjectResult*)result).object;
+            [DataManager shared].currentChatRoom.roomID = res.ID;
         }
     }
     else if ([result isKindOfClass:[QBCOCustomObjectPagedResult class]]){
@@ -1261,22 +1270,19 @@ static BackgroundWorker* instance = nil;
                 }else{
                     // ...
                 }
-
             }
                             // pictures of chat room occupants
             else if ([context isEqualToString:chatRoomUsersProfiles]){
                 
-                if (![DataManager shared].currentChatRoom.usersPictures) {
-                    [DataManager shared].currentChatRoom.usersPictures = [[NSMutableArray alloc] init];
+                if (![DataManager shared].currentChatRoom.fbRoomUsers) {
+                    [DataManager shared].currentChatRoom.fbRoomUsers = [[NSMutableArray alloc] init];
                 }
                 
-//                dispatch_queue_t queue = dispatch_queue_create("parsingQueue", NULL);
-//                
-//                dispatch_async(queue, ^{
-                    NSArray* response = [self parseAsyncResponse:result];
-                    [[DataManager shared].currentChatRoom.usersPictures addObjectsFromArray:response];
-//                });
-//                dispatch_release(queue);
+                NSArray* response = [[result body] allValues];
+                if (response && ![[DataManager shared].currentChatRoom.fbRoomUsers containsObject:[response lastObject]] ) {
+                    [[DataManager shared].currentChatRoom.fbRoomUsers addObject:[response lastObject]];
+                }
+
                 
                 // notify delegate that all photos are retrieved
                 if ([tabBarDelegate respondsToSelector:@selector(didReceiveUserProfilePicturesForViewControllerWithIdentifier:)]) {
@@ -1586,42 +1592,6 @@ static BackgroundWorker* instance = nil;
 
 }
 
-
-// Add Quote data to annotation
-- (void)addQuoteDataToAnnotation:(UserAnnotation *)annotation geoData:(QBLGeoData *)geoData{
-    // get quoted geodata
-    annotation.userStatus = [geoData.status substringFromIndex:[geoData.status rangeOfString:quoteDelimiter].location+1];
-    
-    // Author FB id
-    NSString* authorFBId = [[geoData.status substringFromIndex:6] substringToIndex:[geoData.status rangeOfString:nameIdentifier].location-6];
-    annotation.quotedUserFBId = authorFBId;
-    
-    // Author name
-    NSString* authorName = [[geoData.status substringFromIndex:[geoData.status rangeOfString:nameIdentifier].location+6] substringToIndex:[[geoData.status substringFromIndex:[geoData.status rangeOfString:nameIdentifier].location+6] rangeOfString:dateIdentifier].location];
-    annotation.quotedUserName = authorName;
-    
-    // origin Message date
-    NSString* date = [[geoData.status substringFromIndex:[geoData.status rangeOfString:dateIdentifier].location+6] substringToIndex:[[geoData.status substringFromIndex:[geoData.status rangeOfString:dateIdentifier].location+6] rangeOfString:photoIdentifier].location];
-    //
-    NSDateFormatter* formatter = [[NSDateFormatter alloc] init];
-	[formatter setLocale:[NSLocale currentLocale]];
-    [formatter setDateFormat:@"yyyy'-'MM'-'dd HH':'mm':'ss Z"];
-    annotation.quotedMessageDate = [formatter dateFromString:date];
-    [formatter release];
-    
-    // authore photo
-    NSString* photoLink = [[geoData.status substringFromIndex:[geoData.status rangeOfString:photoIdentifier].location+7] substringToIndex:[[geoData.status substringFromIndex:[geoData.status rangeOfString:photoIdentifier].location+7] rangeOfString:qbidIdentifier].location];
-    annotation.quotedUserPhotoURL = photoLink;
-    
-    // Authore QB id
-    NSString* authorQBId = [[geoData.status substringFromIndex:[geoData.status rangeOfString:qbidIdentifier].location+6] substringToIndex:[[geoData.status substringFromIndex:[geoData.status rangeOfString:qbidIdentifier].location+6] rangeOfString:messageIdentifier].location];
-    annotation.quotedUserQBId = authorQBId;
-    
-    // origin message
-    NSString* message = [[geoData.status substringFromIndex:[geoData.status rangeOfString:messageIdentifier].location+5] substringToIndex:[[geoData.status substringFromIndex:[geoData.status rangeOfString:messageIdentifier].location+5] rangeOfString:quoteDelimiter].location];
-    annotation.quotedMessageText = message;
-}
-
 - (void)createAndAddNewAnnotationToMapChatARForFBUser:(NSDictionary *)fbUser withGeoData:(QBLGeoData *)geoData addToTop:(BOOL)toTop withReloadTable:(BOOL)reloadTable{
     
     // create new user annotation
@@ -1632,7 +1602,7 @@ static BackgroundWorker* instance = nil;
 	if ([geoData.status length] >= 6){
 		if ([[geoData.status substringToIndex:6] isEqualToString:fbidIdentifier]){
             // add Quote
-            [self addQuoteDataToAnnotation:newAnnotation geoData:geoData];
+            [Helper addQuoteDataToAnnotation:newAnnotation quotationText:geoData.status];
             
 		}else {
 			newAnnotation.userStatus = geoData.status;
@@ -1699,6 +1669,11 @@ static BackgroundWorker* instance = nil;
             NSMutableArray* users = [[[DataManager shared].nearbyRooms objectAtIndex:roomIndex] onlineRoomUsers];
             [users removeObject:[DataManager shared].currentQBUser];
         }
+                
+        if ([tabBarDelegate respondsToSelector:@selector(didChangeRatingOfRoom:)]) {
+            [tabBarDelegate didChangeRatingOfRoom:leavedChatRoom];
+        }
+
     }
 }
 
@@ -1734,20 +1709,19 @@ static BackgroundWorker* instance = nil;
                 [self createAndAddNewAnnotationToChatForFBUser:[DataManager shared].currentFBUser withQBChatMessage:message addToTop:YES withReloadTable:YES];
                 
                 room.isSendingMessage = NO;
+                
+                
             }
             else{
                 [room.messagesHistory addObject:message];
-            }
-            
-            if (room.usersPictures.count == 0) {
+                
                 dispatch_queue_t chatRoomsUsersPicturesQueue = dispatch_queue_create("chatRoomsUsersPicturesQueue", NULL);
                 dispatch_async(chatRoomsUsersPicturesQueue, ^{
-                    [self requestUsersPicturesOfCurrentRoom];
+                    [self requestUserWithQBID:message.senderID];
                 });
-                dispatch_release(chatRoomsUsersPicturesQueue);
+
             }
-
-
+            
         }
     }
 }
@@ -1764,7 +1738,7 @@ static BackgroundWorker* instance = nil;
         [roomRecord.fields setObject:room.roomName forKey:@"xmppName"];
         [roomRecord.fields setObject:[NSNumber numberWithDouble:locationManager.location.coordinate.latitude] forKey:@"latitude"];
         [roomRecord.fields setObject:[NSNumber numberWithDouble:locationManager.location.coordinate.longitude] forKey:@"longitude"];
-        
+        [roomRecord.fields setObject:[NSNumber numberWithDouble:0.0] forKey:@"roomRating"];
         [QBCustomObjects createObject:roomRecord delegate:self];
         
             // add room to storage
@@ -1773,6 +1747,7 @@ static BackgroundWorker* instance = nil;
                                                 // set created room as current
         ChatRoom* newRoom = [ChatRoom createRoomWithAdditionalInfoWithName:[Helper createTitleFromXMPPTitle:room.roomName] coordinates:locationManager.location.coordinate];
         [DataManager shared].currentChatRoom = newRoom;
+        newRoom.roomRating = 0;
         
         if (![DataManager shared].roomsWithAdditionalInfo) {
             [DataManager shared].roomsWithAdditionalInfo = [[NSMutableArray alloc] init];
@@ -1796,34 +1771,31 @@ static BackgroundWorker* instance = nil;
             [[DataManager shared].currentChatRoom.onlineRoomUsers addObject:[DataManager shared].currentQBUser];
         }
         
+        [DataManager shared].currentChatRoom.roomRating++;
+        
         if ([tabBarDelegate respondsToSelector:@selector(didEnterExistingRoomForViewControllerWithIdentifier:)]) {
             [tabBarDelegate didEnterExistingRoomForViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
         }
     }
 }
 
--(void)chatRoomDidReceiveListOfOnlineUsers:(NSArray *)users room:(NSString *)roomName{
+- (void)chatRoomDidReceiveListOfOnlineUsers:(NSArray *)users room:(NSString *)roomName{
     ChatRoom* chatRoom = [[DataManager shared] findRoomWithAdditionalInfo:roomName];
     
     if (chatRoom) {
         if (!chatRoom.onlineRoomUsers) {
             chatRoom.onlineRoomUsers = [[NSMutableArray alloc] init];
-            chatRoom.roomRating = 0;
         }
     
         [chatRoom.onlineRoomUsers removeAllObjects];
         [chatRoom.onlineRoomUsers addObjectsFromArray:users];
-                        // calculate room rating depending on number of users in room
-        chatRoom.roomRating = RATING_USER_VALUE * users.count;
-                
     }
-    
 }
 
 #pragma mark -
 #pragma mark ChatRooms helper methods
 
--(void)calculateDistancesForEachRoom{
+- (void)calculateDistancesForEachRoom{
     CLLocationCoordinate2D currentLocation = locationManager.location.coordinate;
     for (ChatRoom* room in [DataManager shared].roomsWithAdditionalInfo) {
         if (room.ownerLocation.longitude == 0 && room.ownerLocation.latitude == 0) {
@@ -1870,8 +1842,8 @@ static BackgroundWorker* instance = nil;
         NSString* url = [pictData objectForKey:kUrl];
         
         NSMutableDictionary* userData = [NSMutableDictionary dictionary];
-        [userData setObject:userFBId forKey:@"userFBId"];
         [userData setObject:url forKey:@"pictureURL"];
+        [userData setObject:userFBId forKey:@"userFBId"];
         [urls addObject:userData];
     }];
     
