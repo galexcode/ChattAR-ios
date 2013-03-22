@@ -17,19 +17,19 @@
 @synthesize distanceFromUser;
 @synthesize onlineRoomUsers;
 @synthesize messagesHistory;
-@synthesize usersPictures;
 @synthesize messagesAsUserAnnotationForDisplaying;
 @synthesize isSendingMessage;
 @synthesize allRoomUsers;
+@synthesize fbRoomUsers;
 
 - (void)dealloc{
     [onlineRoomUsers release];
     [messagesHistory release];
-    [usersPictures release];
     [roomID release];
     [roomName release];
     [createdAt release];
     [allRoomUsers release];
+    [fbRoomUsers release];
     
     [super dealloc];
 }

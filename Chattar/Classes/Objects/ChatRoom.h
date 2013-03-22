@@ -17,10 +17,11 @@
 @property (nonatomic, assign) double distanceFromUser;
 @property (nonatomic, retain) NSMutableArray* onlineRoomUsers;
 @property (nonatomic, retain) NSMutableArray* messagesHistory;
-@property (nonatomic, retain) NSMutableArray* usersPictures;
 @property (nonatomic, retain) NSMutableArray* messagesAsUserAnnotationForDisplaying;
 @property (nonatomic, assign) BOOL isSendingMessage;
 @property (nonatomic, retain) NSMutableArray* allRoomUsers;
+
+@property (nonatomic, retain) NSMutableArray* fbRoomUsers;
 
 +(ChatRoom*)createRoomWithAdditionalInfoWithName:(NSString*)_roomName coordinates:(CLLocationCoordinate2D)coordinates;
 @end
