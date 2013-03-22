@@ -325,7 +325,14 @@
 #pragma mark -
 #pragma mark ChatRoomsDataDelegate methods
 
--(void)refreshRecipientsPicturesWithControllerIdentifier:(NSString*)identifier{
+- (void)didChangeRatingOfRoom:(ChatRoom *)room{
+    NSMutableDictionary* context = [NSMutableDictionary dictionary];
+    [context setObject:room forKey:@"changingChatRoom"];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kDidChangeRatingOfRoom object:nil userInfo:context];
+}
+
+- (void)refreshRecipientsPicturesWithControllerIdentifier:(NSString*)identifier{
     NSMutableDictionary* context = [NSMutableDictionary dictionary];
     [context setObject:identifier forKey:@"context"];
     
@@ -363,7 +370,7 @@
                 [[DataManager shared].qbChatRooms addObject:room];
             }
         }
-
+        
         // get online users for all rooms
         [[BackgroundWorker instance] retrieveOnlineUsersInEachRoom];
                 
@@ -409,6 +416,8 @@
         
         roomObject.roomID = object.ID;
         
+        roomObject.roomRating = [[object.fields objectForKey:@"roomRating"] doubleValue];
+        
         if ([Helper checkSymbol:@"@" inString:[object.fields objectForKey:@"xmppName"]]) {
             NSArray* splittedStrings = [[object.fields objectForKey:@"xmppName"] componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"@"]];
             roomObject.roomName = [splittedStrings objectAtIndex:0];
@@ -416,9 +425,7 @@
         else{
             roomObject.roomName = [object.fields objectForKey:@"xmppName"];
         }
-        
-        roomObject.roomRating = INITIAL_CHATROOM_RATING;
-        
+                
         [[DataManager shared].roomsWithAdditionalInfo addObject:roomObject];
     }
     
@@ -437,7 +444,7 @@
         [DataManager shared].nearbyRooms = [[NSMutableArray alloc] init];
     }
     
-    NSArray* sortedRooms = [Helper sortArray:[DataManager shared].roomsWithAdditionalInfo dependingOnField:@"distanceFromUser" inAscendingOrder:NO];
+    NSArray* sortedRooms = [Helper sortArray:[DataManager shared].roomsWithAdditionalInfo dependingOnField:@"distanceFromUser" inAscendingOrder:YES];
     
     [[DataManager shared].nearbyRooms addObjectsFromArray:sortedRooms];
 }
