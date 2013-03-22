@@ -62,8 +62,10 @@
 #define kDidReceiveMessage @"kDidReceiveMessage"
 #define kNewChatRoomCreated @"kNewChatRoomCreated"
 #define kNeedToUpdateChatRoomController @"kNeedToUpdateChatRoomController"
+#define kDidChangeRatingOfRoom @"kDidChangeRatingOfRoom"
 
 #define INDICATOR_TAG 23458
+#define QUOTE_IDENTIFIER @"@!/"
 // Strings
 #define appName @"ChattAR"
 
