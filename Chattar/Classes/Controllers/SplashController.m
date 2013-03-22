@@ -243,7 +243,7 @@
             QBUUser* user = [QBUUser user];
             user.password =  [BaseService sharedService].token;
             user.ID = res.session.userID;
-            
+                        
             [[QBChat instance] setDelegate:self];
             [[QBChat instance] loginWithUser:user];
             
@@ -284,6 +284,7 @@
         NSArray *cookies = [cookiesStorage cookies];
         NSData *data = [NSKeyedArchiver archivedDataWithRootObject:cookies];
         [[NSUserDefaults standardUserDefaults] setObject:data forKey:FB_COOKIES];
+        
     }else if([result isKindOfClass:QBUUserResult.class])
     {
         if(result.success){
@@ -291,11 +292,6 @@
         
             [[DataManager shared] setCurrentQBUser:res.user];
             NSLog(@"set setCurrentQBUser %@", res.user);
-        }
-        
-        else
-        {
-            NSLog(@"error %@ ", result.errors);
         }
         
     }
