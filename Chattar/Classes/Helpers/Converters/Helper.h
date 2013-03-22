@@ -13,4 +13,5 @@
 +(NSArray*)sortArray:(NSArray*) array dependingOnField:(NSString*)fieldName inAscendingOrder:(BOOL)ascending;
 +(BOOL)checkSymbol:(NSString*)symbol inString:(NSString*)string;
 +(NSString*)createTitleFromXMPPTitle:(NSString*)result;
++ (void)addQuoteDataToAnnotation:(UserAnnotation *)annotation quotationText:(NSString*)quoteText;
 @end
