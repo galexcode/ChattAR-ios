@@ -93,7 +93,9 @@
         // back button was pressed.  We know this is true because self is no longer
         // in the navigation stack.
         QBChatRoom* currentChatRoom = [[DataManager shared] findQBRoomWithName:[DataManager shared].currentChatRoom.roomName];
+        [[BackgroundWorker instance] saveCurrentChatRoomInfoOnServer];
         [[BackgroundWorker instance] exitChatRoom:currentChatRoom];
+
         [self cleanData];
     }
     
@@ -229,7 +231,9 @@
     if ([dataStorage isStorageEmpty]) {
         [messagesTableView reloadData];
         [[BackgroundWorker instance] requestDataForDataStorage:self.dataStorage];
-        [self addSpinner];
+        if ([self.controllerReuseIdentifier isEqualToString:chatViewControllerIdentifier]) {
+            [self addSpinner];
+        }
     }
 
     else{
@@ -247,23 +251,23 @@
     UIImageView* occupantsPanel = [[[UIImageView alloc] initWithFrame:CGRectMake(0, messageField.frame.size.height+12, 320, 50)] autorelease];
     [occupantsPanel setBackgroundColor:[UIColor blueColor]];
     
-    __block int x = 20;
-    [[DataManager shared].currentChatRoom.usersPictures enumerateObjectsUsingBlock:^(NSDictionary* userData, NSUInteger index, BOOL *stop) {
-        AsyncImageView* occupantImage = [[[AsyncImageView alloc] initWithFrame:CGRectMake(x, 5, 40, 40)] autorelease];
-        
-        NSString* currentPictureURL = [userData objectForKey:@"pictureURL"];
-         
-        
-        [occupantImage loadImageFromURL:[NSURL URLWithString:currentPictureURL]];
-        [occupantsPanel addSubview:occupantImage];
-        x += occupantImage.bounds.size.width + 15;
-    }];
-    
-    [self.view insertSubview:occupantsPanel aboveSubview:messagesTableView];
-    CGRect tableFrame = messagesTableView.frame;
-    tableFrame.origin.y += occupantsPanel.frame.size.height;
-    tableFrame.size.height -= occupantsPanel.frame.size.height;
-    messagesTableView.frame = tableFrame;
+//    __block int x = 20;
+//    [[DataManager shared].currentChatRoom.usersPictures enumerateObjectsUsingBlock:^(NSDictionary* userData, NSUInteger index, BOOL *stop) {
+//        AsyncImageView* occupantImage = [[[AsyncImageView alloc] initWithFrame:CGRectMake(x, 5, 40, 40)] autorelease];
+//        
+//        NSString* currentPictureURL = [userData objectForKey:@"pictureURL"];
+//         
+//        
+//        [occupantImage loadImageFromURL:[NSURL URLWithString:currentPictureURL]];
+//        [occupantsPanel addSubview:occupantImage];
+//        x += occupantImage.bounds.size.width + 15;
+//    }];
+//    
+//    [self.view insertSubview:occupantsPanel aboveSubview:messagesTableView];
+//    CGRect tableFrame = messagesTableView.frame;
+//    tableFrame.origin.y += occupantsPanel.frame.size.height;
+//    tableFrame.size.height -= occupantsPanel.frame.size.height;
+//    messagesTableView.frame = tableFrame;
 }
 
 - (IBAction)sendMessageDidPress:(id)sender{
@@ -367,6 +371,7 @@
     quotePhotoTop.clipsToBounds = YES;
     quotePhotoTop.layer.cornerRadius = 2;
 	[recognizer release];
+    
 	UIView* view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 20, 20)];
 	[view addSubview:quotePhotoTop];
     [quotePhotoTop release];
@@ -539,6 +544,7 @@
     CGSize itemFrameSize = [currentAnnotation.userStatus sizeWithFont:[UIFont systemFontOfSize:15]
                                              constrainedToSize:boundingSize
                                                  lineBreakMode:UILineBreakModeWordWrap];
+    
     float textHeight = itemFrameSize.height + 7;
     
     static NSString *reuseIdentifier = @"ChatMessageCell";
@@ -794,6 +800,7 @@
     
     // distance label
     [distanceLabel setFrame:CGRectMake(5, distanceView.frame.origin.y+5, 50, 15)];
+    
     if ([[DataManager shared].currentFBUserId isEqualToString:[currentAnnotation.fbUser objectForKey:kId]]){
         
         distanceLabel.hidden = YES;
@@ -830,8 +837,16 @@
     
     // set message
     [userMessage setFrame:CGRectMake(21, 22, messageBGView.frame.size.width-24, messageBGView.frame.size.height-26)];
-    userMessage.text = currentAnnotation.userStatus;
-//    [userMessage sizeToFit];
+    
+    if ([currentAnnotation.userStatus rangeOfString:QUOTE_IDENTIFIER].location != NSNotFound) {
+        NSString* newText = currentAnnotation.userStatus;
+        
+        NSRange quoteEnd = [newText rangeOfString:@"|"];
+        newText = [newText substringFromIndex:quoteEnd.location + 1];
+        userMessage.text = newText;
+    }
+    else
+        userMessage.text = currentAnnotation.userStatus;
     
     // sate date
     NSDateFormatter* formatter = [[NSDateFormatter alloc] init];
@@ -933,7 +948,7 @@
 //        [dataStorage addDataToStorage:cell];
         [cell release];
 		[loading release];
-		//
+
 		[messagesTableView reloadData];
 		
         // get more messages
@@ -1099,7 +1114,6 @@
         }
 
 
-        
         self.messagesTableView.tag = 0;
         [self.messagesTableView reloadData];
     }
