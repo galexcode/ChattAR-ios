@@ -141,4 +141,6 @@
 - (QBChatMessage*)convertUserAnnotationToQBChatMessage:(UserAnnotation*)annotation;
 - (QBUUser*)findQBUserByID:(NSInteger)qbID;
 
+- (void)sortChatRooms;
+
 @end

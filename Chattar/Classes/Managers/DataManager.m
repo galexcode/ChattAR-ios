@@ -887,6 +887,17 @@ static DataManager *instance = nil;
     return NO;
 }
 
+- (void)sortChatRooms{
+    NSArray* sortedNearbyRooms = [Helper sortArray:nearbyRooms dependingOnField:@"distanceFromUser" inAscendingOrder:YES];
+    NSArray* sortedTrendingRooms = [Helper sortArray:trendingRooms dependingOnField:@"roomRating" inAscendingOrder:NO];
+    
+    [trendingRooms removeAllObjects];
+    [trendingRooms addObjectsFromArray:sortedTrendingRooms];
+    
+    [nearbyRooms removeAllObjects];
+    [nearbyRooms addObjectsFromArray:sortedNearbyRooms];    
+}
+
 #pragma mark -
 #pragma mark Application's documents directory
 
@@ -903,25 +914,53 @@ static DataManager *instance = nil;
 -(UserAnnotation*)convertQBMessageToUserAnnotation:(QBChatMessage*)message{
     UserAnnotation* userAnnotation = [[[UserAnnotation alloc] init] autorelease];
     
-    [userAnnotation setUserStatus:message.text];
     [userAnnotation setCreatedAt:message.datetime];
     
     QBUUser* user = [self findQBUserByID:message.senderID];
+    
     if (user) {
         NSString* qbUserFBID = user.facebookID;
         
         [userAnnotation setFbUserId:qbUserFBID];
+        [userAnnotation setQbUserID:user.ID];
         
-        [self.currentChatRoom.usersPictures enumerateObjectsUsingBlock:^(NSDictionary* userDict, NSUInteger idx, BOOL *stop) {
-            NSString* fbID = [userDict objectForKey:@"userFBId"];
-            
+        [self.currentChatRoom.fbRoomUsers enumerateObjectsUsingBlock:^(NSDictionary* fbUser, NSUInteger idx, BOOL *stop) {
+            NSString* fbID = [fbUser objectForKey:kId];
             if ([qbUserFBID isEqualToString:fbID]) {
-                userAnnotation.userPhotoUrl = [userDict objectForKey:@"pictureURL"];
+                [userAnnotation setUserName:[fbUser objectForKey:kName]];
+                
+                NSDictionary* picture = [fbUser objectForKey:kPicture];
+                NSDictionary* data = [picture objectForKey:kData];
+                NSString* userPhotoURL = [data objectForKey:kUrl];
+    
+                [userAnnotation setUserPhotoUrl:userPhotoURL];
+                [userAnnotation setFbUser:fbUser];
+
                 *stop = YES;
             }
-        }];
-    }   
+        }];        
+    }
     userAnnotation.distance = (int)([self.currentChatRoom distanceFromUser]);
+    
+                // if message has quotation
+    if ([message.text rangeOfString:QUOTE_IDENTIFIER].location != NSNotFound) {
+        NSString* newMessageText = message.text;
+                                    // remove message identifier
+        newMessageText = [newMessageText stringByReplacingOccurrencesOfString:QUOTE_IDENTIFIER withString:@""];
+        
+        [Helper addQuoteDataToAnnotation:userAnnotation quotationText:newMessageText];
+        
+        NSRange quoteEnd = [newMessageText rangeOfString:quoteDelimiter];
+        
+            // delete quote marker from string
+        newMessageText = [newMessageText substringFromIndex:quoteEnd.location + 1];
+        
+        [userAnnotation setUserStatus:newMessageText];
+    }
+    else{
+        [userAnnotation setUserStatus:message.text];
+    }
+        
     return userAnnotation;
 }
 
