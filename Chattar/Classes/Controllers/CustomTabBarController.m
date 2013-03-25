@@ -325,6 +325,13 @@
 #pragma mark -
 #pragma mark ChatRoomsDataDelegate methods
 
+- (void)didReceiveOnlineUserPhotosForRoom:(ChatRoom *)room{
+    NSMutableDictionary* context = [NSMutableDictionary dictionary];
+    [context setObject:room forKey:@"chatRoom"];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kDidReceiveOnlineUsersList object:nil userInfo:context];
+}
+
 - (void)didChangeRatingOfRoom:(ChatRoom *)room{
     NSMutableDictionary* context = [NSMutableDictionary dictionary];
     [context setObject:room forKey:@"changingChatRoom"];
