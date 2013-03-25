@@ -92,7 +92,7 @@
 }
 
 -(BOOL)isStorageEmpty{
-    return ([DataManager shared].chatPoints.count == 0);
+    return ([DataManager shared].allChatPoints.count == 0);
 }
 
 -(void)clearStorage{
