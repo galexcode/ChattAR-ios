@@ -959,14 +959,14 @@
 #pragma mark -
 #pragma mark Notifications Reaction
 
--(void)doUpdateChatRoomsController:(NSNotification*)notification{
+- (void)doUpdateChatRoomsController:(NSNotification*)notification{
     NSString* context = [notification.userInfo objectForKey:@"context"];
     if ([context isEqualToString:self.controllerReuseIdentifier]) {
         [messagesTableView reloadData];
     }
 }
 
--(void)doClearCache{
+- (void)doClearCache{
     showAllUsers  = NO;
     
     [self.allFriendsSwitch setValue:1.0f];

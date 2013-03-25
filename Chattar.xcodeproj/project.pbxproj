@@ -1787,40 +1787,7 @@
 		636735FB1552CF590061BF75 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer: Taras Filatov (BV2558G6T9)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Taras Filatov (6AVH4TA956)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/Externals\"",
-					"\"$(SRCROOT)\"",
-					"\"$(SRCROOT)/../SDK/SDK-ios/Framework/build/Framework\"",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Chattar/Chattar-Prefix.pch";
-				HEADER_SEARCH_PATHS = /usr/include/libxml2;
-				INFOPLIST_FILE = "Chattar/Chattar-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/Externals/XMPP_Framework\"",
-					"\"$(SRCROOT)/Externals/Flurry\"",
-				);
-				OTHER_LDFLAGS = (
-					"-lxml2",
-					"-ObjC",
-					"-lstdc++",
-				);
-				PRODUCT_NAME = Chattar;
-				PROVISIONING_PROFILE = "C6112AC4-DCEB-4C60-BDF9-D7717DAD395D";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "9945B46A-1261-4181-A7D8-B6AB55692D6C";
-				WRAPPER_EXTENSION = app;
-			};
-			name = Debug;
-		};
-		636735FC1552CF590061BF75 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Injoit LTD";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Injoit LTD";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1844,7 +1811,40 @@
 					"-lstdc++",
 				);
 				PRODUCT_NAME = Chattar;
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "70814F24-7072-4BD7-878F-2F1394948909";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "70814F24-7072-4BD7-878F-2F1394948909";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		636735FC1552CF590061BF75 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Injoit LTD";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Injoit LTD";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/Externals\"",
+					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/../SDK/SDK-ios/Framework/build/Framework\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Chattar/Chattar-Prefix.pch";
+				HEADER_SEARCH_PATHS = /usr/include/libxml2;
+				INFOPLIST_FILE = "Chattar/Chattar-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/Externals/XMPP_Framework\"",
+					"\"$(SRCROOT)/Externals/Flurry\"",
+				);
+				OTHER_LDFLAGS = (
+					"-lxml2",
+					"-ObjC",
+					"-lstdc++",
+				);
+				PRODUCT_NAME = Chattar;
+				PROVISIONING_PROFILE = "70814F24-7072-4BD7-878F-2F1394948909";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "70814F24-7072-4BD7-878F-2F1394948909";
 				WRAPPER_EXTENSION = app;
 			};
