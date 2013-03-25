@@ -64,6 +64,8 @@
 #define kNeedToUpdateChatRoomController @"kNeedToUpdateChatRoomController"
 #define kDidChangeRatingOfRoom @"kDidChangeRatingOfRoom"
 
+#define kDidReceiveOnlineUsersList @"kDidReceiveOnlineUsersList"
+
 #define INDICATOR_TAG 23458
 #define QUOTE_IDENTIFIER @"@!/"
 // Strings
@@ -76,6 +78,8 @@
 #define FLURRY_EVENT_USER_DID_LOGIN @"User did login"
 #define chatViewControllerIdentifier @"chatViewControllerIdentifier"
 #define chatRoomsViewControllerIdentifier @"chatRoomsViewControllerIdentifier" 
+
+#define ADMIN_ID 34
 
 // Tab bar indexes enum
 enum TabbarIndexes {
