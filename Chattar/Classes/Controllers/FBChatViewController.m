@@ -11,6 +11,7 @@
 #import "AppDelegate.h"
 #import "DatetimeConverter.h"
 #import "ProvisionManager.h"
+#import "ChatRoomsViewController.h"
 
 
 #define VIEW_WIDTH    self.view.frame.size.width
@@ -148,8 +149,13 @@ static CGFloat const kChatBarHeight4    = 94.0f;
 	
     
 	// set title
-	[self setTitle:[chatHistory.to objectForKey:kName]];
-	
+    UILabel* titleView = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 140, 35)] autorelease];
+    [titleView setText:[chatHistory.to objectForKey:kName]];
+    [titleView setTextColor:[UIColor whiteColor]];
+    [titleView setBackgroundColor:[UIColor clearColor]];
+    [titleView setFont:[UIFont boldSystemFontOfSize:18]];
+    
+    self.navigationItem.titleView = titleView;
     
     // scroll to bottom item
 	if ([chatHistory.messages  count] > 0){
