@@ -111,36 +111,39 @@
 
 #pragma mark -
 #pragma mark Chat rooms 
--(BOOL)roomWithNameHasAdditionalInfo:(NSString*)roomName;
--(QBChatRoom*)findQBRoomWithName:(NSString*)roomName;
--(ChatRoom*)findRoomWithAdditionalInfo:(NSString*)roomName;
+- (BOOL)roomWithNameHasAdditionalInfo:(NSString*)roomName;
+- (QBChatRoom*)findQBRoomWithName:(NSString*)roomName;
+- (ChatRoom*)findRoomWithAdditionalInfo:(NSString*)roomName;
 
-#pragma mark -
-#pragma mark Core Data api
-
--(NSArray *)chatMessagesFromStorage;
--(void)addChatMessagesToStorage:(NSArray *)messages;
--(void)addChatMessageToStorage:(id)message;
-
--(NSArray *)mapARPointsFromStorage;
--(void)addMapARPointsToStorage:(NSArray *)points;
--(void)addMapARPointToStorage:(id)point; 
-
--(NSArray *)checkinsFromStorage;
--(void)addCheckinsToStorage:(NSArray *)checkins;
--(BOOL)addCheckinToStorage:(id)checkins;
-
--(void) deleteAllObjects: (NSString *) entityDescription  context:(NSManagedObjectContext *)ctx;
-
--(NSMutableArray*)photosWithLocationsFromStorage;
--(void)addPhotosWithLocationsToStorage:(NSArray*)photos;
--(BOOL)addPhotoWithLocationsToStorage:(id)photo;
-
-- (NSArray*)photosWithLocationsFromStorageFromUserWithId:(NSDecimalNumber*)userId;
 - (UserAnnotation*)convertQBMessageToUserAnnotation:(QBChatMessage*)message;
 - (QBChatMessage*)convertUserAnnotationToQBChatMessage:(UserAnnotation*)annotation;
 - (QBUUser*)findQBUserByID:(NSInteger)qbID;
 
 - (void)sortChatRooms;
+- (void)saveOnlineUsers:(NSArray*)onlineUsers;
+- (void)saveAllUsers:(NSArray*)allUsers;
+
+#pragma mark -
+#pragma mark Core Data api
+
+- (NSArray *)chatMessagesFromStorage;
+- (void)addChatMessagesToStorage:(NSArray *)messages;
+- (void)addChatMessageToStorage:(id)message;
+
+- (NSArray *)mapARPointsFromStorage;
+- (void)addMapARPointsToStorage:(NSArray *)points;
+- (void)addMapARPointToStorage:(id)point;
+
+- (NSArray *)checkinsFromStorage;
+- (void)addCheckinsToStorage:(NSArray *)checkins;
+- (BOOL)addCheckinToStorage:(id)checkins;
+
+- (void) deleteAllObjects: (NSString *) entityDescription  context:(NSManagedObjectContext *)ctx;
+
+- (NSMutableArray*)photosWithLocationsFromStorage;
+- (void)addPhotosWithLocationsToStorage:(NSArray*)photos;
+- (BOOL)addPhotoWithLocationsToStorage:(id)photo;
+
+- (NSArray*)photosWithLocationsFromStorageFromUserWithId:(NSDecimalNumber*)userId;
 
 @end

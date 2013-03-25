@@ -857,7 +857,8 @@ static DataManager *instance = nil;
 
 #pragma mark -
 #pragma mark ChatRooms methods
--(QBChatRoom*)findQBRoomWithName:(NSString *)roomName{
+
+- (QBChatRoom*)findQBRoomWithName:(NSString *)roomName{
     for (QBChatRoom* room in qbChatRooms) {
         NSString* nonXMPPName = [Helper createTitleFromXMPPTitle:room.roomName];
         if ([nonXMPPName isEqualToString:roomName]) {
@@ -867,7 +868,7 @@ static DataManager *instance = nil;
     return nil;
 }
 
--(ChatRoom*)findRoomWithAdditionalInfo:(NSString *)roomName{
+- (ChatRoom*)findRoomWithAdditionalInfo:(NSString *)roomName{
     for (ChatRoom* room in roomsWithAdditionalInfo) {
         if ([room.roomName isEqualToString:roomName]) {
             return room;
@@ -876,7 +877,7 @@ static DataManager *instance = nil;
     
     return nil;
 }
--(BOOL)roomWithNameHasAdditionalInfo:(NSString*)roomName{
+- (BOOL)roomWithNameHasAdditionalInfo:(NSString*)roomName{
     for (ChatRoom* room in [DataManager shared].roomsWithAdditionalInfo) {
         
         NSString* nonXMPPName = [Helper createTitleFromXMPPTitle:roomName];
@@ -896,6 +897,31 @@ static DataManager *instance = nil;
     
     [nearbyRooms removeAllObjects];
     [nearbyRooms addObjectsFromArray:sortedNearbyRooms];    
+}
+
+- (void)saveOnlineUsers:(NSArray*)onlineUsers{
+    if (![DataManager shared].currentChatRoom.onlineRoomUsers) {
+        [DataManager shared].currentChatRoom.onlineRoomUsers = [[NSMutableArray alloc] init];
+    }
+    
+    [onlineUsers enumerateObjectsUsingBlock:^(QBUUser* user, NSUInteger idx, BOOL *stop) {
+        if (![[DataManager shared].currentChatRoom.onlineRoomUsers containsObject:user]) {
+            [[DataManager shared].currentChatRoom.onlineRoomUsers addObject:user];
+        }
+    }];
+}
+
+
+- (void)saveAllUsers:(NSArray*)allUsers{
+    if (![DataManager shared].currentChatRoom.allRoomUsers) {
+        [DataManager shared].currentChatRoom.allRoomUsers = [[NSMutableArray alloc] init];
+    }
+    
+    [allUsers enumerateObjectsUsingBlock:^(QBUUser* user, NSUInteger idx, BOOL *stop) {
+        if (![[DataManager shared].currentChatRoom.allRoomUsers containsObject:user]) {
+            [[DataManager shared].currentChatRoom.allRoomUsers addObject:user];
+        }
+    }];
 }
 
 #pragma mark -
