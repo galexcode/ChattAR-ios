@@ -38,6 +38,9 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doChangeRatingOfRoom:) name:kDidChangeRatingOfRoom object:nil];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(logoutDone) name:kNotificationLogout object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveOnlineUsers:) name:kDidReceiveOnlineUsersList object:nil];
+
     }
     return self;
 }
@@ -193,6 +196,29 @@
     }];
     
     return viewWithLastActiveUsers;
+}
+
+- (UIImageView*)viewWithUsersInRoom:(ChatRoom*)room{
+    UIImageView* viewWithUsers = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 100, 40)];
+    
+    __block int userViewXPosition = 210;
+    __block int displayedUserCount = 0;
+    
+    [room.onlineRoomUsers enumerateObjectsUsingBlock:^(NSDictionary* fbUserDictionary, NSUInteger idx, BOOL *stop) {
+        NSString* userImageURL = [fbUserDictionary objectForKey:kUrl];
+        
+        AsyncImageView* activeUserView = [[[AsyncImageView alloc] initWithFrame:CGRectMake(userViewXPosition, 5, SIZE_OF_USER_PICTURE, SIZE_OF_USER_PICTURE)] autorelease];
+        [activeUserView loadImageFromURL:[NSURL URLWithString:userImageURL]];
+        [viewWithUsers addSubview:activeUserView];
+        userViewXPosition -= activeUserView.frame.size.width + PADDING;
+        displayedUserCount++;
+        
+        if (displayedUserCount == NUMBER_OF_USERS_TO_DISPLAY) {
+            *stop = YES;
+        }
+    }];
+
+    return viewWithUsers;
 }
 
 - (void)addExpandedSeeAllButton:(UIButton*) seeAllButton isButtonExpanded:(BOOL)isExpanded {
@@ -420,6 +446,10 @@
                                                                                                      [DataManager shared].trendingRooms.count;
             }
         }
+        
+        else{
+            numberOfRowsSection = NUMBER_OF_ROOM_DISPLAYED_BY_DEFAULT;
+        }
     }
     else{
         if (section == mainChatSection) {
@@ -544,6 +574,16 @@
 #pragma mark -
 #pragma mark Notifications Reactions
 
+- (void)doReceiveOnlineUsers:(NSNotification*)notification{
+    ChatRoom* room = [notification.userInfo objectForKey:@"chatRoom"];
+    
+    NSArray* cells = [self retrieveCellsForChatRoom:room];
+    
+    [cells enumerateObjectsUsingBlock:^(UITableViewCell* cell, NSUInteger idx, BOOL *stop) {
+        [cell.contentView addSubview:[self viewWithUsersInRoom:room]];
+    }];
+}
+
 - (void)logoutDone{
     [[QBChat instance] logout];
 }
@@ -551,10 +591,11 @@
 - (void)doChangeRatingOfRoom:(NSNotification*)notification {
     ChatRoom* room = [notification.userInfo objectForKey:@"changingChatRoom"];
     
-    UITableViewCell* roomCell = [self retrieveCellForChatRoom:room];
-    if (roomCell) {
-        [self changeRatingForCell:roomCell withRoomRating:room.roomRating];
-    }
+    NSArray* cells = [self retrieveCellsForChatRoom:room];
+    [cells enumerateObjectsUsingBlock:^(UITableViewCell* cell, NSUInteger idx, BOOL *stop) {
+        [self changeRatingForCell:cell withRoomRating:room.roomRating];
+    }];
+        
     [[DataManager shared] sortChatRooms];
     
     [_roomsTableView reloadData];
@@ -623,20 +664,29 @@
 
 #pragma mark -
 #pragma mark Helpers
-- (UITableViewCell*)retrieveCellForChatRoom:(ChatRoom*)room{
+- (NSArray*)retrieveCellsForChatRoom:(ChatRoom*)room{
     int nearbyIndex = [[DataManager shared].nearbyRooms indexOfObject:room];
     int trendingIndex = [[DataManager shared].trendingRooms indexOfObject:room];
     
     NSIndexPath* indexPath = nil;
+    NSMutableArray* cells = [NSMutableArray array];
+    
     if (nearbyIndex != NSNotFound) {
         indexPath = [NSIndexPath indexPathForRow:nearbyIndex inSection:nearbySection];
+        if ([_roomsTableView cellForRowAtIndexPath:indexPath]) {
+            [cells addObject:[_roomsTableView cellForRowAtIndexPath:indexPath]];
+        }
     }
     
-    else if (trendingIndex != NSNotFound){
+    if (trendingIndex != NSNotFound){
         indexPath = [NSIndexPath indexPathForRow:trendingIndex inSection:trendingSection];
+        if ([_roomsTableView cellForRowAtIndexPath:indexPath]) {
+            [cells addObject:[_roomsTableView cellForRowAtIndexPath:indexPath]];
+        }
     }
     
-    return [_roomsTableView cellForRowAtIndexPath:indexPath];
+    
+    return cells;
 }
 
 @end
