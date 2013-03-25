@@ -16,7 +16,9 @@
 #define moreChatMessages @"getMoreChatMessages"
 #define chatRoomUsersProfiles @"chatRoomUsersProfiles"
 #define chatRoomMessagesSenders @"chatRoomMessagesSenders"
+#define chatRoomOnlineUsers @"chatRoomOnlineUsers"
 #define qbUserFBPhoto @"qbUserFBPhoto"
+#define onlineUsersProfiles @"onlineUsersProfiles"
 #define kGetGeoDataCount 100
 
 @implementation BackgroundWorker
@@ -118,11 +120,24 @@ static BackgroundWorker* instance = nil;
     [QBCustomObjects updateObject:chatRoomUpdate delegate:self];
 }
 
-- (void)requestUserWithQBID:(NSInteger)qbID{
-    [QBUsers userWithID:qbID delegate:self context:chatRoomMessagesSenders];
+- (void)requestUsersWithQbIDs:(NSArray*)qbIDs{
+    [self requestUsersWithQbIDs:qbIDs context:chatRoomMessagesSenders];
 }
 
-- (void)requestPhotosOfQBUsers:(NSArray *)qbUsers withContext:(NSString*)context{
+- (void)requestUsersWithQbIDs:(NSArray*)qbIDs context:(void*)context{
+    NSMutableString* ids = [[[NSMutableString alloc] initWithString:@""] autorelease];
+    
+    [qbIDs enumerateObjectsUsingBlock:^(NSNumber* qbUserID, NSUInteger idx, BOOL *stop) {
+        [ids appendString:[qbUserID stringValue]];
+        if (idx != qbIDs.count-1) {
+            [ids appendString:@","];
+        }
+    }];
+    
+    [QBUsers usersWithIDs:ids delegate:self context:context];
+}
+
+- (void)requestPhotosOfQBUsers:(NSArray *)qbUsers withContext:(void*)context{
     NSMutableString* ids = [[[NSMutableString alloc] initWithString:@""] autorelease];
     
     [qbUsers enumerateObjectsUsingBlock:^(QBUUser* user, NSUInteger idx, BOOL *stop) {
@@ -133,6 +148,10 @@ static BackgroundWorker* instance = nil;
     }];
     
     [[FBService shared] usersProfilesWithIds:ids delegate:self context:context];
+}
+
+- (void)requestOnlineUsersWithQbIDs:(NSArray*)qbIDs forChatRoom:(ChatRoom*)room{
+    [self requestUsersWithQbIDs:qbIDs];
 }
 
 - (void)retrieveOnlineUsersInEachRoom{
@@ -950,45 +969,44 @@ static BackgroundWorker* instance = nil;
     else     // search QB user by FB ID result
         if([result isKindOfClass:QBUUserResult.class]){
             if(result.success){
+                QBUUser *qbUser = ((QBUUserResult *)result).user;
                 
-                if ([((NSString*)contextInfo) isEqualToString:chatRoomMessagesSenders]) {
-                    QBUUserResult* res = (QBUUserResult*)result;
+                // Create push message
+                
+                NSMutableDictionary *payload = [NSMutableDictionary dictionary];
+                NSMutableDictionary *aps = [NSMutableDictionary dictionary];
+                [aps setObject:@"default" forKey:QBMPushMessageSoundKey];
+                [aps setObject:[NSString stringWithFormat:@"%@: %@", [[DataManager shared].currentFBUser objectForKey:kName], (NSString *)contextInfo] forKey:QBMPushMessageAlertKey];
+                [payload setObject:aps forKey:QBMPushMessageApsKey];
+                //
+                QBMPushMessage *message = [[QBMPushMessage alloc] initWithPayload:payload];
+                
+                // Send push
+                [QBMessages TSendPush:message
+                              toUsers:[NSString stringWithFormat:@"%d",  qbUser.ID]
+                             delegate:self];
+                
+                [message release];
+            }
+        }
+        else if ([result isKindOfClass:[QBUUserPagedResult class]]){
+            if (result.success) {
+                id context = (id)contextInfo;
+                
+                if ([context isKindOfClass:[NSString class]] && [(NSString*)context isEqualToString:chatRoomMessagesSenders]) {
+                    QBUUserPagedResult* res = (QBUUserPagedResult*)result;
                     
-                    if (![DataManager shared].currentChatRoom.allRoomUsers) {
-                        [DataManager shared].currentChatRoom.allRoomUsers = [[NSMutableArray alloc] init];
-                    }
+                    [[DataManager shared] saveAllUsers:res.users];
                     
-                    if (![[DataManager shared].currentChatRoom.allRoomUsers containsObject:res.user]) {
-                        [[DataManager shared].currentChatRoom.allRoomUsers addObject:res.user];
-                    }
-                    
-                    NSArray* users = [NSArray arrayWithObject:res.user];
-                    [self requestPhotosOfQBUsers:users withContext:chatRoomUsersProfiles];
+                    [self requestPhotosOfQBUsers:res.users withContext:chatRoomUsersProfiles];
                 }
                 
-                else{
-                    QBUUser *qbUser = ((QBUUserResult *)result).user;
-                    
-                    // Create push message
-                    
-                    NSMutableDictionary *payload = [NSMutableDictionary dictionary];
-                    NSMutableDictionary *aps = [NSMutableDictionary dictionary];
-                    [aps setObject:@"default" forKey:QBMPushMessageSoundKey];
-                    [aps setObject:[NSString stringWithFormat:@"%@: %@", [[DataManager shared].currentFBUser objectForKey:kName], (NSString *)contextInfo] forKey:QBMPushMessageAlertKey];
-                    [payload setObject:aps forKey:QBMPushMessageApsKey];
-                    //
-                    QBMPushMessage *message = [[QBMPushMessage alloc] initWithPayload:payload];
-                    
-                    // Send push
-                    [QBMessages TSendPush:message
-                                  toUsers:[NSString stringWithFormat:@"%d",  qbUser.ID]
-                                 delegate:self];
-                    
-                    [message release];
+                else if([context isKindOfClass:[ChatRoom class]]){
+                    QBUUserPagedResult* res = (QBUUserPagedResult*)result;
+                    [self requestPhotosOfQBUsers:res.users withContext:contextInfo];
                 }
             }
-            
-            
+
         }
     
         else{
@@ -1272,7 +1290,7 @@ static BackgroundWorker* instance = nil;
                 }
             }
                             // pictures of chat room occupants
-            else if ([context isEqualToString:chatRoomUsersProfiles]){
+            else if ([context isKindOfClass:[NSString class]] && [context isEqualToString:chatRoomUsersProfiles]){
                 
                 if (![DataManager shared].currentChatRoom.fbRoomUsers) {
                     [DataManager shared].currentChatRoom.fbRoomUsers = [[NSMutableArray alloc] init];
@@ -1283,7 +1301,6 @@ static BackgroundWorker* instance = nil;
                     [[DataManager shared].currentChatRoom.fbRoomUsers addObject:[response lastObject]];
                 }
 
-                
                 // notify delegate that all photos are retrieved
                 if ([tabBarDelegate respondsToSelector:@selector(didReceiveUserProfilePicturesForViewControllerWithIdentifier:)]) {
                     [tabBarDelegate didReceiveUserProfilePicturesForViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
@@ -1291,6 +1308,25 @@ static BackgroundWorker* instance = nil;
                 
                 if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:)]) {
                     [tabBarDelegate chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+                }
+            }
+            else if ([context isKindOfClass:[ChatRoom class]]){
+                
+                NSArray* response = [[result body] allValues];
+                
+                ChatRoom* room = (ChatRoom*)context;
+                                
+                dispatch_queue_t processFBProfiles = dispatch_queue_create("fbUserProfilesProcessing", NULL);
+                dispatch_async(processFBProfiles, ^{
+                    
+                    [room.onlineRoomUsers removeAllObjects];
+                    [room.onlineRoomUsers addObjectsFromArray:response];
+
+                });
+                dispatch_release(processFBProfiles);
+                
+                if ([tabBarDelegate respondsToSelector:@selector(didReceiveOnlineUserPhotosForRoom:)]) {
+                    [tabBarDelegate didReceiveOnlineUserPhotosForRoom:room];
                 }
             }
             
@@ -1717,7 +1753,8 @@ static BackgroundWorker* instance = nil;
                 
                 dispatch_queue_t chatRoomsUsersPicturesQueue = dispatch_queue_create("chatRoomsUsersPicturesQueue", NULL);
                 dispatch_async(chatRoomsUsersPicturesQueue, ^{
-                    [self requestUserWithQBID:message.senderID];
+                    NSArray* ids = [NSArray arrayWithObject:@(message.senderID)];
+                    [self requestUsersWithQbIDs:ids];
                 });
 
             }
@@ -1744,6 +1781,9 @@ static BackgroundWorker* instance = nil;
             // add room to storage
         [[DataManager shared].qbChatRooms addObject:room];
         
+                            // add admin to the owners of room for deleting rooms
+        [[QBChat instance] addUsers:[NSArray arrayWithObject:@(ADMIN_ID)] toRoom:room];
+        
                                                 // set created room as current
         ChatRoom* newRoom = [ChatRoom createRoomWithAdditionalInfoWithName:[Helper createTitleFromXMPPTitle:room.roomName] coordinates:locationManager.location.coordinate];
         [DataManager shared].currentChatRoom = newRoom;
@@ -1758,6 +1798,8 @@ static BackgroundWorker* instance = nil;
         if ([tabBarDelegate respondsToSelector:@selector(didCreateNewChatRoom:viewControllerWithIdentifier:)]) {
             [tabBarDelegate didCreateNewChatRoom:room.roomName viewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
         }
+        
+        
     }
                         // join to already existing room
     else{
@@ -1782,13 +1824,14 @@ static BackgroundWorker* instance = nil;
 - (void)chatRoomDidReceiveListOfOnlineUsers:(NSArray *)users room:(NSString *)roomName{
     ChatRoom* chatRoom = [[DataManager shared] findRoomWithAdditionalInfo:roomName];
     
-    if (chatRoom) {
+    if (chatRoom && users.count) {
         if (!chatRoom.onlineRoomUsers) {
             chatRoom.onlineRoomUsers = [[NSMutableArray alloc] init];
         }
     
         [chatRoom.onlineRoomUsers removeAllObjects];
-        [chatRoom.onlineRoomUsers addObjectsFromArray:users];
+        
+        [self requestUsersWithQbIDs:users context:chatRoom];
     }
 }
 

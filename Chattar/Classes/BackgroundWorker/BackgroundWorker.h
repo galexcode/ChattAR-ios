@@ -99,9 +99,14 @@
 
 - (void)didReceiveMessageForViewControllerWithIdentifier:(NSString*)identifier;
 - (void)didCreateNewChatRoom:(NSString*)roomName viewControllerWithIdentifier:(NSString*)identifier;
+
 - (void)refreshRecipientsPicturesWithControllerIdentifier:(NSString*)identifier;
 
 - (void)didChangeRatingOfRoom:(ChatRoom*)room;
+
+- (void)didReceiveOnlineUsersPhotos;
+
+- (void)didReceiveOnlineUserPhotosForRoom:(ChatRoom*)room;
 @end
 
 
@@ -157,7 +162,7 @@
 
 - (void)sendPresenceToQBChat;
 
-- (void)requestPhotosOfQBUsers:(NSArray*)qbUsers withContext:(NSString*)context;
+- (void)requestPhotosOfQBUsers:(NSArray*)qbUsers withContext:(void*)context;
 
 - (void)saveCurrentChatRoomInfoOnServer;
 
