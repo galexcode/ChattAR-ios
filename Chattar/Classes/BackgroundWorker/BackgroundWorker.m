@@ -98,7 +98,6 @@ static BackgroundWorker* instance = nil;
 - (void)sendMessage:(NSString*)message{
     QBChatRoom* room = [[DataManager shared] findQBRoomWithName:[DataManager shared].currentChatRoom.roomName];
     [[QBChat instance] sendMessage:message toRoom:room];
-    
 }
 
 #pragma mark -
@@ -1308,10 +1307,10 @@ static BackgroundWorker* instance = nil;
                 if ([tabBarDelegate respondsToSelector:@selector(didReceiveUserProfilePicturesForViewControllerWithIdentifier:)]) {
                     [tabBarDelegate didReceiveUserProfilePicturesForViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
                 }
-                
-                if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:)]) {
-                    [tabBarDelegate chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
-                }
+//                
+//                if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:)]) {
+//                    [tabBarDelegate chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+//                }
             }
             else if ([context isKindOfClass:[ChatRoom class]]){
                 
@@ -1628,7 +1627,6 @@ static BackgroundWorker* instance = nil;
                                        isFBCheckin:NO
                                        viewControllerIdentifier:chatRoomsViewControllerIdentifier];
     }
-
 }
 
 - (void)createAndAddNewAnnotationToMapChatARForFBUser:(NSDictionary *)fbUser withGeoData:(QBLGeoData *)geoData addToTop:(BOOL)toTop withReloadTable:(BOOL)reloadTable{
@@ -1754,12 +1752,20 @@ static BackgroundWorker* instance = nil;
             else{
                 [room.messagesHistory addObject:message];
                 
-                dispatch_queue_t chatRoomsUsersPicturesQueue = dispatch_queue_create("chatRoomsUsersPicturesQueue", NULL);
-                dispatch_async(chatRoomsUsersPicturesQueue, ^{
-                    NSArray* ids = [NSArray arrayWithObject:@(message.senderID)];
-                    [self requestUsersWithQbIDs:ids];
-                });
-
+                if ([[DataManager shared] findQBUserByID:message.senderID]) {
+                    if ([tabBarDelegate respondsToSelector:@selector(didReceiveUserProfilePicturesForViewControllerWithIdentifier:)]) {
+                        [tabBarDelegate didReceiveUserProfilePicturesForViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+                    }
+                }
+                else{
+                
+                    dispatch_queue_t chatRoomsUsersPicturesQueue = dispatch_queue_create("chatRoomsUsersPicturesQueue", NULL);
+                    dispatch_async(chatRoomsUsersPicturesQueue, ^{
+                        NSArray* ids = [NSArray arrayWithObject:@(message.senderID)];
+                        [self requestUsersWithQbIDs:ids];
+                    });                    
+                }
+                
             }
             
         }
