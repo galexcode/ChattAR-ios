@@ -249,28 +249,37 @@
 
 -(void)addUserPicturesToPanel{
     UIImageView* occupantsPanel = [[[UIImageView alloc] initWithFrame:CGRectMake(0, messageField.frame.size.height+12, 320, 50)] autorelease];
-    [occupantsPanel setBackgroundColor:[UIColor blueColor]];
+    [occupantsPanel setBackgroundColor:[UIColor grayColor]];
     
-//    __block int x = 20;
-//    [[DataManager shared].currentChatRoom.usersPictures enumerateObjectsUsingBlock:^(NSDictionary* userData, NSUInteger index, BOOL *stop) {
-//        AsyncImageView* occupantImage = [[[AsyncImageView alloc] initWithFrame:CGRectMake(x, 5, 40, 40)] autorelease];
-//        
-//        NSString* currentPictureURL = [userData objectForKey:@"pictureURL"];
-//         
-//        
-//        [occupantImage loadImageFromURL:[NSURL URLWithString:currentPictureURL]];
-//        [occupantsPanel addSubview:occupantImage];
-//        x += occupantImage.bounds.size.width + 15;
-//    }];
-//    
-//    [self.view insertSubview:occupantsPanel aboveSubview:messagesTableView];
-//    CGRect tableFrame = messagesTableView.frame;
-//    tableFrame.origin.y += occupantsPanel.frame.size.height;
-//    tableFrame.size.height -= occupantsPanel.frame.size.height;
-//    messagesTableView.frame = tableFrame;
+    __block int x = 20;
+    [[DataManager shared].currentChatRoom.fbRoomUsers enumerateObjectsUsingBlock:^(NSDictionary* userData, NSUInteger index, BOOL *stop) {
+        AsyncImageView* occupantImage = [[[AsyncImageView alloc] initWithFrame:CGRectMake(x, 5, 40, 40)] autorelease];
+        
+        NSString* fbUserID = [userData objectForKey:kId];
+        
+        if ([[DataManager shared] isFbUserOnlineInCurrentChatRoom:fbUserID]) {
+            
+            NSDictionary* pictureDict = [userData objectForKey:kPicture];
+            NSDictionary* data = [pictureDict objectForKey:kData];
+            NSString* currentPictureURL = [data objectForKey:kUrl];
+            
+            [occupantImage loadImageFromURL:[NSURL URLWithString:currentPictureURL]];
+            [occupantsPanel addSubview:occupantImage];
+            x += occupantImage.bounds.size.width + 15;
+
+        }
+    }];
+    
+    
+    
+    [self.view insertSubview:occupantsPanel aboveSubview:messagesTableView];
+    CGRect tableFrame = messagesTableView.frame;
+    tableFrame.origin.y += occupantsPanel.frame.size.height;
+    tableFrame.size.height -= occupantsPanel.frame.size.height;
+    messagesTableView.frame = tableFrame;
 }
 
-- (IBAction)sendMessageDidPress:(id)sender{
+- (IBAction)sendMessageDidPress:(id)sender {
                                                 // check internet connection
     if (![Reachability internetConnected]) {
         

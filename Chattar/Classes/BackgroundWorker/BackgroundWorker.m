@@ -1297,10 +1297,13 @@ static BackgroundWorker* instance = nil;
                 }
                 
                 NSArray* response = [[result body] allValues];
-                if (response && ![[DataManager shared].currentChatRoom.fbRoomUsers containsObject:[response lastObject]] ) {
-                    [[DataManager shared].currentChatRoom.fbRoomUsers addObject:[response lastObject]];
-                }
 
+                [response enumerateObjectsUsingBlock:^(NSDictionary* userData, NSUInteger idx, BOOL *stop) {
+                    if (![[DataManager shared].currentChatRoom.fbRoomUsers containsObject:userData]) {
+                        [[DataManager shared].currentChatRoom.fbRoomUsers addObject:userData];
+                    }
+                }];
+                
                 // notify delegate that all photos are retrieved
                 if ([tabBarDelegate respondsToSelector:@selector(didReceiveUserProfilePicturesForViewControllerWithIdentifier:)]) {
                     [tabBarDelegate didReceiveUserProfilePicturesForViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
@@ -1319,8 +1322,8 @@ static BackgroundWorker* instance = nil;
                 dispatch_queue_t processFBProfiles = dispatch_queue_create("fbUserProfilesProcessing", NULL);
                 dispatch_async(processFBProfiles, ^{
                     
-                    [room.onlineRoomUsers removeAllObjects];
-                    [room.onlineRoomUsers addObjectsFromArray:response];
+                    [room.roomOnlineQBUsers removeAllObjects];
+                    [room.roomOnlineQBUsers addObjectsFromArray:response];
 
                 });
                 dispatch_release(processFBProfiles);
@@ -1696,13 +1699,13 @@ static BackgroundWorker* instance = nil;
     if (leavedChatRoom) {
         int roomIndex = [[DataManager shared].trendingRooms indexOfObject:leavedChatRoom];
         if (roomIndex != NSNotFound) {
-            NSMutableArray* users = [[[DataManager shared].trendingRooms objectAtIndex:roomIndex] onlineRoomUsers];
+            NSMutableArray* users = [[[DataManager shared].trendingRooms objectAtIndex:roomIndex] roomOnlineQBUsers];
             [users removeObject:[DataManager shared].currentQBUser];
         }
         
         roomIndex = [[DataManager shared].nearbyRooms indexOfObject:leavedChatRoom];
         if (roomIndex != NSNotFound) {
-            NSMutableArray* users = [[[DataManager shared].nearbyRooms objectAtIndex:roomIndex] onlineRoomUsers];
+            NSMutableArray* users = [[[DataManager shared].nearbyRooms objectAtIndex:roomIndex] roomOnlineQBUsers];
             [users removeObject:[DataManager shared].currentQBUser];
         }
                 
@@ -1806,11 +1809,11 @@ static BackgroundWorker* instance = nil;
         NSString* nonXMPPRoomName = [Helper createTitleFromXMPPTitle:room.roomName];
         if ([[DataManager shared].currentChatRoom.roomName isEqualToString:nonXMPPRoomName]) {
             
-            if (![DataManager shared].currentChatRoom.onlineRoomUsers) {
-                [DataManager shared].currentChatRoom.onlineRoomUsers = [[NSMutableArray alloc] init];
+            if (![DataManager shared].currentChatRoom.roomOnlineQBUsers) {
+                [DataManager shared].currentChatRoom.roomOnlineQBUsers = [[NSMutableArray alloc] init];
             }
             
-            [[DataManager shared].currentChatRoom.onlineRoomUsers addObject:[DataManager shared].currentQBUser];
+            [[DataManager shared].currentChatRoom.roomOnlineQBUsers addObject:[DataManager shared].currentQBUser];
         }
         
         [DataManager shared].currentChatRoom.roomRating++;
@@ -1825,11 +1828,11 @@ static BackgroundWorker* instance = nil;
     ChatRoom* chatRoom = [[DataManager shared] findRoomWithAdditionalInfo:roomName];
     
     if (chatRoom && users.count) {
-        if (!chatRoom.onlineRoomUsers) {
-            chatRoom.onlineRoomUsers = [[NSMutableArray alloc] init];
+        if (!chatRoom.roomOnlineQBUsers) {
+            chatRoom.roomOnlineQBUsers = [[NSMutableArray alloc] init];
         }
     
-        [chatRoom.onlineRoomUsers removeAllObjects];
+        [chatRoom.roomOnlineQBUsers removeAllObjects];
         
         [self requestUsersWithQbIDs:users context:chatRoom];
     }
