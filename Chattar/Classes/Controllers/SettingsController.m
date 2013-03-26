@@ -149,7 +149,7 @@
 }
 
 // logout
--(void)logoutButtonDidPress{
+- (void)logoutButtonDidPress {
         
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Are you sure you want to sign out?"
                                                         message:nil

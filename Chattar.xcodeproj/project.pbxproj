@@ -1787,8 +1787,8 @@
 		636735FB1552CF590061BF75 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Injoit LTD";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Injoit LTD";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Taras Filatov (6AVH4TA956)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Taras Filatov (6AVH4TA956)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/Externals\"",
@@ -1811,8 +1811,8 @@
 					"-lstdc++",
 				);
 				PRODUCT_NAME = Chattar;
-				PROVISIONING_PROFILE = "70814F24-7072-4BD7-878F-2F1394948909";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "70814F24-7072-4BD7-878F-2F1394948909";
+				PROVISIONING_PROFILE = "166E1B7E-08B4-43A6-BD93-F2723017C3B8";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "166E1B7E-08B4-43A6-BD93-F2723017C3B8";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
