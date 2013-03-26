@@ -477,6 +477,11 @@ static DataManager *instance = nil;
     
     [[DataManager shared].allCheckins removeAllObjects];
     
+    [[DataManager shared].qbChatRooms removeAllObjects];
+    [[DataManager shared].roomsWithAdditionalInfo removeAllObjects];
+    [[DataManager shared].nearbyRooms removeAllObjects];
+    [[DataManager shared].trendingRooms removeAllObjects];
+        
 }
 
 
@@ -1033,7 +1038,11 @@ static DataManager *instance = nil;
     
     NSString* objectID = [NSString stringWithFormat:@"%d",object.geoDataID];
    
-    if (((index >= 0 && index < [DataManager shared].allChatPoints.count) && !index) && ![[DataManager shared].chatMessagesIDs containsObject:objectID]) {
+    if (self.allChatPoints.count == 0 && index == 0 && ![[DataManager shared].chatMessagesIDs containsObject:objectID]) {
+        [[DataManager shared].allChatPoints addObject:object];
+    }
+    
+    if (((index >= 0 && index < [DataManager shared].allChatPoints.count)) && ![[DataManager shared].chatMessagesIDs containsObject:objectID]) {
         [[DataManager shared].allChatPoints insertObject:object atIndex:index];
     }
 }
@@ -1044,6 +1053,11 @@ static DataManager *instance = nil;
     }
     
     NSString* objectID = [NSString stringWithFormat:@"%d",object.geoDataID];
+    
+    if (self.chatPoints.count == 0 && index == 0 && ![[DataManager shared].chatMessagesIDs containsObject:objectID]) {
+        [[DataManager shared].chatPoints addObject:object];
+    }
+
     if ( (index >= 0 && index < [DataManager shared].chatPoints.count)  &&  ![[DataManager shared].chatMessagesIDs containsObject:objectID]  ) {
         [[DataManager shared].chatPoints insertObject:object atIndex:index];
     }
