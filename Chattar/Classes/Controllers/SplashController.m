@@ -315,9 +315,12 @@
 -(void)chatDidLogin{
     NSLog(@"SUCCESS LOGIN QBCHAT!");
     
+    NSLog(@"%d",[QBChat instance].isLoggedIn);
+    
     // notify tabbar to request FB info
     [[NSNotificationCenter defaultCenter] postNotificationName:kRegisterPushNotificatons object:nil];
-
+    
+    [[QBChat instance] setDelegate:[BackgroundWorker instance]];
 }
 
 -(void)chatDidNotLogin{

@@ -52,11 +52,7 @@ static BackgroundWorker* instance = nil;
         
         [locationManager setDelegate:self];
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(stopRequestingNewData) name:kNotificationLogout object:nil];
-        
-        [[QBChat instance] setDelegate:self];
-        
-        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(stopRequestingNewData) name:kNotificationLogout object:nil];        
     }
     return self;
 }
@@ -170,19 +166,20 @@ static BackgroundWorker* instance = nil;
     }
 }
 
--(void)requestAdditionalChatRoomsInfo{
+- (void)requestAdditionalChatRoomsInfo {
     [QBCustomObjects objectsWithClassName:@"Room" delegate:self];
 }
 
--(void)joinRoom:(QBChatRoom *)room{
+- (void)joinRoom:(QBChatRoom *)room {
     [[QBChat instance] joinRoom:room];
 }
 
--(void)requestAllChatRooms{
+- (void)requestAllChatRooms {
+    NSLog(@"REQUEST ALL ROOMS!");
     [[QBChat instance] requestAllRooms];
 }
 
--(void)exitChatRoom:(QBChatRoom*)currentChatRoom{
+- (void)exitChatRoom:(QBChatRoom*)currentChatRoom{
     [[QBChat instance] leaveRoom:currentChatRoom];
 }
 
@@ -1308,9 +1305,9 @@ static BackgroundWorker* instance = nil;
                     [tabBarDelegate didReceiveUserProfilePicturesForViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
                 }
 //                
-//                if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:)]) {
-//                    [tabBarDelegate chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
-//                }
+                if ([tabBarDelegate respondsToSelector:@selector(chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:)]) {
+                    [tabBarDelegate chatEndOfRetrievingInitialDataInViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
+                }
             }
             else if ([context isKindOfClass:[ChatRoom class]]){
                 
