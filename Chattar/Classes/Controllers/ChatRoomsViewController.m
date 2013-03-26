@@ -40,6 +40,9 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(logoutDone) name:kNotificationLogout object:nil];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doReceiveOnlineUsers:) name:kDidReceiveOnlineUsersList object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doAddNewPointToChat:) name:kWillAddNewMessageToChat object:nil];
+
 
     }
     return self;
@@ -522,8 +525,7 @@
 }
 
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 
     ChatRoom* selectedChatRoomWithAdditionalInfo = nil;
     switch (indexPath.section) {
@@ -574,6 +576,52 @@
 #pragma mark -
 #pragma mark Notifications Reactions
 
+- (void)doAddNewPointToChat:(NSNotification*) notification {
+    UserAnnotation* message = [notification.userInfo objectForKey:@"newMessage"];
+    BOOL toTop = [[notification.userInfo objectForKey:@"addToTop"] boolValue];
+    BOOL isFBCheckin = [[notification.userInfo objectForKey:@"isFBCheckin"] boolValue];
+    
+    NSArray *friendsIds = [[DataManager shared].myFriendsAsDictionary allKeys];
+    
+    // New messages
+    if (toTop){
+        [[DataManager shared] insertDataToAllChatPoints:message AtIndex:0];
+        if([friendsIds containsObject:message.fbUserId] ||
+           
+           [message.fbUserId isEqualToString:[DataManager shared].currentFBUserId]){
+            
+            [[DataManager shared] insertDataToChatPoints:message AtIndex:0];
+        }
+        
+        // old messages
+    }
+    else {
+        
+        [[DataManager shared] insertDataToAllChatPoints:message AtIndex:([DataManager shared].allChatPoints.count > 0) ?
+                                                                         ([DataManager shared].allChatPoints.count-1):
+                                                                         0];
+        
+        if([friendsIds containsObject:message.fbUserId] ||
+           [message.fbUserId isEqualToString:[DataManager shared].currentFBUserId]){
+            
+            [[DataManager shared] insertDataToChatPoints:message AtIndex:[DataManager shared].chatPoints.count > 0 ? [DataManager shared].chatPoints.count-1 : 0];
+        }
+    }
+    
+    
+    if(message.geoDataID != -1){
+        [[DataManager shared].chatMessagesIDs addObject:[NSString stringWithFormat:@"%d", message.geoDataID]];
+    }
+    
+    
+    // Save to cache
+    //
+    if(!isFBCheckin){
+        [[DataManager shared] addChatMessageToStorage:message];
+    }
+}
+
+
 - (void)doReceiveOnlineUsers:(NSNotification*)notification{
     ChatRoom* room = [notification.userInfo objectForKey:@"chatRoom"];
     
@@ -586,6 +634,7 @@
 
 - (void)logoutDone{
     [[QBChat instance] logout];
+    [_roomsTableView reloadData];
 }
 
 - (void)doChangeRatingOfRoom:(NSNotification*)notification {
@@ -607,12 +656,13 @@
     [self showChatController];
 }
 
--(void)doReceiveChatRooms{   
+-(void)doReceiveChatRooms{
+    [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
+
     [_roomsTableView reloadData];
 }
 
 -(void)doChatEndRetrievingData:(NSNotification*)notification{
-    [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
 
     [_roomsTableView reloadData];
 }

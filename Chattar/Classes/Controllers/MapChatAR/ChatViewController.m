@@ -1018,7 +1018,6 @@
 -(void)doReceiveUserProfilePictures:(NSNotification*)notification{
     NSString* context = [notification.userInfo objectForKey:@"context"];
     
-    
     if ([context isEqualToString:self.controllerReuseIdentifier] && [self.controllerReuseIdentifier isEqualToString:chatRoomsViewControllerIdentifier] ) {
         [self showPictures];
     }
@@ -1102,7 +1101,7 @@
     }
 }
 
--(void)doClearMessageField:(NSNotification*)notification{
+- (void)doClearMessageField:(NSNotification*)notification {
     NSString* context = [notification.userInfo objectForKey:@"context"];
     
     if ([context isEqualToString:self.controllerReuseIdentifier]) {
@@ -1112,7 +1111,7 @@
     }
 }
 
--(void)doAddNewPointToChat:(NSNotification*) notification{
+- (void)doAddNewPointToChat:(NSNotification*) notification {
     NSString* context = [notification.userInfo objectForKey:@"context"];
     
     if ([context isEqualToString:self.controllerReuseIdentifier]) {
