@@ -58,10 +58,6 @@
 
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-    if ([DataManager shared].isFirstStartApp) {
-        [[DataManager shared] setFirstStartApp:NO];
-        [self addSpinner];
-    }
 }
 
 - (void)didReceiveMemoryWarning
