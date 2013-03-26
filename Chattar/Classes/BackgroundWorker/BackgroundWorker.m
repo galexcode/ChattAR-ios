@@ -1790,6 +1790,9 @@ static BackgroundWorker* instance = nil;
                                                 // set created room as current
         ChatRoom* newRoom = [ChatRoom createRoomWithAdditionalInfoWithName:[Helper createTitleFromXMPPTitle:room.roomName] coordinates:locationManager.location.coordinate];
         [DataManager shared].currentChatRoom = newRoom;
+        [[DataManager shared].nearbyRooms addObject:newRoom];
+        [[DataManager shared].trendingRooms addObject:newRoom];
+        
         newRoom.roomRating = 0;
         
         if (![DataManager shared].roomsWithAdditionalInfo) {

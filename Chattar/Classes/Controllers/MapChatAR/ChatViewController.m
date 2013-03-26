@@ -92,10 +92,13 @@
     if ([self.navigationController.viewControllers indexOfObject:self] == NSNotFound && [self.controllerReuseIdentifier isEqualToString:chatRoomsViewControllerIdentifier]) {
         // back button was pressed.  We know this is true because self is no longer
         // in the navigation stack.
+        
         QBChatRoom* currentChatRoom = [[DataManager shared] findQBRoomWithName:[DataManager shared].currentChatRoom.roomName];
         [[BackgroundWorker instance] saveCurrentChatRoomInfoOnServer];
         [[BackgroundWorker instance] exitChatRoom:currentChatRoom];
-
+        
+        [[DataManager shared] sortChatRooms];
+        
         [self cleanData];
     }
     
@@ -1067,7 +1070,10 @@
     if ([context isEqualToString:self.controllerReuseIdentifier]) {
         messageField.enabled = YES;
         
-        [self.allFriendsSwitch setEnabled:YES];
+        if ([self.controllerReuseIdentifier isEqualToString:chatViewControllerIdentifier]) {
+            [self.allFriendsSwitch setEnabled:YES];
+        }
+        
         [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
         
         [self refresh];
