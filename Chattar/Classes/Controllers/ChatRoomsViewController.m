@@ -130,18 +130,18 @@
 
 }
 
-- (void)changeRatingForCell:(UITableViewCell*)cell withRoomRating:(double)rating{
+- (void)changeRatingForCell:(UITableViewCell*)cell withRoomRating:(double)rating {
     UIView* accessoryView = cell.accessoryView;
     UILabel* counterLabel = (UILabel*)[accessoryView viewWithTag:COUNTER_TAG];
     [counterLabel setText:[NSString stringWithFormat:@"%f",rating]];
 }
 
-- (UIImageView*)createAccessoryViewWithRating:(double)rating{
+- (UIImageView*)createAccessoryViewWithRating:(double)rating {
     
     UIImageView* accessoryView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"occupantsCounter.png"]] autorelease];
     UILabel* counter = [[[UILabel alloc] initWithFrame:CGRectMake(20, -1, 20, 20)] autorelease];
-    [counter setFont:[UIFont fontWithName:@"Helvetica" size:10]];
-    [counter setText:[NSString stringWithFormat:@"%f",rating]];
+    [counter setFont:[UIFont fontWithName:@"Helvetica" size:15]];
+    [counter setText:[NSString stringWithFormat:@"%d",(int)rating]];
     
     [counter setBackgroundColor:[UIColor clearColor]];
     [counter setTag:COUNTER_TAG];
@@ -149,7 +149,7 @@
     return accessoryView;
 }
 
-- (UIImageView*)createAccessoryViewWithRating:(double)rating distance:(NSInteger)distance{
+- (UIImageView*)createAccessoryViewWithRating:(double)rating distance:(NSInteger)distance {
     UIImageView* accessoryView = [self createAccessoryViewWithRating:rating];
     
     NSString* distanceString = [NSString stringWithFormat:@"%d kms",distance];
@@ -164,7 +164,7 @@
     return accessoryView;
 }
 
-- (UIImageView*)viewWithLastActiveUsers{
+- (UIImageView*)viewWithLastActiveUsers {
     
     UIImageView* viewWithLastActiveUsers = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 100, 40)];
     NSSortDescriptor* sortOrder = [NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:NO];
@@ -173,7 +173,7 @@
     __block int userViewXPosition = -10;
     __block NSMutableArray* usedURLsArray = [[[NSMutableArray alloc] init] autorelease];
     
-    [sortedByDateChatMessages enumerateObjectsUsingBlock:^(UserAnnotation* obj, NSUInteger idx, BOOL *stop) {        
+    [sortedByDateChatMessages enumerateObjectsUsingBlock:^(UserAnnotation* obj, NSUInteger idx, BOOL *stop) {
         NSString* userImageURL = nil;
         if ([obj.userPhotoUrl isKindOfClass:[NSString class]]){
             userImageURL = obj.userPhotoUrl;
@@ -198,13 +198,13 @@
     return viewWithLastActiveUsers;
 }
 
-- (UIImageView*)viewWithUsersInRoom:(ChatRoom*)room{
+- (UIImageView*)viewWithUsersInRoom:(ChatRoom*)room {
     UIImageView* viewWithUsers = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 100, 40)];
     
     __block int userViewXPosition = 210;
     __block int displayedUserCount = 0;
     
-    [room.onlineRoomUsers enumerateObjectsUsingBlock:^(NSDictionary* fbUserDictionary, NSUInteger idx, BOOL *stop) {
+    [room.roomOnlineQBUsers enumerateObjectsUsingBlock:^(NSDictionary* fbUserDictionary, NSUInteger idx, BOOL *stop) {
         NSString* userImageURL = [fbUserDictionary objectForKey:kUrl];
         
         AsyncImageView* activeUserView = [[[AsyncImageView alloc] initWithFrame:CGRectMake(userViewXPosition, 5, SIZE_OF_USER_PICTURE, SIZE_OF_USER_PICTURE)] autorelease];
