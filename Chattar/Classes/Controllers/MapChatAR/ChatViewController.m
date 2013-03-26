@@ -133,7 +133,11 @@
 }
 
 
--(void)viewWillAppear:(BOOL)animated{   
+-(void)viewWillAppear:(BOOL)animated{
+    if ([self.controllerReuseIdentifier isEqualToString:chatRoomsViewControllerIdentifier]) {
+        [self.allFriendsSwitch removeFromSuperview];
+    }
+    
     [super viewWillAppear:animated];
 }
 
@@ -153,6 +157,22 @@
 
 #pragma mark -
 #pragma mark Interface based methods
+
+- (void)displayData{
+    if ([self.controllerReuseIdentifier isEqualToString:chatViewControllerIdentifier]) {
+        if ([[self allFriendsSwitch] value] == friendsValue) {
+            [self showFriends];
+        }
+        
+        else
+            [self showWorld];
+    }
+    
+    else if ([self.controllerReuseIdentifier isEqualToString:chatRoomsViewControllerIdentifier]){
+        [self showWorld];
+    }
+
+}
 
 - (void)showPictures{
     [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying removeAllObjects];
@@ -237,13 +257,7 @@
     }
 
     else{
-        if ([[self allFriendsSwitch] value] == friendsValue) {
-            [self showFriends];
-        }
-        
-        else
-            [self showWorld];
-        
+        [self displayData];
     }
 }
 
@@ -978,8 +992,9 @@
 - (void)doClearCache{
     showAllUsers  = NO;
     
-    [self.allFriendsSwitch setValue:1.0f];
-    isDataRetrieved = NO;
+    if ([self.controllerReuseIdentifier isEqualToString:chatViewControllerIdentifier]) {
+        [self.allFriendsSwitch setValue:1.0f];
+    }
     
     [self.messageField setText:nil];
     [self.messagesTableView reloadData];
@@ -991,12 +1006,8 @@
     if ([context isEqualToString:self.controllerReuseIdentifier]) {
         [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
         [self refresh];
-        
-        if ([self.allFriendsSwitch value] == friendsValue) {
-            [self showFriends];
-        }
-        else
-            [self showWorld];
+
+        [self displayData];
     }
     
 }
@@ -1021,7 +1032,10 @@
     
     if ([context isEqualToString:self.controllerReuseIdentifier]) {
         BOOL enabled = [[[notification userInfo] objectForKey:@"switchEnabled"] boolValue];
-        [self.allFriendsSwitch setEnabled:enabled];
+        
+        if ([self.controllerReuseIdentifier isEqualToString:chatViewControllerIdentifier]) {
+            [self.allFriendsSwitch setEnabled:enabled];
+        }
     }
 }
 
@@ -1052,19 +1066,14 @@
 
     if ([context isEqualToString:self.controllerReuseIdentifier]) {
         messageField.enabled = YES;
-        isDataRetrieved = YES;
         
         [self.allFriendsSwitch setEnabled:YES];
         [(UIActivityIndicatorView*)([self.view viewWithTag:INDICATOR_TAG]) removeFromSuperview];
         
         [self refresh];
         
-        if ([self.allFriendsSwitch value] == friendsValue) {
-            [self showFriends];
-        }
-        else
-            [self showWorld];
-    }    
+        [self displayData];
+    }
 }
 
 -(void)doUpdate:(NSNotification*)notification{
@@ -1160,8 +1169,9 @@
 - (void)logoutDone{
     showAllUsers  = NO;
     
-    [self.allFriendsSwitch setValue:1.0f];
-    isDataRetrieved = NO;
+    if ([self.controllerReuseIdentifier isEqualToString:chatViewControllerIdentifier]) {
+        [self.allFriendsSwitch setValue:1.0f];
+    }
     
     [self.messageField setText:nil];
     

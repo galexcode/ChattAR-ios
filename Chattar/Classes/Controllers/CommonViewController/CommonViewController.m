@@ -29,12 +29,13 @@
 }
 
 
--(void)dealloc{
+- (void)dealloc{
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [selectedUserAnnotation release];
     [_loadingIndicator release];
     [super dealloc];
 }
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -51,9 +52,8 @@
     [allFriendsSwitch setValue:worldValue];
     [allFriendsSwitch scaleSwitch:0.9];
     [allFriendsSwitch addTarget:self action:@selector(allFriendsSwitchValueDidChanged:) forControlEvents:UIControlEventValueChanged];
-	[allFriendsSwitch setBackgroundColor:[UIColor clearColor]];
-	[self.view addSubview:allFriendsSwitch];
-
+    [allFriendsSwitch setBackgroundColor:[UIColor clearColor]];
+    [self.view addSubview:allFriendsSwitch];
 }
 
 -(void)viewWillAppear:(BOOL)animated{
@@ -67,7 +67,6 @@
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 #pragma mark -

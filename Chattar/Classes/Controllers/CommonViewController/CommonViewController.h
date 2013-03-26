@@ -13,7 +13,9 @@
 
 @interface CommonViewController : UIViewController<UIActionSheetDelegate>{
     BOOL showAllUsers;
+    BOOL needToShowAllFriendsSwitch;
 }
+
 @property (nonatomic, assign) CustomSwitch *allFriendsSwitch;
 @property (nonatomic,retain) UIActivityIndicatorView* loadingIndicator;
 @property (retain) UserAnnotation *selectedUserAnnotation;
