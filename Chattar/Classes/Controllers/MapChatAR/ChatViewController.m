@@ -100,6 +100,7 @@
         [[DataManager shared] sortChatRooms];
         
         [self cleanData];
+        
     }
     
     [super viewWillDisappear:animated];
@@ -192,6 +193,8 @@
     // clean data
     [[DataManager shared].currentChatRoom.messagesAsUserAnnotationForDisplaying removeAllObjects];
     [[DataManager shared].currentChatRoom.messagesHistory removeAllObjects];
+    
+    [messagesTableView reloadData];
 }
 
 - (void)addMessageToChatTable: (UserAnnotation*)message toTableTop:(BOOL)toTop withReloadTable:(BOOL)reloadTable{
