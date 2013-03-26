@@ -15,7 +15,7 @@
 @synthesize roomName;
 @synthesize roomRating;
 @synthesize distanceFromUser;
-@synthesize onlineRoomUsers;
+@synthesize roomOnlineQBUsers;
 @synthesize messagesHistory;
 @synthesize messagesAsUserAnnotationForDisplaying;
 @synthesize isSendingMessage;
@@ -23,7 +23,7 @@
 @synthesize fbRoomUsers;
 
 - (void)dealloc{
-    [onlineRoomUsers release];
+    [roomOnlineQBUsers release];
     [messagesHistory release];
     [roomID release];
     [roomName release];
@@ -35,7 +35,7 @@
 }
 
 - (NSString*)description{
-    return [NSString stringWithFormat:@"room name - %@ \n room rating - %f \n number of room users - %d \n room messages - %@\n room location - %f %f",roomName,roomRating,onlineRoomUsers.count,messagesHistory, ownerLocation.latitude,ownerLocation.longitude];
+    return [NSString stringWithFormat:@"room name - %@ \n room rating - %f \n number of room users - %d \n room messages - %@\n room location - %f %f",roomName,roomRating,roomOnlineQBUsers.count,messagesHistory, ownerLocation.latitude,ownerLocation.longitude];
 }
 + (ChatRoom*)createRoomWithAdditionalInfoWithName:(NSString*)_roomName coordinates:(CLLocationCoordinate2D)coordinates{
     ChatRoom* room = [[[ChatRoom alloc] init] autorelease];

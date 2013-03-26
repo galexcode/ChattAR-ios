@@ -146,4 +146,7 @@
 
 - (NSArray*)photosWithLocationsFromStorageFromUserWithId:(NSDecimalNumber*)userId;
 
+#pragma mark -
+#pragma mark Helpers
+- (BOOL)isFbUserOnlineInCurrentChatRoom:(NSString*)fbID;
 @end

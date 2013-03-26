@@ -900,13 +900,13 @@ static DataManager *instance = nil;
 }
 
 - (void)saveOnlineUsers:(NSArray*)onlineUsers{
-    if (![DataManager shared].currentChatRoom.onlineRoomUsers) {
-        [DataManager shared].currentChatRoom.onlineRoomUsers = [[NSMutableArray alloc] init];
+    if (![DataManager shared].currentChatRoom.roomOnlineQBUsers) {
+        [DataManager shared].currentChatRoom.roomOnlineQBUsers = [[NSMutableArray alloc] init];
     }
     
     [onlineUsers enumerateObjectsUsingBlock:^(QBUUser* user, NSUInteger idx, BOOL *stop) {
-        if (![[DataManager shared].currentChatRoom.onlineRoomUsers containsObject:user]) {
-            [[DataManager shared].currentChatRoom.onlineRoomUsers addObject:user];
+        if (![[DataManager shared].currentChatRoom.roomOnlineQBUsers containsObject:user]) {
+            [[DataManager shared].currentChatRoom.roomOnlineQBUsers addObject:user];
         }
     }];
 }
@@ -1005,6 +1005,20 @@ static DataManager *instance = nil;
     [returnMessage setText:annotation.userStatus];
         
     return returnMessage;
+}
+
+
+#pragma mark -
+#pragma mark Helpers
+
+- (BOOL)isFbUserOnlineInCurrentChatRoom:(NSString*)fbID {
+    __block BOOL isOnline = NO;
+    [self.currentChatRoom.roomOnlineQBUsers enumerateObjectsUsingBlock:^(QBUUser* user, NSUInteger idx, BOOL *stop) {
+        if ([user.facebookID isEqualToString:fbID]) {
+            isOnline = YES;
+        }
+    }];
+    return isOnline;
 }
 
 @end

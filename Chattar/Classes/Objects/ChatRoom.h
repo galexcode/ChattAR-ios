@@ -15,7 +15,7 @@
 @property (nonatomic, retain) NSDate* createdAt;
 @property (nonatomic, assign) double roomRating;
 @property (nonatomic, assign) double distanceFromUser;
-@property (nonatomic, retain) NSMutableArray* onlineRoomUsers;
+@property (nonatomic, retain) NSMutableArray* roomOnlineQBUsers;
 @property (nonatomic, retain) NSMutableArray* messagesHistory;
 @property (nonatomic, retain) NSMutableArray* messagesAsUserAnnotationForDisplaying;
 @property (nonatomic, assign) BOOL isSendingMessage;
