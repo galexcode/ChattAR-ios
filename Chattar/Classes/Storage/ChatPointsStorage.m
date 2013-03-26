@@ -106,25 +106,11 @@
 }
 
 -(void)insertObjectToAllData:(UserAnnotation *)object atIndex:(NSInteger)index{
-    if (![DataManager shared].allChatPoints) {
-        [DataManager shared].allChatPoints = [[NSMutableArray alloc] init];
-    }
-    
-    NSString* objectID = [NSString stringWithFormat:@"%d",object.geoDataID];
-    if (((index >= 0 && index < [DataManager shared].allChatPoints.count) ) && ![[DataManager shared].chatMessagesIDs containsObject:objectID]) {
-        [[DataManager shared].allChatPoints insertObject:object atIndex:index];
-    }
+    [[DataManager shared] insertDataToAllChatPoints:object AtIndex:index];
 }
 
 -(void)insertObjectToPartialData:(UserAnnotation *)object atIndex:(NSInteger)index{
-    if (![DataManager shared].chatPoints) {
-        [DataManager shared].chatPoints = [[NSMutableArray alloc] init];
-    }
-
-    NSString* objectID = [NSString stringWithFormat:@"%d",object.geoDataID];
-    if ( (index >= 0 && index < [DataManager shared].chatPoints.count)  &&  ![[DataManager shared].chatMessagesIDs containsObject:objectID]  ) {
-        [[DataManager shared].chatPoints insertObject:object atIndex:index];
-    }
+    [[DataManager shared] insertDataToChatPoints:object AtIndex:index];
 }
 
 -(void)removeAllPartialData{
