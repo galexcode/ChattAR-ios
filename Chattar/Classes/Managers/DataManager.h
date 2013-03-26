@@ -146,6 +146,13 @@
 
 - (NSArray*)photosWithLocationsFromStorageFromUserWithId:(NSDecimalNumber*)userId;
 
+
+#pragma mark -
+#pragma mark Data Manipulation methods
+
+- (void)insertDataToAllChatPoints:(UserAnnotation*)object AtIndex:(NSInteger)index;
+- (void)insertDataToChatPoints:(UserAnnotation*)object AtIndex:(NSInteger)index;
+
 #pragma mark -
 #pragma mark Helpers
 - (BOOL)isFbUserOnlineInCurrentChatRoom:(NSString*)fbID;

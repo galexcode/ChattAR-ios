@@ -942,30 +942,46 @@ static DataManager *instance = nil;
     
     [userAnnotation setCreatedAt:message.datetime];
     
-    QBUUser* user = [self findQBUserByID:message.senderID];
-    
-    if (user) {
-        NSString* qbUserFBID = user.facebookID;
+    if (currentQBUser.ID == message.senderID) {
+        [userAnnotation setFbUser:currentFBUser];
+        userAnnotation.fbUserId = currentFBUserId;
+        [userAnnotation setUserName:[currentFBUser objectForKey:kName]];
         
-        [userAnnotation setFbUserId:qbUserFBID];
-        [userAnnotation setQbUserID:user.ID];
+        NSDictionary* picture = [currentFBUser objectForKey:kPicture];
+        NSDictionary* data = [picture objectForKey:kData];
+        NSString* userPhotoURL = [data objectForKey:kUrl];
         
-        [self.currentChatRoom.fbRoomUsers enumerateObjectsUsingBlock:^(NSDictionary* fbUser, NSUInteger idx, BOOL *stop) {
-            NSString* fbID = [fbUser objectForKey:kId];
-            if ([qbUserFBID isEqualToString:fbID]) {
-                [userAnnotation setUserName:[fbUser objectForKey:kName]];
-                
-                NSDictionary* picture = [fbUser objectForKey:kPicture];
-                NSDictionary* data = [picture objectForKey:kData];
-                NSString* userPhotoURL = [data objectForKey:kUrl];
-    
-                [userAnnotation setUserPhotoUrl:userPhotoURL];
-                [userAnnotation setFbUser:fbUser];
-
-                *stop = YES;
-            }
-        }];        
+        [userAnnotation setUserPhotoUrl:userPhotoURL];
+        [userAnnotation setQbUserID:currentQBUser.ID];
     }
+    
+    else{
+        QBUUser* user = [self findQBUserByID:message.senderID];
+        
+        if (user) {
+            NSString* qbUserFBID = user.facebookID;
+            
+            [userAnnotation setFbUserId:qbUserFBID];
+            [userAnnotation setQbUserID:user.ID];
+            
+            [self.currentChatRoom.fbRoomUsers enumerateObjectsUsingBlock:^(NSDictionary* fbUser, NSUInteger idx, BOOL *stop) {
+                NSString* fbID = [fbUser objectForKey:kId];
+                if ([qbUserFBID isEqualToString:fbID]) {
+                    [userAnnotation setUserName:[fbUser objectForKey:kName]];
+                    
+                    NSDictionary* picture = [fbUser objectForKey:kPicture];
+                    NSDictionary* data = [picture objectForKey:kData];
+                    NSString* userPhotoURL = [data objectForKey:kUrl];
+                    
+                    [userAnnotation setUserPhotoUrl:userPhotoURL];
+                    [userAnnotation setFbUser:fbUser];
+                    
+                    *stop = YES;
+                }
+            }];        
+        }
+    }
+    
     userAnnotation.distance = (int)([self.currentChatRoom distanceFromUser]);
     
                 // if message has quotation
@@ -1006,6 +1022,33 @@ static DataManager *instance = nil;
         
     return returnMessage;
 }
+
+#pragma mark -
+#pragma mark Data Manipulation methods
+
+- (void)insertDataToAllChatPoints:(UserAnnotation*)object AtIndex:(NSInteger)index {
+    if (![DataManager shared].allChatPoints) {
+        [DataManager shared].allChatPoints = [[NSMutableArray alloc] init];
+    }
+    
+    NSString* objectID = [NSString stringWithFormat:@"%d",object.geoDataID];
+   
+    if (((index >= 0 && index < [DataManager shared].allChatPoints.count) && !index) && ![[DataManager shared].chatMessagesIDs containsObject:objectID]) {
+        [[DataManager shared].allChatPoints insertObject:object atIndex:index];
+    }
+}
+
+- (void)insertDataToChatPoints:(UserAnnotation *)object AtIndex:(NSInteger)index {
+    if (![DataManager shared].chatPoints) {
+        [DataManager shared].chatPoints = [[NSMutableArray alloc] init];
+    }
+    
+    NSString* objectID = [NSString stringWithFormat:@"%d",object.geoDataID];
+    if ( (index >= 0 && index < [DataManager shared].chatPoints.count)  &&  ![[DataManager shared].chatMessagesIDs containsObject:objectID]  ) {
+        [[DataManager shared].chatPoints insertObject:object atIndex:index];
+    }
+}
+
 
 
 #pragma mark -
