@@ -1821,13 +1821,13 @@ static BackgroundWorker* instance = nil;
             
             [[DataManager shared].currentChatRoom.roomOnlineQBUsers addObject:[DataManager shared].currentQBUser];
         }
-        
-        [DataManager shared].currentChatRoom.roomRating++;
-        
+                
         if ([tabBarDelegate respondsToSelector:@selector(didEnterExistingRoomForViewControllerWithIdentifier:)]) {
             [tabBarDelegate didEnterExistingRoomForViewControllerWithIdentifier:chatRoomsViewControllerIdentifier];
         }
     }
+                    // if room is entered increase its rating
+    [DataManager shared].currentChatRoom.roomRating++;
 }
 
 - (void)chatRoomDidReceiveListOfOnlineUsers:(NSArray *)users room:(NSString *)roomName{
