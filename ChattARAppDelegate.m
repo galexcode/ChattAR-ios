@@ -38,15 +38,6 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    
-//    UIApplicationLaunchOptionsRemoteNotificationKey =     {
-//        aps =         {
-//            alert = "Oleg Svarovski: lllllloololol";
-//            id = 100003078678033;
-//            sound = default;
-//        };
-//    };
-    
     // Override point for customization after application launch.
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
     [[UIApplication sharedApplication] setApplicationIconBadgeNumber:-1];

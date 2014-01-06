@@ -49,6 +49,7 @@
 #define kQuickbloxID        @"quickbloxID"
 #define kRecepientID        @"recicpentID"
 #define kSenderID           @"senderID"
+#define kRoomName           @"RoomName"
 
 // Segue Identifiers
 #define kChatSegueIdentifier                @"Chat"

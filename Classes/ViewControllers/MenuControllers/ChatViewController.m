@@ -122,7 +122,6 @@
 - (void)loadLocalRooms {
     
     NSMutableDictionary *extendedRequest = [@{@"limit": @1000} mutableCopy];
-    [QBCustomObjects objectsWithClassName:kChatRoom delegate:self];
     [QBCustomObjects objectsWithClassName:kChatRoom extendedRequest:extendedRequest delegate:self];
 }
 

@@ -119,13 +119,13 @@
         <!--Chat Room View Controller-->
         <scene sceneID="KcF-fe-sHD">
             <objects>
-                <viewController id="Vch-rc-7Oy" customClass="ChatRoomViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="chatRoomController" id="Vch-rc-7Oy" customClass="ChatRoomViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="2GZ-eo-kOd">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="64" width="320" height="416"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" keyboardDismissMode="onDrag" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="FSd-Vp-dNN">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="434"/>
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="370"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <connections>
@@ -134,7 +134,7 @@
                                 </connections>
                             </tableView>
                             <view contentMode="scaleToFill" id="4e0-Cg-koI">
-                                <rect key="frame" x="0.0" y="434" width="320" height="46"/>
+                                <rect key="frame" x="0.0" y="370" width="320" height="46"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="lpw-hC-RxZ">
@@ -1249,9 +1249,9 @@
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="GXn-8Q-nrq"/>
-        <segue reference="K6Z-1q-k1N"/>
+        <segue reference="i69-BF-qyq"/>
+        <segue reference="08e-u6-zeQ"/>
+        <segue reference="7Mb-AF-cFY"/>
         <segue reference="wsq-0v-N34"/>
-        <segue reference="gGZ-kD-fDC"/>
     </inferredMetricsTieBreakers>
 </document>

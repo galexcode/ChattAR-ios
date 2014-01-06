@@ -26,7 +26,7 @@
 
 - (void)sendMessage:(NSString *)message toUser:(NSUInteger)userID option:(id)option;
 - (void)sendMessage:(NSString *)message toChatRoom:(QBChatRoom *)room quote:(id)quote;
-- (void)sendPushNotificationWithMessage:(NSString *)message toUser:(NSMutableDictionary *)user;
+- (void)sendPushNotificationWithMessage:(NSString *)message toUser:(NSString *)quickbloxUserID roomName:(NSString *)roomName;
 
 
 #pragma mark -
@@ -41,7 +41,7 @@
 - (void)chatCreateOrJoinRoomWithName:(NSString *)roomName andNickName:(NSString *)nickname;
 
 - (NSMutableDictionary *)findConversationToUserWithMessage:(QBChatMessage *)message;
-- (NSMutableDictionary *)findConversationWithFriend:(NSMutableDictionary *)aFriend;
+- (NSMutableDictionary *)findConversationWithUser:(NSMutableDictionary *)aFriend;
 - (NSMutableDictionary *)findUserWithID:(NSString *)ID;
 
 

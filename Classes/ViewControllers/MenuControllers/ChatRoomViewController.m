@@ -25,7 +25,7 @@
 @interface ChatRoomViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, QBChatDelegate, QBActionStatusDelegate, CLLocationManagerDelegate, UIActionSheetDelegate, SASlideMenuDelegate>
 
 @property (strong, nonatomic) ChatRoomDataSource *chatRoomDataSource;
-@property (strong, nonatomic) UIActivityIndicatorView *indicatorView;
+@property (nonatomic, copy)   NSString *opponentID;
 @property (strong, nonatomic) IBOutlet UIButton *backButton;
 @property (strong, nonatomic) NSMutableDictionary *quote;
 @property (strong, nonatomic) IBOutlet UIView *inputTextView;
@@ -106,7 +106,8 @@
 #pragma mark -
 #pragma mark Table View Data Source
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
     return 1;
 }
 
@@ -167,12 +168,14 @@
             if (quote == nil) {
                 quote = [[NSMutableDictionary alloc] init];
             }
+            self.opponentID = jsonDict[kQuickbloxID];
             NSString *time = [[Utilites shared].dateFormatter stringFromDate:msg.datetime];
             
-            [quote setValue:[jsonDict objectForKey:kPhoto] forKey:kPhoto];
-            [quote setValue:[jsonDict objectForKey:kUserName] forKey:kUserName];
-            [quote setValue:[jsonDict objectForKey:kMessage] forKey:kMessage];
-            [quote setValue:time forKey:kDateTime];
+            quote[kPhoto] = jsonDict[kPhoto];
+            quote[kUserName] = jsonDict[kUserName];
+            quote[kMessage] =jsonDict[kMessage];
+            quote[kDateTime] = time;
+            
             
             // user's replay image
             AsyncImageView *imgView = [[AsyncImageView alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
@@ -210,7 +213,8 @@
     }
 }
 
-- (NSMutableDictionary *)userWithMessage:(QBChatMessage *)message {
+- (NSMutableDictionary *)userWithMessage:(QBChatMessage *)message
+{
     NSMutableDictionary *currentFriend = [[FBStorage shared] findUserWithMessage:message];
     if (currentFriend == nil) {
         //creating FBUser(No Friend):
@@ -233,8 +237,8 @@
 
 - (void)creatingOrJoiningRoom
 {
-    NSString *facebookID = [[FBStorage shared].me objectForKey:kId];
-    NSString *roomName = [_currentChatRoom.fields objectForKey:kName];
+    NSString *facebookID = [FBStorage shared].me[kId];
+    NSString *roomName = _currentChatRoom.fields[kName];
     // saving room name to cache:
     [QBStorage shared].chatRoomName = roomName;
     // login to room:
@@ -267,10 +271,11 @@
         [self.inputMessageField resignFirstResponder];
         return;
     }
-    
     // Send message to chat room
     [[QBService defaultService] sendMessage:trimmedString toChatRoom:[QBStorage shared].joinedChatRoom quote:quote];
-    
+    if (quote != nil) {
+        [[QBService defaultService] sendPushNotificationWithMessage:trimmedString toUser:self.opponentID roomName:self.currentChatRoom.fields[kName]];
+    }
     self.inputMessageField.text = @"";
     [self.chatRoomTable reloadData];
     [self.inputMessageField resignFirstResponder];
@@ -280,14 +285,16 @@
 #pragma mark -
 #pragma mark Notifications
 
-- (void)resetTableView {
+- (void)resetTableView
+{
     [self.chatRoomTable reloadData];
     if ([_chatHistory count] > 2) {
         [self.chatRoomTable scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:[_chatHistory count]-1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
     }
 }
 
-- (void)joinedRoom {
+- (void)joinedRoom
+{
     [Flurry logEvent:kFlurryEventRoomWasJoined withParameters:@{kFrom:self.controllerName}];
     
     [[ChatRoomStorage shared] increaseRankOfRoom:self.currentChatRoom];
@@ -296,7 +303,8 @@
     [[Utilites shared].progressHUD performSelector:@selector(hide:) withObject:nil afterDelay:2.0];
 }
 
-- (void)messageReceived {
+- (void)messageReceived
+{
     self.chatHistory = [QBStorage shared].chatHistory;
     self.chatRoomDataSource.chatHistory = self.chatHistory;
     [self resetTableView];
@@ -306,8 +314,8 @@
     [currentHUD performSelector:@selector(hide:) withObject:nil afterDelay:2.0];
 }
 
-- (void)recordPublished:(NSNotification *)aNotification {
-
+- (void)recordPublished:(NSNotification *)aNotification
+{
     [Utilites shared].isShared = NO;
     [[Utilites shared].progressHUD performSelector:@selector(hide:) withObject:nil afterDelay:2.0];
     NSError *error = aNotification.object;

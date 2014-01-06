@@ -258,6 +258,12 @@
     [self userProfileWithResultBlock:^(id result) {
         FBGraphObject *user = (FBGraphObject *)result;
         [FBStorage shared].me = [user mutableCopy];
+        
+        [QBUsers userWithFacebookID:user[kId] delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:^(Result *result) {
+            //
+            QBUUser *qbMe = ((QBUUserResult *)result).user;
+            [FBStorage shared].me[kQuickbloxID] = @(qbMe.ID);
+        }]];
     }];
     
     // getting my friends:

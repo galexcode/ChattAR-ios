@@ -91,7 +91,7 @@
         case 1:
         {
             user = [self.otherUsers objectAtIndex:indexPath.row];
-            conversation = [[QBService defaultService] findConversationWithFriend:user];
+            conversation = [[QBService defaultService] findConversationWithUser:user];
             ((DetailDialogsViewController *)segue.destinationViewController).isChatWithFacebookFriend = NO;
         }
             break;

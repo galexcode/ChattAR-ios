@@ -168,6 +168,9 @@
     [dict setValue:urlString forKey:kPhoto];
     [dict setValue:userName forKey:kUserName];
     
+    dict[kId] = [FBStorage shared].me[kId];
+    dict[kQuickbloxID] = [FBStorage shared].me[kQuickbloxID];
+    
     NSString *isQuoted = @"No";
     if (quote != nil) {
         isQuoted = @"Yes";
@@ -185,32 +188,34 @@
     [Flurry logEvent:kFlurryEventRoomMessageWasSent withParameters:@{@"room_name":room.name, kQuote:isQuoted}];
 }
 
-- (void)sendPushNotificationWithMessage:(NSString *)message toUser:(NSMutableDictionary *)user {
-    NSString *userID = [user objectForKey:kQuickbloxID];
-    if (userID != nil) {
-        NSMutableDictionary *payload = [[NSMutableDictionary alloc] init];
-        NSMutableDictionary *aps = [[NSMutableDictionary alloc] init];
-        aps[QBMPushMessageSoundKey] = @"default";
-        aps[QBMPushMessageAlertKey] = message;
-        aps[kId] = user[kId];
-        aps[kQuickbloxID] = user[kQuickbloxID];
-        
-        payload[QBMPushMessageApsKey] = aps;
-        QBMPushMessage *pushMessage = [[QBMPushMessage alloc] initWithPayload:payload];
-        [QBMessages TSendPush:pushMessage toUsers:userID delegate:nil];
+- (void)sendPushNotificationWithMessage:(NSString *)message toUser:(NSString *)quickbloxUserID roomName:(NSString *)roomName
+{
+    NSMutableDictionary *payload = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *aps = [[NSMutableDictionary alloc] init];
+    aps[QBMPushMessageSoundKey] = @"default";
+    aps[QBMPushMessageAlertKey] = message;
+    aps[kId] = [FBStorage shared].me[kId];
+    aps[kQuickbloxID] = [FBStorage shared].me[kQuickbloxID];
+    if (roomName != nil) {
+        aps[kRoomName] = roomName;
     }
+    payload[QBMPushMessageApsKey] = aps;
+    QBMPushMessage *pushMessage = [[QBMPushMessage alloc] initWithPayload:payload];
+    [QBMessages TSendPush:pushMessage toUsers:quickbloxUserID delegate:nil];
 }
 
 
 #pragma mark -
 #pragma mark Operations
 
-- (void)chatCreateOrJoinRoomWithName:(NSString *)roomName andNickName:(NSString *)nickname {
+- (void)chatCreateOrJoinRoomWithName:(NSString *)roomName andNickName:(NSString *)nickname
+{
     NSString *encodedString = [Utilites urlencode:roomName];
     [[QBChat instance] createOrJoinRoomWithName:encodedString nickname:nickname membersOnly:NO persistent:YES];
 }
 
-- (NSMutableDictionary *)findConversationToUserWithMessage:(QBChatMessage *)message {
+- (NSMutableDictionary *)findConversationToUserWithMessage:(QBChatMessage *)message
+{
     NSMutableDictionary *messageData = [[QBService defaultService] unarchiveMessageData:message.text];
     NSString *userID = [messageData objectForKey:kId];
     NSMutableDictionary *conversation = [[QBStorage shared].allQuickBloxHistoryConversation objectForKey:userID];
@@ -222,7 +227,8 @@
     return conversation;
 }
 
-- (NSMutableDictionary *)findConversationWithFriend:(NSMutableDictionary *)aFriend {
+- (NSMutableDictionary *)findConversationWithUser:(NSMutableDictionary *)aFriend
+{
     NSString *friendID = [aFriend objectForKey:kId];
     NSMutableDictionary *conversation = [[QBStorage shared].allQuickBloxHistoryConversation objectForKey:friendID];
     if (conversation == nil) {
@@ -233,7 +239,8 @@
     return conversation;
 }
 
-- (NSMutableDictionary *)findUserWithID:(NSString *)ID {
+- (NSMutableDictionary *)findUserWithID:(NSString *)ID
+{
     NSArray *users = [QBStorage shared].otherUsers;
     NSMutableDictionary *currentUser = nil;
     for (NSMutableDictionary *user in users) {
@@ -249,7 +256,8 @@
 #pragma mark -
 #pragma mark Archiving
 
-- (NSString *)archiveMessageData:(NSMutableDictionary *)messageData {
+- (NSString *)archiveMessageData:(NSMutableDictionary *)messageData
+{
     NSError *error = nil;
     NSData* nsdata = [NSJSONSerialization dataWithJSONObject:messageData options:NSJSONWritingPrettyPrinted error:&error];
     NSString* jsonString =[[NSString alloc] initWithData:nsdata encoding:NSUTF8StringEncoding];
@@ -266,7 +274,8 @@
 #pragma mark -
 #pragma mark QBChatDelegate
 
-- (void)chatDidLogin {
+- (void)chatDidLogin
+{
     NSLog(@"Chat login success");
     self.presenceTimer = [NSTimer scheduledTimerWithTimeInterval:30 target:[QBChat instance] selector:@selector(sendPresence) userInfo:nil repeats:YES];
     //start getting location:
@@ -288,7 +297,8 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:kNotificationDidLogin object:nil];
 }
 
-- (void)chatDidReceiveMessage:(QBChatMessage *)message {
+- (void)chatDidReceiveMessage:(QBChatMessage *)message
+{
     NSMutableDictionary *messageData = [self unarchiveMessageData:message.text];
     NSString *facebookID = [messageData objectForKey:kId];
     [self cachingMessage:message forUserID:facebookID];
@@ -298,7 +308,8 @@
     [Utilites playSound:settingService.soundEnabled vibrate:settingService.vibrationEnabled];
 }
 
-- (void)chatRoomDidReceiveMessage:(QBChatMessage *)message fromRoom:(NSString *)roomName {
+- (void)chatRoomDidReceiveMessage:(QBChatMessage *)message fromRoom:(NSString *)roomName
+{
     [[QBStorage shared].chatHistory addObject:message];
     [[NSNotificationCenter defaultCenter] postNotificationName:CAChatRoomDidReceiveOrSendMessageNotification object:nil];
 }
@@ -315,18 +326,16 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:CAChatRoomDidEnterNotification object:nil];
 }
 
-- (void)chatRoomDidNotEnter:(NSString *)roomName error:(NSError *)error {
+- (void)chatRoomDidNotEnter:(NSString *)roomName error:(NSError *)error
+{
     NSLog(@"Error:%@", error);
 }
 
 
-- (void)chatRoomDidLeave:(NSString *)roomName {
+- (void)chatRoomDidLeave:(NSString *)roomName
+{
     NSLog(@"Did  Leave worked");
     [[QBStorage shared] setJoinedChatRoom:nil];
-}
-
-- (void)chatDidNotLogin {
-    
 }
 
 @end
