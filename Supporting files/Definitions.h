@@ -26,7 +26,6 @@
 #define CAChatDidReceiveOrSendMessageNotification           @"CAChatDidReceiveOrSendMessageNotification"
 #define CAChatRoomDidReceiveOrSendMessageNotification       @"CAChatRoomDidReceiveOrSendMessageNotification"
 #define CAChatRoomDidEnterNotification                      @"CAChatRoomDidEnterNotification"
-#define CAChatDidReceiveSearchResults                       @"CAChatDidReceiveSearchResults"
 #define CAChatRoomDidCreateNotification                     @"CAChatRoomDidCreateNotification"
 #define CARoomDidPublishedToFacebookNotification            @"CARoomDidPublishedToFacebook"
 

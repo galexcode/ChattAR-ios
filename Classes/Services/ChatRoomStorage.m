@@ -119,19 +119,31 @@
     [QBCustomObjects updateObject:newRoom specialUpdateOperators:[@{@"inc[rank]" : @(1)} mutableCopy] delegate:nil];
 }
 
+- (QBCOCustomObject *)findChatRoomWithName:(NSString *)roomName
+{
+    for (QBCOCustomObject *room in self.allTrendingRooms) {
+        if ([room.fields[kName] isEqual:roomName]) {
+            return room;
+        }
+    }
+    for (QBCOCustomObject *room in self.allLocalRooms) {
+        if ([room.fields[kName] isEqual:roomName]) {
+            return room;
+        }
+    }
+    return nil;
+}
+
 
 #pragma mark -
 #pragma mark QBActionStatusDelegate
 
-- (void)completedWithResult:(Result *)result {
-    if ([result success]) {
-        if ([result isKindOfClass:[QBCOCustomObjectPagedResult class]]) {
-            QBCOCustomObjectPagedResult *pagedResult = (QBCOCustomObjectPagedResult *)result;
-            NSArray *searchedRooms = pagedResult.objects;
-            self.searchedRooms = searchedRooms;
-            [[NSNotificationCenter defaultCenter] postNotificationName:CAChatDidReceiveSearchResults object:nil];
-        }
-    }
-}
+//- (void)completedWithResult:(Result *)result {
+//    if ([result success]) {
+//        if ([result isKindOfClass:[QBCOCustomObjectPagedResult class]]) {
+//
+//        }
+//    }
+//}
 
 @end

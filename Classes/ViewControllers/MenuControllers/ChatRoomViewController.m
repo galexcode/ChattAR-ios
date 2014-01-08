@@ -56,7 +56,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    [[ControllerStateService shared] setIsInChatRoom:YES];
     self.chatRoomDataSource = [[ChatRoomDataSource alloc] init];
     self.chatRoomTable.dataSource = self.chatRoomDataSource;
     self.chatRoomDataSource.chatHistory = self.chatHistory;
@@ -100,6 +99,12 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    [ControllerStateService shared].isInChatRoom = YES;
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:NO];
+    [ControllerStateService shared].isInChatRoom = NO;
 }
 
 

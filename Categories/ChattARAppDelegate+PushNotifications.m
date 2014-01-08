@@ -12,7 +12,7 @@
 #import "FBStorage.h"
 #import "QBService.h"
 #import "QBStorage.h"
-
+#import "ChatRoomStorage.h"
 #import "DetailDialogsViewController.h"
 #import "ChatRoomViewController.h"
 
@@ -44,8 +44,25 @@ static NSString *chatRoomIdentifier = @"chatRoomController";
         UIStoryboard *myStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
         if (roomName != nil) {
             viewController = [myStoryboard instantiateViewControllerWithIdentifier:chatRoomIdentifier];
-            
-            
+            if ([viewController isKindOfClass:[ChatRoomViewController class]]) {
+                QBCOCustomObject *currentRoom = [[ChatRoomStorage shared] findChatRoomWithName:roomName];
+                if (currentRoom == nil) {
+                    NSMutableDictionary *extendedRequest = [NSMutableDictionary dictionary];
+                    extendedRequest[kName] = roomName;
+                    [QBCustomObjects objectsWithClassName:kChatRoom extendedRequest:extendedRequest delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:^(Result *result) {
+                        
+                        QBCOCustomObject *room = [((QBCOCustomObjectPagedResult *)result).objects lastObject];
+                        ((ChatRoomViewController *)viewController).controllerName = @"Push Notification";
+                        ((ChatRoomViewController *)viewController).currentChatRoom = room;
+                        [navigationVC pushViewController:viewController animated:YES];
+                    }]];
+                    return;
+                }
+                ((ChatRoomViewController *)viewController).controllerName = @"Push Notification";   // Flurry track
+                ((ChatRoomViewController *)viewController).currentChatRoom = currentRoom;
+                [navigationVC pushViewController:viewController animated:YES];
+                return;
+            }
             
         } else {
             // DIALOG:
@@ -91,9 +108,10 @@ static NSString *chatRoomIdentifier = @"chatRoomController";
                 ((DetailDialogsViewController *)viewController).isChatWithFacebookFriend = isFacebookDialog;
                 ((DetailDialogsViewController *)viewController).opponent = user;
                 ((DetailDialogsViewController *)viewController).conversation = conversation;
+                
+                [navigationVC pushViewController:viewController animated:YES];
             }
         }
-        [navigationVC pushViewController:viewController animated:YES];
     }
 }
 

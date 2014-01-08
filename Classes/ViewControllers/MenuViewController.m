@@ -48,7 +48,6 @@
     if (![Utilites shared].isArNotAvailable) {
         [self checkForARModuleAvailable];
     }
-
     [self.menuTable selectRowAtIndexPath:[NSIndexPath indexPathForRow:2 inSection:0] animated:NO scrollPosition:UITableViewScrollPositionNone];
 }
 

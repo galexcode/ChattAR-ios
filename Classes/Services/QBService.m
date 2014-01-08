@@ -289,7 +289,7 @@
         return;
     }
     
-    if ([QBStorage shared].pushNotification != nil && ![ControllerStateService shared].isInDialog) {
+    if ([QBStorage shared].pushNotification != nil && ![ControllerStateService shared].isInChatRoom) {
         [ (ChattARAppDelegate *)[UIApplication sharedApplication].delegate processRemoteNotification:[QBStorage shared].pushNotification];
         [QBStorage shared].pushNotification = nil;
     }

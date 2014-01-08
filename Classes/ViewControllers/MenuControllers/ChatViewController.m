@@ -23,9 +23,10 @@
 @property (nonatomic, strong) IBOutlet UITableView *trendingTableView;
 @property (strong, nonatomic) IBOutlet UITableView *locationTableView;
 @property (strong, nonatomic) IBOutlet UISearchBar *searchBar;
-@property (strong, nonatomic) IBOutlet UILabel *noMatchResultsLabel;
+@property (strong, nonatomic) IBOutlet UIView *noMatchResultsView;
 
-@property (nonatomic, strong) NSArray *trendings;
+
+@property (nonatomic, strong) NSMutableArray *trendings;
 @property (nonatomic, strong) NSMutableArray *locals;
 
 @property (nonatomic, strong) TrendingChatRoomsDataSource *trendingDataSource;
@@ -35,6 +36,7 @@
 @property (nonatomic, strong) UILabel *trendingFooterLabel;
 @property (nonatomic, weak) NSString *tableName;
 
+- (IBAction)globalSearch:(id)sender;
 @end
 
 @implementation ChatViewController
@@ -48,11 +50,10 @@
     [super viewDidLoad];
     [Flurry logEvent:kFlurryEventChatScreenWasOpened];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(searchForResults) name:CAChatDidReceiveSearchResults object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loadRooms) name:kNotificationDidLogin object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(newRoomCreated:) name:CAChatRoomDidCreateNotification object:nil];
     
-    _trendings = [[NSArray alloc] initWithArray:[[ChatRoomStorage shared] allTrendingRooms]];
+    _trendings = [[NSMutableArray alloc] initWithArray:[[ChatRoomStorage shared] allTrendingRooms]];
     _locals = [[NSMutableArray alloc] initWithArray:[[ChatRoomStorage shared] allLocalRooms]];
     
     _trendingTableView.tag = kTrendingTableViewTag;
@@ -144,16 +145,7 @@
 }
 
 - (void)searchForResults {
-    self.noMatchResultsLabel.hidden = YES;
-    self.trendings = [ChatRoomStorage shared].searchedRooms;
-    self.trendingDataSource.chatRooms = [ChatRoomStorage shared].searchedRooms;
-    [self.trendingTableView reloadData];
-    self.trendingFooterLabel.text = nil;
-    
-    if ([[ChatRoomStorage shared].searchedRooms count] == 0) {
-        self.noMatchResultsLabel.hidden = NO;
-    }
-    [self.searchIndicatorView stopAnimating];
+
 }
 
 - (void)newRoomCreated:(NSNotification *)notification {
@@ -254,7 +246,7 @@
         //return;
     }
     // handle new results
-        _trendings = [_trendings arrayByAddingObjectsFromArray:results];
+        [_trendings addObjectsFromArray:results];
         _trendingDataSource.chatRooms = _trendings;
         [[ChatRoomStorage shared] setAllTrendingRooms:_trendings];
         [self.trendingActivityIndicator stopAnimating];
@@ -375,24 +367,64 @@
 #pragma mark -
 #pragma mark UISearchBarDelegate
 
-- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
-    ChatRoomStorage *chatRoomService = [ChatRoomStorage shared];
-    // called when keyboard search button pressed
-    NSMutableDictionary *extendedRequest = [[NSMutableDictionary alloc] init];
-    [extendedRequest setObject:self.searchBar.text forKey:@"name[ctn]"];
-    [QBCustomObjects objectsWithClassName:kChatRoom extendedRequest:extendedRequest delegate:chatRoomService];
-    [searchBar resignFirstResponder];
-    [self.searchIndicatorView startAnimating];
+//- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
+//    ChatRoomStorage *chatRoomService = [ChatRoomStorage shared];
+//    // called when keyboard search button pressed
+//    NSMutableDictionary *extendedRequest = [[NSMutableDictionary alloc] init];
+//    [extendedRequest setObject:self.searchBar.text forKey:@"name[ctn]"];
+//    [QBCustomObjects objectsWithClassName:kChatRoom extendedRequest:extendedRequest delegate:chatRoomService];
+//    [searchBar resignFirstResponder];
+//    [self.searchIndicatorView startAnimating];
+//}
+
+- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
+{
+    self.trendings = [[ChatRoomStorage shared].allTrendingRooms mutableCopy];
+    self.trendingDataSource.chatRooms = _trendings;
+    self.noMatchResultsView.hidden = YES;
+    self.trendingFooterLabel.text = [NSString stringWithFormat:@"Load more..."];
+    if (searchText.length == 0) {
+        [self.trendingTableView reloadData];
+    } else {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            NSMutableArray *foundedFriends = [self searchText:searchText inArray:self.trendings];
+            
+            [self.trendings removeAllObjects];
+            [self.trendings addObjectsFromArray:foundedFriends];
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if ([self.trendings count] == 0) {
+                    self.noMatchResultsView.hidden = NO;
+                    self.trendingFooterLabel.text = nil;
+                }
+                [self.trendingTableView reloadData];
+            });
+        });
+    }
 }
 
-- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText {
-    if ([searchText isEqualToString:@""]) {
-        self.noMatchResultsLabel.hidden = YES;
-        self.trendings = [ChatRoomStorage shared].allTrendingRooms;
-        self.trendingDataSource.chatRooms = _trendings;
-        [self.trendingTableView reloadData];
-        self.trendingFooterLabel.text = [NSString stringWithFormat:@"Load more..."];
+- (BOOL)searchingString:(NSString *)source inString:(NSString *)searchString
+{
+    BOOL answer;
+    NSString *sourceString = [source stringByReplacingOccurrencesOfString:@"  " withString:@" "];
+    NSRange range = [sourceString rangeOfString:searchString options:NSCaseInsensitiveSearch];
+    if (range.location == NSNotFound) {
+        answer = NO;
+    } else {
+        answer = YES;
     }
+    return answer;
+}
+
+- (NSMutableArray *)searchText:(NSString *)text  inArray:(NSMutableArray *)array
+{
+    NSMutableArray *founded = [[NSMutableArray alloc] init];
+    [array enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(QBCOCustomObject *obj, NSUInteger idx, BOOL *stop) {
+        if ([self searchingString:obj.fields[kName] inString:text]) {
+            [founded addObject:obj];
+        }
+    }];
+    return founded;
 }
 
 - (BOOL)searchBarShouldBeginEditing:(UISearchBar *)searchBar {
@@ -400,13 +432,36 @@
     return YES;
 }
 
-- (void)searchBarCancelButtonClicked:(UISearchBar *) searchBar{
-    self.trendings = [ChatRoomStorage shared].allTrendingRooms;
+- (void)searchBarCancelButtonClicked:(UISearchBar *) searchBar {
+    self.trendings = [[ChatRoomStorage shared].allTrendingRooms mutableCopy];
     self.trendingDataSource.chatRooms = _trendings;
     [searchBar setShowsCancelButton:NO animated:YES];
     [searchBar resignFirstResponder];
     self.trendingFooterLabel.text = @"Load more...";
     [self.trendingTableView reloadData];
+}
+
+- (IBAction)globalSearch:(id)sender
+{
+    NSMutableDictionary *extendedRequest = [[NSMutableDictionary alloc] init];
+    [extendedRequest setObject:self.searchBar.text forKey:@"name[ctn]"];
+    [QBCustomObjects objectsWithClassName:kChatRoom extendedRequest:extendedRequest delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:^(Result *result) {
+        QBCOCustomObjectPagedResult *pagedResult = (QBCOCustomObjectPagedResult *)result;
+        NSArray *searchedRooms = pagedResult.objects;
+        [ChatRoomStorage shared].searchedRooms = searchedRooms;
+        
+        self.noMatchResultsView.hidden = YES;
+        self.trendings = [[ChatRoomStorage shared].searchedRooms mutableCopy];
+        self.trendingDataSource.chatRooms = [ChatRoomStorage shared].searchedRooms;
+        [self.trendingTableView reloadData];
+        self.trendingFooterLabel.text = nil;
+        
+        if ([[ChatRoomStorage shared].searchedRooms count] == 0) {
+            self.noMatchResultsView.hidden = NO;
+        }
+        [self.searchIndicatorView stopAnimating];
+    }]];
+    [self.searchIndicatorView startAnimating];
 }
 
 @end
