@@ -341,7 +341,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Chat" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="KbX-ze-Lzv">
-                                                    <rect key="frame" x="71" y="14" width="134" height="35"/>
+                                                    <rect key="frame" x="71" y="14" width="70" height="35"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                                     <color key="textColor" red="0.87839673910000005" green="0.87839673910000005" blue="0.87839673910000005" alpha="1" colorSpace="calibratedRGB"/>
@@ -362,7 +362,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Map" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="yEe-Iy-n2F">
-                                                    <rect key="frame" x="71" y="14" width="134" height="35"/>
+                                                    <rect key="frame" x="71" y="14" width="70" height="35"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                                     <color key="textColor" red="0.87839673910000005" green="0.87839673910000005" blue="0.87839673910000005" alpha="1" colorSpace="calibratedRGB"/>
@@ -383,7 +383,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="AR" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="YlW-uE-aVg">
-                                                    <rect key="frame" x="71" y="14" width="134" height="35"/>
+                                                    <rect key="frame" x="71" y="14" width="70" height="35"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                                     <color key="textColor" red="0.87839673910000005" green="0.87839673910000005" blue="0.87839673910000005" alpha="1" colorSpace="calibratedRGB"/>
@@ -396,7 +396,7 @@
                                             </subviews>
                                         </tableViewCellContentView>
                                     </tableViewCell>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="65" id="ny1-gp-XWm" customClass="MenuCell">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="dialog" rowHeight="65" id="ny1-gp-XWm" customClass="MenuCell">
                                         <rect key="frame" x="0.0" y="302" width="320" height="65"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="ny1-gp-XWm" id="TDn-7N-yOu">
@@ -404,7 +404,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Dialogs" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="ANV-7r-L8D">
-                                                    <rect key="frame" x="71" y="14" width="134" height="35"/>
+                                                    <rect key="frame" x="71" y="14" width="70" height="35"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                                     <color key="textColor" red="0.87839673910000005" green="0.87839673910000005" blue="0.87839673910000005" alpha="1" colorSpace="calibratedRGB"/>
@@ -414,6 +414,11 @@
                                                     <rect key="frame" x="20" y="19" width="27" height="25"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 </imageView>
+                                                <view contentMode="scaleToFill" id="LSZ-wY-xjQ">
+                                                    <rect key="frame" x="149" y="19" width="30" height="30"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <color key="backgroundColor" red="1" green="0.24576291755917867" blue="0.19691500915694427" alpha="1" colorSpace="calibratedRGB"/>
+                                                </view>
                                             </subviews>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -425,7 +430,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="About" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="e3v-Gg-XuY">
-                                                    <rect key="frame" x="71" y="14" width="134" height="35"/>
+                                                    <rect key="frame" x="71" y="14" width="70" height="35"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                                     <color key="textColor" red="0.87839673910000005" green="0.87839673910000005" blue="0.87839673910000005" alpha="1" colorSpace="calibratedRGB"/>
@@ -450,6 +455,7 @@
                     <connections>
                         <outlet property="firstNameField" destination="Oa7-cT-stz" id="0rF-qm-iZl"/>
                         <outlet property="menuTable" destination="O8j-gz-Sfk" id="YVa-re-JBF"/>
+                        <outlet property="unreadLabel" destination="LSZ-wY-xjQ" id="p4B-Fu-6jr"/>
                         <segue destination="doc-P0-YCL" kind="custom" identifier="Chat" customClass="SASlideMenuContentSegue" id="POg-Df-gpJ"/>
                         <segue destination="FgT-Db-JXl" kind="custom" identifier="Map" customClass="SASlideMenuContentSegue" id="jgz-po-BPx"/>
                         <segue destination="79Z-YM-vAE" kind="custom" identifier="AR" customClass="SASlideMenuContentSegue" id="0IC-8a-lf6"/>
@@ -1269,8 +1275,8 @@
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
+        <segue reference="GXn-8Q-nrq"/>
         <segue reference="08e-u6-zeQ"/>
-        <segue reference="i69-BF-qyq"/>
         <segue reference="7Mb-AF-cFY"/>
         <segue reference="wsq-0v-N34"/>
     </inferredMetricsTieBreakers>

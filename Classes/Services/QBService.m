@@ -286,14 +286,13 @@
     if ([QBService defaultService].userIsJoinedChatRoom) {
         [[QBService defaultService] loginToChatFromBackground];
         [[Utilites shared].progressHUD performSelector:@selector(show:) withObject:nil];
-        return;
     }
     
-    if ([QBStorage shared].pushNotification != nil && ![ControllerStateService shared].isInChatRoom) {
+    if ([QBStorage shared].pushNotification != nil) {
         [ (ChattARAppDelegate *)[UIApplication sharedApplication].delegate processRemoteNotification:[QBStorage shared].pushNotification];
         [QBStorage shared].pushNotification = nil;
     }
-    
+
     [[NSNotificationCenter defaultCenter] postNotificationName:kNotificationDidLogin object:nil];
 }
 

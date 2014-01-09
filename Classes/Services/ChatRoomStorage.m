@@ -8,7 +8,7 @@
 
 #import "ChatRoomStorage.h"
 #import "LocationService.h"
-
+#import "FBStorage.h"
 
 @interface ChatRoomStorage()
 
@@ -134,16 +134,14 @@
     return nil;
 }
 
-
-#pragma mark -
-#pragma mark QBActionStatusDelegate
-
-//- (void)completedWithResult:(Result *)result {
-//    if ([result success]) {
-//        if ([result isKindOfClass:[QBCOCustomObjectPagedResult class]]) {
-//
-//        }
-//    }
-//}
+- (void)trackAllUnreadMessages
+{
+    int unreadMsgCount = 0;
+    NSArray *allFacebookConversations = [[FBStorage shared].allFriendsHistoryConversation allValues];
+    for (NSMutableDictionary *conversation in allFacebookConversations) {
+        unreadMsgCount += [conversation[kUnread] integerValue];
+    }
+    NSLog(@"%d messages unread", unreadMsgCount);
+}
 
 @end

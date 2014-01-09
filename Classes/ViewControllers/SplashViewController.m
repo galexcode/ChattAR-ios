@@ -15,6 +15,7 @@
 #import "QBStorage.h"
 #import "AppSettingsService.h"
 #import "CaptureSessionService.h"
+#import "ChatRoomStorage.h"
 
 #import "ChattARAppDelegate+PushNotifications.h"
 
@@ -212,12 +213,8 @@
 {
     [Flurry logEvent:kFlurryEventUserWasLoggedIn];
     [self.activityIndicatior stopAnimating];
-    [self dismissViewControllerAnimated:YES completion:^{
-        NSDictionary *userInfo = [QBStorage shared].pushNotification;
-        if (userInfo != nil) {
-            [(ChattARAppDelegate *)[UIApplication sharedApplication].delegate processRemoteNotification: userInfo];
-        }
-    }];
+    [self dismissViewControllerAnimated:YES completion:nil];
+    [[ChatRoomStorage shared] trackAllUnreadMessages];
 }
 
 @end

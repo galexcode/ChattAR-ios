@@ -20,6 +20,12 @@
 #import "QBService.h"
 #import "QBStorage.h"
 
+@interface MenuViewController ()
+
+@property (strong, nonatomic) IBOutlet UIView *unreadLabel;
+
+
+@end
 
 @implementation MenuViewController
 

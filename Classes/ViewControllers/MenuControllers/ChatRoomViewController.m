@@ -304,8 +304,7 @@
     
     [[ChatRoomStorage shared] increaseRankOfRoom:self.currentChatRoom];
     [self.chatRoomTable reloadData];
-    
-    [[Utilites shared].progressHUD performSelector:@selector(hide:) withObject:nil afterDelay:2.0];
+    [[Utilites shared].progressHUD performSelector:@selector(hide:) withObject:nil afterDelay:3.0];
 }
 
 - (void)messageReceived

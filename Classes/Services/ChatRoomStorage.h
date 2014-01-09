@@ -15,6 +15,7 @@
 @property (nonatomic, strong) NSMutableArray *distances;
 @property (nonatomic, strong) NSArray *searchedRooms;
 @property (nonatomic, assign) BOOL endOfList;
+@property (nonatomic, assign) NSInteger unreadMessages;
 
 + (instancetype)shared;
 
@@ -31,5 +32,6 @@
 - (NSMutableArray *)sortingRoomsByDistance:(CLLocation *)me toChatRooms:(NSArray *)rooms;
 - (void)increaseRankOfRoom:(QBCOCustomObject *)room;
 - (QBCOCustomObject *)findChatRoomWithName:(NSString *)roomName;
+- (void)trackAllUnreadMessages;
 
 @end

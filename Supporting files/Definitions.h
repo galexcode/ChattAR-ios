@@ -75,6 +75,7 @@
 #define FBAccessTokenKey       @"FBAccessTokenKey"
 #define kFacebookKey           @"facebook"
 
+#define kUnread             @"unread"
 #define kMe					@"me"
 #define kResponse			@"response"
 #define kData				@"data"

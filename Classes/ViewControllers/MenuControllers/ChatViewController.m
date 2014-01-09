@@ -367,16 +367,6 @@
 #pragma mark -
 #pragma mark UISearchBarDelegate
 
-//- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
-//    ChatRoomStorage *chatRoomService = [ChatRoomStorage shared];
-//    // called when keyboard search button pressed
-//    NSMutableDictionary *extendedRequest = [[NSMutableDictionary alloc] init];
-//    [extendedRequest setObject:self.searchBar.text forKey:@"name[ctn]"];
-//    [QBCustomObjects objectsWithClassName:kChatRoom extendedRequest:extendedRequest delegate:chatRoomService];
-//    [searchBar resignFirstResponder];
-//    [self.searchIndicatorView startAnimating];
-//}
-
 - (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
 {
     self.trendings = [[ChatRoomStorage shared].allTrendingRooms mutableCopy];
