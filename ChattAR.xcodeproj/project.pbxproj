@@ -77,6 +77,8 @@
 		694746481805A71600928ED4 /* LocationService.m in Sources */ = {isa = PBXBuildFile; fileRef = 694746441805A71600928ED4 /* LocationService.m */; };
 		6953903E1859A7C000294227 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 6953903D1859A7C000294227 /* MBProgressHUD.m */; };
 		6953F9D51855CA9400A81C47 /* shadow_for_profile@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6953F9D41855CA9400A81C47 /* shadow_for_profile@2x.png */; };
+		6954B1EC18840438006A1A75 /* MessagesCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6954B1EB18840438006A1A75 /* MessagesCell.m */; };
+		6954B1F0188408BC006A1A75 /* red-circle-solid-th.png in Resources */ = {isa = PBXBuildFile; fileRef = 6954B1EF188408BC006A1A75 /* red-circle-solid-th.png */; };
 		6954C42717CDD502003C6893 /* ChatViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6954C42617CDD502003C6893 /* ChatViewController.m */; };
 		6954C42A17CDD53E003C6893 /* MapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6954C42917CDD53E003C6893 /* MapViewController.m */; };
 		6954C43317CDD579003C6893 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6954C43217CDD579003C6893 /* SettingsViewController.m */; };
@@ -397,6 +399,9 @@
 		6953F9D41855CA9400A81C47 /* shadow_for_profile@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "shadow_for_profile@2x.png"; sourceTree = "<group>"; };
 		6953F9DB1855D2BA00A81C47 /* Flurry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Flurry.h; path = Flurry/Flurry.h; sourceTree = "<group>"; };
 		6953F9DE1855D85D00A81C47 /* FlurryDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FlurryDefines.h; path = Flurry/FlurryDefines.h; sourceTree = "<group>"; };
+		6954B1EA18840438006A1A75 /* MessagesCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessagesCell.h; sourceTree = "<group>"; };
+		6954B1EB18840438006A1A75 /* MessagesCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessagesCell.m; sourceTree = "<group>"; };
+		6954B1EF188408BC006A1A75 /* red-circle-solid-th.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "red-circle-solid-th.png"; path = "../../red-circle-solid-th.png"; sourceTree = "<group>"; };
 		6954C42517CDD502003C6893 /* ChatViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatViewController.h; sourceTree = "<group>"; };
 		6954C42617CDD502003C6893 /* ChatViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatViewController.m; sourceTree = "<group>"; };
 		6954C42817CDD53E003C6893 /* MapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapViewController.h; sourceTree = "<group>"; };
@@ -1155,6 +1160,8 @@
 				69B96E2C17E89EED00C94DB7 /* MenuCell.m */,
 				69B96E2D17E89EED00C94DB7 /* UserProfileCell.h */,
 				69B96E2E17E89EED00C94DB7 /* UserProfileCell.m */,
+				6954B1EA18840438006A1A75 /* MessagesCell.h */,
+				6954B1EB18840438006A1A75 /* MessagesCell.m */,
 				6924A75A1802AD5400D61E5E /* MapAnnotationView.h */,
 				6924A75B1802AD5400D61E5E /* MapAnnotationView.m */,
 				690A70921806E0AD00F3C584 /* ARMarkerView.h */,
@@ -1187,6 +1194,7 @@
 		69D721CC185A22980075ABEB /* Profile_images */ = {
 			isa = PBXGroup;
 			children = (
+				6954B1EF188408BC006A1A75 /* red-circle-solid-th.png */,
 				69D721CD185A22980075ABEB /* 001_education.png */,
 				69D721CE185A22980075ABEB /* 001_education@2x.png */,
 				69D721CF185A22980075ABEB /* 001_location.png */,
@@ -2071,6 +2079,7 @@
 				691AC030184DEC9000BBEE4B /* loginButton@2x.png in Resources */,
 				69A4029E17D740F900E7BE1F /* qb_mnu_grey.png in Resources */,
 				69A4029F17D740F900E7BE1F /* qb_mnu_grey@2x.png in Resources */,
+				6954B1F0188408BC006A1A75 /* red-circle-solid-th.png in Resources */,
 				69A402A217D740F900E7BE1F /* create_room.png in Resources */,
 				69A402A317D740F900E7BE1F /* create_room@2x.png in Resources */,
 				69A402A417D740F900E7BE1F /* mnubtn.png in Resources */,
@@ -2278,6 +2287,7 @@
 				BF00030E185A2FDF00F83907 /* XMPPUserMemoryStorageObject.m in Sources */,
 				69165AE3182A91D300486DA8 /* ProfileViewController.m in Sources */,
 				690A70911806B8AE00F3C584 /* ARGeoCoordinate.m in Sources */,
+				6954B1EC18840438006A1A75 /* MessagesCell.m in Sources */,
 				BF000357185A2FDF00F83907 /* DispatchQueueLogFormatter.m in Sources */,
 				BF000356185A2FDF00F83907 /* ContextFilterLogFormatter.m in Sources */,
 				BF0002FA185A2FDF00F83907 /* XMPPElement.m in Sources */,

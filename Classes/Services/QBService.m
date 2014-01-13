@@ -122,22 +122,32 @@
     
     [[QBChat instance] sendMessage:msg];
     [Flurry logEvent:kFlurryEventDialogMessageWasSent withParameters:@{@"type":@"QuickBlox"}];
-    [self cachingMessage:msg forUserID:option];
+    [self cachingMessage:msg forUserID:option received:NO];
 }
 
-- (void)cachingMessage:(QBChatMessage *)message forUserID:(NSString *)userID {
-    NSMutableDictionary *temporary = [[QBStorage shared].allQuickBloxHistoryConversation objectForKey:userID];
+- (void)cachingMessage:(QBChatMessage *)message forUserID:(NSString *)userID received:(BOOL)received{
+    NSMutableDictionary *temporary = [QBStorage shared].allQuickBloxHistoryConversation[userID];
     if (temporary != nil) {
-        NSMutableArray *messages = [temporary objectForKey:kMessage];
+        // unread messages count:
+        if (received == YES) {
+            int numb = [temporary[kUnread] integerValue];
+            numb++;
+            temporary[kUnread] = @(numb);
+        }
+        NSMutableArray *messages = temporary[kMessage];
         [messages addObject:message];
         [[NSNotificationCenter defaultCenter] postNotificationName:CAChatDidReceiveOrSendMessageNotification object:nil];
     } else {
         NSMutableArray *messages = [[NSMutableArray alloc] initWithObjects:message, nil];
-        temporary = [[NSMutableDictionary alloc] initWithObjectsAndKeys:messages,kMessage, nil];
-        [[QBStorage shared].allQuickBloxHistoryConversation setObject:temporary forKey:userID];
+        if (received == YES) {
+            temporary = [@{kMessage: messages} mutableCopy];
+            temporary[kUnread] = @(1);
+        }
+        [QBStorage shared].allQuickBloxHistoryConversation[userID] = temporary;
         // load user:
         NSMutableDictionary *opponent = [self findUserWithID:userID];
         if (opponent != nil) {
+            opponent[kUnread] = @YES;
             [[NSNotificationCenter defaultCenter] postNotificationName:CAChatDidReceiveOrSendMessageNotification object:nil];
             return;
         }
@@ -148,6 +158,7 @@
             NSString *photoURL = [[NSString alloc] initWithFormat:@"https://graph.facebook.com/%@/picture?access_token=%@", userID, [FBStorage shared].accessToken];
             newUser[kPhoto] = photoURL;
             newUser[kQuickbloxID] = [@(message.senderID) stringValue];
+            newUser[kUnread] = @YES;
             [[QBStorage shared].otherUsers addObject:newUser];
             [[NSNotificationCenter defaultCenter] postNotificationName:CAChatDidReceiveOrSendMessageNotification object:nil];
         }];
@@ -298,9 +309,9 @@
 
 - (void)chatDidReceiveMessage:(QBChatMessage *)message
 {
-    NSMutableDictionary *messageData = [self unarchiveMessageData:message.text];
+    NSMutableDictionary *messageData = [self unarchiveMessageData:message.text];   // JSON parsing
     NSString *facebookID = [messageData objectForKey:kId];
-    [self cachingMessage:message forUserID:facebookID];
+    [self cachingMessage:message forUserID:facebookID received:YES];
     
     // play sound and vibrate:
     AppSettingsService *settingService = [AppSettingsService shared];

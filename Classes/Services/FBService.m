@@ -396,8 +396,8 @@
     NSArray *friends = [FBStorage shared].friends;
     
     // find opponent:
-    NSDictionary *friend = nil;
-    for (NSDictionary *myFriend in friends) {
+    NSMutableDictionary *friend = nil;
+    for (NSMutableDictionary *myFriend in friends) {
         if ([[myFriend objectForKey:kId] isEqual:fromID]) {
             friend = myFriend;
             break;
@@ -419,9 +419,21 @@
     NSString *createdTime = [[Utilites shared].dateFormatter stringFromDate:date];
     [message setValue:createdTime forKey:kCreatedTime];
     
+    // increase unread msg count
+    NSNumber *number = ([FBStorage shared].allFriendsHistoryConversation[fromID])[kUnread];
+    if (number == nil) {
+        ([FBStorage shared].allFriendsHistoryConversation[fromID])[kUnread] = @1;
+    } else {
+        int numb = [number integerValue];
+        numb++;
+        ([FBStorage shared].allFriendsHistoryConversation[fromID])[kUnread] = @(numb);
+    }
+    if (![ControllerStateService shared].isInDialog) {
+        friend[kUnread] = @YES;
+    }
+    
     // save message to history
-    [[[[[FBStorage shared].allFriendsHistoryConversation objectForKey:fromID]
-            objectForKey:kComments] objectForKey:kData] addObject:message];
+    [[[[[FBStorage shared].allFriendsHistoryConversation objectForKey:fromID] objectForKey:kComments] objectForKey:kData] addObject:message];
     
     // post notification
     [[NSNotificationCenter defaultCenter] postNotificationName:CAChatDidReceiveOrSendMessageNotification object:nil];

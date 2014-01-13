@@ -14,7 +14,6 @@
 #define IS_IOS_6 ([[[UIDevice currentDevice] systemVersion] floatValue] <= 6.1f)
 
 #define kNotificationDidLogin           @"kNotificationDidLogin"
-#define kNotificationMessageReceived    @"NotificationMessageReceived"
 
 // QBCO Request keys:
 #define  kLimit      @"limit"
@@ -25,6 +24,7 @@
 // NOTIFICATIONS:
 #define CAChatDidReceiveOrSendMessageNotification           @"CAChatDidReceiveOrSendMessageNotification"
 #define CAChatRoomDidReceiveOrSendMessageNotification       @"CAChatRoomDidReceiveOrSendMessageNotification"
+#define CADialogsHideUnreadMessagesLabelNotification        @"CADialogsHideUnreadMessagesLabelNotification"
 #define CAChatRoomDidEnterNotification                      @"CAChatRoomDidEnterNotification"
 #define CAChatRoomDidCreateNotification                     @"CAChatRoomDidCreateNotification"
 #define CARoomDidPublishedToFacebookNotification            @"CARoomDidPublishedToFacebook"
@@ -75,7 +75,7 @@
 #define FBAccessTokenKey       @"FBAccessTokenKey"
 #define kFacebookKey           @"facebook"
 
-#define kUnread             @"unread"
+#define kUnread             @"unread_msg"
 #define kMe					@"me"
 #define kResponse			@"response"
 #define kData				@"data"

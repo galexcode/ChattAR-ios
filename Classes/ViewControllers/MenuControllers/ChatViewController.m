@@ -49,6 +49,8 @@
 {
     [super viewDidLoad];
     [Flurry logEvent:kFlurryEventChatScreenWasOpened];
+    [NSThread callStackSymbols];
+    self.searchBar.autocorrectionType= UITextAutocorrectionTypeNo;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loadRooms) name:kNotificationDidLogin object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(newRoomCreated:) name:CAChatRoomDidCreateNotification object:nil];

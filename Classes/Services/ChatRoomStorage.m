@@ -9,6 +9,7 @@
 #import "ChatRoomStorage.h"
 #import "LocationService.h"
 #import "FBStorage.h"
+#import "QBStorage.h"
 
 @interface ChatRoomStorage()
 
@@ -134,14 +135,19 @@
     return nil;
 }
 
-- (void)trackAllUnreadMessages
+- (int)trackAllUnreadMessages
 {
     int unreadMsgCount = 0;
     NSArray *allFacebookConversations = [[FBStorage shared].allFriendsHistoryConversation allValues];
     for (NSMutableDictionary *conversation in allFacebookConversations) {
         unreadMsgCount += [conversation[kUnread] integerValue];
     }
-    NSLog(@"%d messages unread", unreadMsgCount);
+    
+    NSArray *allQuickbloxConversations = [[QBStorage shared].allQuickBloxHistoryConversation allValues];
+    for (NSMutableDictionary *conversation in allQuickbloxConversations) {
+        unreadMsgCount += [conversation[kUnread] integerValue];
+    }
+    return unreadMsgCount;
 }
 
 @end

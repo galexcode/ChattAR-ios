@@ -43,6 +43,11 @@
     
     [Flurry logEvent:kFlurryEventDialogScreenWasOpened];
     
+    // hide labels for unread messages:
+    self.conversation[kUnread] = @0;
+    self.opponent[kUnread] = @NO;
+    [[NSNotificationCenter defaultCenter] postNotificationName:CADialogsHideUnreadMessagesLabelNotification object:nil];
+    
     [self configureInputTextViewLayer];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveMessage) name:CAChatDidReceiveOrSendMessageNotification object:nil];
     self.title = [self.opponent objectForKey:kName];

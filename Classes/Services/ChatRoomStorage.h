@@ -32,6 +32,6 @@
 - (NSMutableArray *)sortingRoomsByDistance:(CLLocation *)me toChatRooms:(NSArray *)rooms;
 - (void)increaseRankOfRoom:(QBCOCustomObject *)room;
 - (QBCOCustomObject *)findChatRoomWithName:(NSString *)roomName;
-- (void)trackAllUnreadMessages;
+- (int)trackAllUnreadMessages;
 
 @end

@@ -9,6 +9,7 @@
 #import "DialogsViewController.h"
 #import "DetailDialogsViewController.h"
 #import "DialogsDataSource.h"
+#import "ChatRoomStorage.h"
 #import "FBService.h"
 #import "FBStorage.h"
 #import "QBService.h"
@@ -34,6 +35,8 @@
     self.searchBar.autocorrectionType= UITextAutocorrectionTypeNo;
     self.dialogsDataSource = [[DialogsDataSource alloc] init];
     self.tableView.dataSource = self.dialogsDataSource;
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTableView) name:CADialogsHideUnreadMessagesLabelNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fillTableView) name:CAChatDidReceiveOrSendMessageNotification object:nil];
     
     NSArray *sortUsers = [self sortingUsers:[FBStorage shared].friends];
@@ -50,17 +53,17 @@
 #pragma mark -
 #pragma mark Notifications 
 
-- (void)fillTableView {
+- (void)fillTableView
+{
     self.otherUsers = [QBStorage shared].otherUsers;
     self.dialogsDataSource.otherUsers = self.otherUsers;
     [self.tableView reloadData];
 }
 
+- (void)reloadTableView {
+    [self.tableView reloadData];
+}
 
-#pragma mark -
-#pragma mark Table view data source
-
-/////////////lol/////////
 
 #pragma mark -
 #pragma mark Table View Delegate
@@ -188,6 +191,15 @@
 - (NSArray *)sortingUsers:(NSArray *)users {
     NSSortDescriptor *descriptor = [NSSortDescriptor sortDescriptorWithKey:kLastName ascending:YES];
    return [users sortedArrayUsingDescriptors:@[descriptor]];
+}
+
+
+#pragma mark -
+#pragma mark Unread Messages
+
+- (void)trackAllUnreadMessagesCount
+{
+    
 }
 
 @end

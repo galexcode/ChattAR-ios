@@ -15,6 +15,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import "MenuCell.h"
 #import "UserProfileCell.h"
+#import "ChatRoomStorage.h"
 #import "FBStorage.h"
 #import "Utilites.h"
 #import "QBService.h"
@@ -22,8 +23,8 @@
 
 @interface MenuViewController ()
 
-@property (strong, nonatomic) IBOutlet UIView *unreadLabel;
-
+@property (strong, nonatomic) IBOutlet UILabel *unreadMsgRank;
+@property (strong, nonatomic) IBOutlet UIImageView *redBubleForRank;
 
 @end
 
@@ -37,17 +38,23 @@
 #pragma mark - 
 #pragma mark ViewController Lifecycle
 
-- (void)viewDidUnload {
+- (void)viewDidUnload
+{
     [self setFirstNameField:nil];
     [super viewDidUnload];
 }
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
     [self configureQButton];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(trackAllUnreadMessagesCount) name:CADialogsHideUnreadMessagesLabelNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(trackAllUnreadMessagesCount) name:CAChatDidReceiveOrSendMessageNotification object:nil];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
+- (void)viewDidAppear:(BOOL)animated
+{
     [super viewDidAppear:NO];
     NSString *firstLastName = [[FBStorage shared].me objectForKey:kName];
     [self.firstNameField setText:firstLastName];
@@ -61,7 +68,8 @@
 #pragma mark - 
 #pragma mark Options
 
-- (void)checkForARModuleAvailable {
+- (void)checkForARModuleAvailable
+{
     if (![Utilites deviceSupportsAR]) {
         NSArray *indexPaths = [NSArray arrayWithObject:[NSIndexPath indexPathForRow:4 inSection:0]];
         [Utilites shared].isArNotAvailable = YES;
@@ -73,7 +81,8 @@
 #pragma mark -
 #pragma mark QuickBlox Button
 
-- (void)configureQButton {
+- (void)configureQButton
+{
     UIImage *img = [UIImage imageNamed:@"qb_mnu_grey.png"];
     UIButton *qbButton = [[UIButton alloc] init];
     qbButton.backgroundColor = [UIColor colorWithPatternImage:img];
@@ -239,6 +248,27 @@
     [[FBStorage shared] setAccessToken:nil];
     [[FBStorage shared] setMe:nil];
     [Flurry logEvent:kFlurryEventUserWasLoggedOut];
+}
+
+
+#pragma mark -
+#pragma mark Unread Messages
+
+- (void)trackAllUnreadMessagesCount
+{
+    if ([ControllerStateService shared].isInDialog) {
+        return;
+    }
+    int unreadMsgCount = [[ChatRoomStorage shared] trackAllUnreadMessages];
+    
+    if (unreadMsgCount == 0) {
+        self.redBubleForRank.hidden = YES;
+        self.unreadMsgRank.hidden = YES;
+    } else {
+        self.unreadMsgRank.text = [NSString stringWithFormat:@"%d", unreadMsgCount];
+        self.redBubleForRank.hidden = NO;
+        self.unreadMsgRank.hidden = NO;
+    }
 }
 
 @end
