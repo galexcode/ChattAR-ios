@@ -141,6 +141,7 @@
 		69A402B017D7431E00E7BE1F /* MenuViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 69A402AF17D7431D00E7BE1F /* MenuViewController.m */; };
 		69A402B417D7452E00E7BE1F /* SplashViewSegue.m in Sources */ = {isa = PBXBuildFile; fileRef = 69A402B317D7452E00E7BE1F /* SplashViewSegue.m */; };
 		69A477A617C513C100591A28 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 69A477A517C513C100591A28 /* Security.framework */; };
+		69A7E0221885A25D00D553C5 /* NSMutableArray+MoveObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = 69A7E0211885A25D00D553C5 /* NSMutableArray+MoveObjects.m */; };
 		69AE64DD18327D3A005A1AE4 /* FriendDialogDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 69AE64DC18327D3A005A1AE4 /* FriendDialogDataSource.m */; };
 		69AF72EE186C27F3005FFAD1 /* btn.png in Resources */ = {isa = PBXBuildFile; fileRef = 69AF72EA186C27F3005FFAD1 /* btn.png */; };
 		69AF72EF186C27F3005FFAD1 /* btn@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 69AF72EB186C27F3005FFAD1 /* btn@2x.png */; };
@@ -481,6 +482,8 @@
 		69A402B217D7452E00E7BE1F /* SplashViewSegue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SplashViewSegue.h; sourceTree = "<group>"; };
 		69A402B317D7452E00E7BE1F /* SplashViewSegue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SplashViewSegue.m; sourceTree = "<group>"; };
 		69A477A517C513C100591A28 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		69A7E0201885A25D00D553C5 /* NSMutableArray+MoveObjects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableArray+MoveObjects.h"; sourceTree = "<group>"; };
+		69A7E0211885A25D00D553C5 /* NSMutableArray+MoveObjects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableArray+MoveObjects.m"; sourceTree = "<group>"; };
 		69AE64DB18327D3A005A1AE4 /* FriendDialogDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FriendDialogDataSource.h; sourceTree = "<group>"; };
 		69AE64DC18327D3A005A1AE4 /* FriendDialogDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FriendDialogDataSource.m; sourceTree = "<group>"; };
 		69AF72EA186C27F3005FFAD1 /* btn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = btn.png; sourceTree = "<group>"; };
@@ -1035,6 +1038,8 @@
 				69D5F6691848DEAD00BDA9AB /* UIImage+Cropper.m */,
 				69C1C29E1875AE0D00C7D137 /* ChattARAppDelegate+PushNotifications.h */,
 				69C1C29F1875AE0D00C7D137 /* ChattARAppDelegate+PushNotifications.m */,
+				69A7E0201885A25D00D553C5 /* NSMutableArray+MoveObjects.h */,
+				69A7E0211885A25D00D553C5 /* NSMutableArray+MoveObjects.m */,
 			);
 			path = Categories;
 			sourceTree = "<group>";
@@ -2239,6 +2244,7 @@
 				69601BDA181FBB8700E842C8 /* DialogsViewController.m in Sources */,
 				BF000331185A2FDF00F83907 /* XMPPCapabilitiesCoreDataStorage.m in Sources */,
 				BF00031F185A2FDF00F83907 /* XMPPvCardTempBase.m in Sources */,
+				69A7E0221885A25D00D553C5 /* NSMutableArray+MoveObjects.m in Sources */,
 				BF000304185A2FDF00F83907 /* XMPPGoogleSharedStatus.m in Sources */,
 				BF0002F8185A2FDF00F83907 /* NSNumber+XMPP.m in Sources */,
 				69D5F66A1848DEAD00BDA9AB /* UIImage+Cropper.m in Sources */,

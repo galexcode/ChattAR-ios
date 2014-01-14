@@ -95,7 +95,7 @@
     }
     [[QBChat instance] loginWithUser:me];
     [[QBStorage shared] loadHistory];
-    
+    [[AppSettingsService shared] checkSoundAndVibration];
     MBProgressHUD *currentHUD = [MBProgressHUD HUDForView:currentWindow];
     if (currentHUD == nil) {
         [Utilites shared].progressHUD = [MBProgressHUD showHUDAddedTo:currentWindow animated:YES];
@@ -108,7 +108,6 @@
         }
         [currentHUD performSelector:@selector(show:) withObject:nil];
     }
-    [[AppSettingsService shared] checkSoundAndVibration];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application

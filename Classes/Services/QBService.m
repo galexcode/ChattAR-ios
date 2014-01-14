@@ -139,7 +139,7 @@
         NSMutableArray *messages = temporary[kMessage];
         [messages addObject:message];
         
-        [[NSNotificationCenter defaultCenter] postNotificationName:CAChatDidReceiveOrSendMessageNotification object:nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:CAChatDidReceiveOrSendMessageNotification object:@{kFrom:userID}];
     } else {
         NSMutableArray *messages = [[NSMutableArray alloc] initWithObjects:message, nil];
         if (received == YES) {
@@ -151,7 +151,7 @@
         NSMutableDictionary *opponent = [self findUserWithID:userID];
         if (opponent != nil) {
             opponent[kUnread] = @YES;
-            [[NSNotificationCenter defaultCenter] postNotificationName:CAChatDidReceiveOrSendMessageNotification object:nil];
+            [[NSNotificationCenter defaultCenter] postNotificationName:CAChatDidReceiveOrSendMessageNotification object:@{kFrom:userID}];
             return;
         }
         
@@ -163,7 +163,7 @@
             newUser[kQuickbloxID] = [@(message.senderID) stringValue];
             newUser[kUnread] = @YES;
             [[QBStorage shared].otherUsers addObject:newUser];
-            [[NSNotificationCenter defaultCenter] postNotificationName:CAChatDidReceiveOrSendMessageNotification object:nil];
+            [[NSNotificationCenter defaultCenter] postNotificationName:CAChatDidReceiveOrSendMessageNotification object:@{kFrom:userID}];
         }];
     }
 }
@@ -306,6 +306,7 @@
     if (push != nil) {
         [ (ChattARAppDelegate *)[UIApplication sharedApplication].delegate processRemoteNotification:push];
         push = nil;
+        [QBStorage shared].pushNotification = nil;
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:kNotificationDidLogin object:nil];

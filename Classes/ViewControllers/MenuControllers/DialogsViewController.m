@@ -8,6 +8,7 @@
 
 #import "DialogsViewController.h"
 #import "DetailDialogsViewController.h"
+#import "NSMutableArray+MoveObjects.h"
 #import "DialogsDataSource.h"
 #import "ChatRoomStorage.h"
 #import "FBService.h"
@@ -37,7 +38,7 @@
     self.tableView.dataSource = self.dialogsDataSource;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTableView) name:CADialogsHideUnreadMessagesLabelNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fillTableView) name:CAChatDidReceiveOrSendMessageNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fillTableView:) name:CAChatDidReceiveOrSendMessageNotification object:nil];
     
     NSArray *sortUsers = [self sortingUsers:[FBStorage shared].friends];
     [FBStorage shared].friends = [NSMutableArray arrayWithArray:sortUsers];
@@ -53,8 +54,17 @@
 #pragma mark -
 #pragma mark Notifications 
 
-- (void)fillTableView
+- (void)fillTableView:(NSNotification *)aNotification
 {
+    NSDictionary *userInfo = aNotification.object;
+    NSString *opponentID = userInfo[kFrom];
+    if (opponentID != nil) {
+        NSMutableArray *allFriends = [FBStorage shared].friends;
+        NSDictionary *opponent = [[FBService shared] findFriendWithID:opponentID];
+        NSUInteger indx = [allFriends indexOfObject:opponent];
+        [allFriends moveObjectAtIndex:indx toIndex:0];
+    }
+    
     self.otherUsers = [QBStorage shared].otherUsers;
     self.dialogsDataSource.otherUsers = self.otherUsers;
     [self.tableView reloadData];
