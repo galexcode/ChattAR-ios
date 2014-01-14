@@ -3,7 +3,7 @@
 //  ChattAR
 //
 //  Created by Igor Alefirenko on 02/01/2014.
-//  Copyright (c) 2014 Stefano Antonelli. All rights reserved.
+//  Copyright (c) 2014 by Quickblox. All rights reserved.
 //
 
 #import "ChattARAppDelegate+PushNotifications.h"
@@ -28,6 +28,9 @@ static NSString *chatRoomIdentifier = @"chatRoomController";
     // Get Push notification params:
     NSDictionary *aps = userInfo[@"aps"];
     NSString *opponentID = aps[kId];
+    if ([opponentID isEqual:[FBStorage shared].me[kId]]) {
+        return;
+    }
     NSString *qbOpponentID = aps[kQuickbloxID];
     NSString *roomName = aps[kRoomName];
     

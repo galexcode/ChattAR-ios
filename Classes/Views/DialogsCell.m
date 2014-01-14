@@ -21,8 +21,11 @@
     
     // set user's text
     cell.name.text = [aFriend objectForKey:kName];
+    
     if ([aFriend[kUnread] boolValue]) {
         cell.backgroundColor = [UIColor lightGrayColor];
+    } else {
+        cell.backgroundColor = [UIColor whiteColor];
     }
 }
 

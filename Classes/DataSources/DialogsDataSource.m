@@ -68,6 +68,9 @@
         case 0:{
             NSDictionary *friend = [self.friends objectAtIndex:indexPath.row];
             [DialogsCell configureDialogsCell:cell forIndexPath:indexPath forFriend:friend];
+            if ([friend[kUnread] boolValue]) {
+                cell.backgroundColor = [UIColor lightGrayColor];
+            }
         }
             break;
             

@@ -128,14 +128,17 @@
 - (void)cachingMessage:(QBChatMessage *)message forUserID:(NSString *)userID received:(BOOL)received{
     NSMutableDictionary *temporary = [QBStorage shared].allQuickBloxHistoryConversation[userID];
     if (temporary != nil) {
+        NSMutableDictionary *opponent = [self findUserWithID:userID];
         // unread messages count:
         if (received == YES) {
             int numb = [temporary[kUnread] integerValue];
             numb++;
             temporary[kUnread] = @(numb);
+            opponent[kUnread] = @YES;
         }
         NSMutableArray *messages = temporary[kMessage];
         [messages addObject:message];
+        
         [[NSNotificationCenter defaultCenter] postNotificationName:CAChatDidReceiveOrSendMessageNotification object:nil];
     } else {
         NSMutableArray *messages = [[NSMutableArray alloc] initWithObjects:message, nil];
@@ -299,9 +302,10 @@
         [[Utilites shared].progressHUD performSelector:@selector(show:) withObject:nil];
     }
     
-    if ([QBStorage shared].pushNotification != nil) {
-        [ (ChattARAppDelegate *)[UIApplication sharedApplication].delegate processRemoteNotification:[QBStorage shared].pushNotification];
-        [QBStorage shared].pushNotification = nil;
+    NSDictionary *push = [QBStorage shared].pushNotification;
+    if (push != nil) {
+        [ (ChattARAppDelegate *)[UIApplication sharedApplication].delegate processRemoteNotification:push];
+        push = nil;
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:kNotificationDidLogin object:nil];

@@ -279,7 +279,9 @@
     // Send message to chat room
     [[QBService defaultService] sendMessage:trimmedString toChatRoom:[QBStorage shared].joinedChatRoom quote:quote];
     if (quote != nil) {
-        [[QBService defaultService] sendPushNotificationWithMessage:trimmedString toUser:self.opponentID roomName:self.currentChatRoom.fields[kName]];
+        NSString *roomName = self.currentChatRoom.fields[kName];
+        NSString *pushMessage = [NSString stringWithFormat:@"Your message in room %@ was quoted by user %@.", roomName, [FBStorage shared].me[kName]];
+        [[QBService defaultService] sendPushNotificationWithMessage:pushMessage toUser:self.opponentID roomName:roomName];
     }
     self.inputMessageField.text = @"";
     [self.chatRoomTable reloadData];

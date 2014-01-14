@@ -134,7 +134,7 @@
 - (NSMutableArray *)searchText:(NSString *)text  inArray:(NSMutableArray *)array {
     NSMutableArray *found = [[NSMutableArray alloc] init];
 
-    [array enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+    [array enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         if ([self searchingString:obj[kName] inString:text]) {
             [found addObject:obj];
         }
@@ -153,29 +153,23 @@
 
     if ([self.friends count] == 0 && [self.otherUsers count] == 0) {
         self.noResultsLabel.hidden = NO;
-        
     } else if (searchText.length == 0) {
         self.noResultsLabel.hidden = YES;
         [self.tableView reloadData];
-    
     } else {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSMutableArray *foundedFriends = [self searchText:searchText inArray:self.friends];
-            NSMutableArray *foundedOpponents = [self searchText:searchText inArray:self.otherUsers];
-            
-            [self.friends removeAllObjects];
-            [self.friends addObjectsFromArray:foundedFriends];
-            
-            [self.otherUsers removeAllObjects];
-            [self.otherUsers addObjectsFromArray:foundedOpponents];
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if ([self.friends count] == 0 && [self.otherUsers count] == 0) {
-                    self.noResultsLabel.hidden = NO;
-                }
-                [self.tableView reloadData];
-            });
-        });
+        NSMutableArray *foundedFriends = [self searchText:searchText inArray:self.friends];
+        NSMutableArray *foundedOpponents = [self searchText:searchText inArray:self.otherUsers];
+        
+        [self.friends removeAllObjects];
+        [self.friends addObjectsFromArray:foundedFriends];
+        
+        [self.otherUsers removeAllObjects];
+        [self.otherUsers addObjectsFromArray:foundedOpponents];
+    
+        if ([self.friends count] == 0 && [self.otherUsers count] == 0) {
+            self.noResultsLabel.hidden = NO;
+        }
+        [self.tableView reloadData];
     }
 }
 

@@ -378,20 +378,15 @@
     if (searchText.length == 0) {
         [self.trendingTableView reloadData];
     } else {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSMutableArray *foundedFriends = [self searchText:searchText inArray:self.trendings];
-            
-            [self.trendings removeAllObjects];
-            [self.trendings addObjectsFromArray:foundedFriends];
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if ([self.trendings count] == 0) {
-                    self.noMatchResultsView.hidden = NO;
-                    self.trendingFooterLabel.text = nil;
-                }
-                [self.trendingTableView reloadData];
-            });
-        });
+        NSMutableArray *foundedFriends = [self searchText:searchText inArray:self.trendings];
+        
+        [self.trendings removeAllObjects];
+        [self.trendings addObjectsFromArray:foundedFriends];
+        if ([self.trendings count] == 0) {
+            self.noMatchResultsView.hidden = NO;
+            self.trendingFooterLabel.text = nil;
+        }
+        [self.trendingTableView reloadData];
     }
 }
 
@@ -411,11 +406,11 @@
 - (NSMutableArray *)searchText:(NSString *)text  inArray:(NSMutableArray *)array
 {
     NSMutableArray *founded = [[NSMutableArray alloc] init];
-    [array enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(QBCOCustomObject *obj, NSUInteger idx, BOOL *stop) {
+    for (QBCOCustomObject *obj in array) {
         if ([self searchingString:obj.fields[kName] inString:text]) {
             [founded addObject:obj];
         }
-    }];
+    }
     return founded;
 }
 
@@ -429,6 +424,7 @@
     self.trendingDataSource.chatRooms = _trendings;
     [searchBar setShowsCancelButton:NO animated:YES];
     [searchBar resignFirstResponder];
+    self.noMatchResultsView.hidden = YES;
     self.trendingFooterLabel.text = @"Load more...";
     [self.trendingTableView reloadData];
 }
