@@ -139,7 +139,7 @@
         NSMutableArray *messages = temporary[kMessage];
         [messages addObject:message];
         
-        [[NSNotificationCenter defaultCenter] postNotificationName:CAChatDidReceiveOrSendMessageNotification object:@{kFrom:userID}];
+        [[NSNotificationCenter defaultCenter] postNotificationName:CAChatDidReceiveOrSendMessageNotification object:nil];
     } else {
         NSMutableArray *messages = [[NSMutableArray alloc] initWithObjects:message, nil];
         if (received == YES) {
@@ -151,7 +151,7 @@
         NSMutableDictionary *opponent = [self findUserWithID:userID];
         if (opponent != nil) {
             opponent[kUnread] = @YES;
-            [[NSNotificationCenter defaultCenter] postNotificationName:CAChatDidReceiveOrSendMessageNotification object:@{kFrom:userID}];
+            [[NSNotificationCenter defaultCenter] postNotificationName:CAChatDidReceiveOrSendMessageNotification object:nil];
             return;
         }
         
@@ -163,7 +163,7 @@
             newUser[kQuickbloxID] = [@(message.senderID) stringValue];
             newUser[kUnread] = @YES;
             [[QBStorage shared].otherUsers addObject:newUser];
-            [[NSNotificationCenter defaultCenter] postNotificationName:CAChatDidReceiveOrSendMessageNotification object:@{kFrom:userID}];
+            [[NSNotificationCenter defaultCenter] postNotificationName:CAChatDidReceiveOrSendMessageNotification object:nil];
         }];
     }
 }
@@ -300,12 +300,11 @@
     if ([QBService defaultService].userIsJoinedChatRoom) {
         [[QBService defaultService] loginToChatFromBackground];
         [[Utilites shared].progressHUD performSelector:@selector(show:) withObject:nil];
+        return;
     }
     
-    NSDictionary *push = [QBStorage shared].pushNotification;
-    if (push != nil) {
-        [ (ChattARAppDelegate *)[UIApplication sharedApplication].delegate processRemoteNotification:push];
-        push = nil;
+    if ([QBStorage shared].pushNotification != nil) {
+        [ (ChattARAppDelegate *)[UIApplication sharedApplication].delegate processRemoteNotification:[QBStorage shared].pushNotification];
         [QBStorage shared].pushNotification = nil;
     }
 
@@ -332,6 +331,11 @@
 - (void)chatRoomDidEnter:(QBChatRoom *)room
 {
     [room addUsers:@[@34]];
+    
+    if ([QBStorage shared].pushNotification != nil && [QBService defaultService].userIsJoinedChatRoom) {
+        [ (ChattARAppDelegate *)[UIApplication sharedApplication].delegate processRemoteNotification:[QBStorage shared].pushNotification];
+        [QBStorage shared].pushNotification = nil;
+    }
     
     [QBService defaultService].userIsJoinedChatRoom = YES;
     NSLog(@"Chat Room is opened");

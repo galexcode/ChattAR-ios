@@ -40,8 +40,12 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTableView) name:CADialogsHideUnreadMessagesLabelNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fillTableView:) name:CAChatDidReceiveOrSendMessageNotification object:nil];
     
+    static dispatch_once_t onceToken;
+dispatch_once(&onceToken, ^{
     NSArray *sortUsers = [self sortingUsers:[FBStorage shared].friends];
-    [FBStorage shared].friends = [NSMutableArray arrayWithArray:sortUsers];
+    [FBStorage shared].friends = [sortUsers mutableCopy];
+});
+    
     self.friends = [FBStorage shared].friends;
     self.otherUsers = [[QBStorage shared].otherUsers mutableCopy];
     
@@ -56,15 +60,14 @@
 
 - (void)fillTableView:(NSNotification *)aNotification
 {
-    NSDictionary *userInfo = aNotification.object;
-    NSString *opponentID = userInfo[kFrom];
-    if (opponentID != nil) {
+    if (aNotification.userInfo != nil) {
         NSMutableArray *allFriends = [FBStorage shared].friends;
-        NSDictionary *opponent = [[FBService shared] findFriendWithID:opponentID];
+        NSDictionary *opponent = aNotification.userInfo;
         NSUInteger indx = [allFriends indexOfObject:opponent];
         [allFriends moveObjectAtIndex:indx toIndex:0];
+        
+        self.friends = [FBStorage shared].friends;
     }
-    
     self.otherUsers = [QBStorage shared].otherUsers;
     self.dialogsDataSource.otherUsers = self.otherUsers;
     [self.tableView reloadData];

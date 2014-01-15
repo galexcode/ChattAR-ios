@@ -8,14 +8,23 @@
 #import "Utilites.h"
 #import "SASlideMenuViewController.h"
 #import "SASlideMenuRootViewController.h"
+
+
 @interface SASlideMenuViewController ()<SASlideMenuDataSource,SASlideMenuDelegate>
+
 @property (nonatomic) NSIndexPath* currentContentIndexPath;
 @property (nonatomic, weak) NSIndexPath *lastPath;
+
 @end
 
+
+
 @implementation SASlideMenuViewController
+
+
 #pragma mark -
 #pragma mark Init
+
 -(void)setup; {
     if(self.slideMenuDataSource == nil)
         self.slideMenuDataSource = self;
@@ -96,11 +105,11 @@
 
 
 - (NSIndexPath *)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    if (![[Utilites shared] isUserLoggedIn]) {
-        return [NSIndexPath indexPathForRow:2 inSection:0];
+
+    if ([indexPath isEqual:[ControllerStateService shared].lastIndexPath]) {
+        return indexPath;
     }
-    
-    
+    [ControllerStateService shared].lastIndexPath = indexPath;
     if((indexPath.row == 1) || (indexPath.row == 0)){
         return nil;
     }

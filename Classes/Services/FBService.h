@@ -20,9 +20,9 @@
 #pragma mark -
 #pragma mark Facebook Requests
 
-- (void) userProfileWithResultBlock:(FBResultBlock)resultBlock;
-- (void) userFriendsUsingBlock:(FBResultBlock)resultBlock;
-- (void) userProfileWithID:(NSString *)userID withBlock:(FBResultBlock)resultBlock;
+- (void)userProfileWithResultBlock:(FBResultBlock)resultBlock;
+- (void)userFriendsUsingBlock:(FBResultBlock)resultBlock;
+- (void)userProfileWithID:(NSString *)userID withBlock:(FBResultBlock)resultBlock;
 - (void)usersProfilesWithIDs:(NSArray *)userIDs resultBlock:(FBResultBlock)resultBlock;
 
 

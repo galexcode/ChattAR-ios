@@ -12,7 +12,8 @@
 @implementation ControllerStateService
 
 
-+ (instancetype)shared {
++ (instancetype)shared
+{
     static id stateInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{

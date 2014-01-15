@@ -19,6 +19,8 @@
 // Index of controller, which was being active, when app hides
 @property (nonatomic, assign) NSUInteger controllerIndex;
 
+@property (nonatomic, strong) NSIndexPath *lastIndexPath;
+
 + (instancetype)shared;
 
 @end

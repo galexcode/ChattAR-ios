@@ -436,7 +436,7 @@
     [[[[[FBStorage shared].allFriendsHistoryConversation objectForKey:fromID] objectForKey:kComments] objectForKey:kData] addObject:message];
     
     // post notification
-    [[NSNotificationCenter defaultCenter] postNotificationName:CAChatDidReceiveOrSendMessageNotification object:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:CAChatDidReceiveOrSendMessageNotification object:nil userInfo:friend];
     
     // play sound and vibrate:
     AppSettingsService *service = [AppSettingsService shared];
