@@ -332,11 +332,6 @@
 {
     [room addUsers:@[@34]];
     
-    if ([QBStorage shared].pushNotification != nil && [QBService defaultService].userIsJoinedChatRoom) {
-        [ (ChattARAppDelegate *)[UIApplication sharedApplication].delegate processRemoteNotification:[QBStorage shared].pushNotification];
-        [QBStorage shared].pushNotification = nil;
-    }
-    
     [QBService defaultService].userIsJoinedChatRoom = YES;
     NSLog(@"Chat Room is opened");
     

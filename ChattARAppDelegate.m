@@ -34,6 +34,9 @@
 -(void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
 {
     [QBStorage shared].pushNotification = userInfo;
+    if ([QBService defaultService].userIsJoinedChatRoom) {
+        [QBService defaultService].userIsJoinedChatRoom = NO;
+    }
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
