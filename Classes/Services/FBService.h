@@ -45,6 +45,7 @@
 - (NSMutableArray *)gettingAllIDsOfFacebookUsers:(NSMutableArray *)facebookUsers;
 // users should have Facebook ID & Quiclblox ID for correct work of chat with non-friend
 - (NSMutableArray *)putQuickbBloxIDsToFacebookUsers:(NSMutableArray *)facebookUsers fromQuickbloxUsers:(NSArray *)quickbloxUsers ;
+
 - (NSDictionary *)findFriendWithID:(NSString *)facebookID;
 
 

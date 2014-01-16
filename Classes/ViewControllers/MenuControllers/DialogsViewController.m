@@ -20,8 +20,8 @@
 
 @property (strong, nonatomic) IBOutlet UILabel *noResultsLabel;
 @property (strong, nonatomic) IBOutlet UISearchBar *searchBar;
-@property (nonatomic, strong) NSMutableArray *friends;
-@property (nonatomic, strong) NSMutableArray *otherUsers;
+@property (nonatomic, strong) NSMutableArray *allUsers;
+@property (nonatomic, strong) NSMutableArray *searchedUsers;
 @property (nonatomic, strong) DialogsDataSource *dialogsDataSource;
 
 @end
@@ -36,22 +36,23 @@
     self.searchBar.autocorrectionType= UITextAutocorrectionTypeNo;
     self.dialogsDataSource = [[DialogsDataSource alloc] init];
     self.tableView.dataSource = self.dialogsDataSource;
+    [self reloadUsers];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTableView) name:CADialogsHideUnreadMessagesLabelNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fillTableView:) name:CAChatDidReceiveOrSendMessageNotification object:nil];
     
-    static dispatch_once_t onceToken;
-dispatch_once(&onceToken, ^{
-    NSArray *sortUsers = [self sortingUsers:[FBStorage shared].friends];
-    [FBStorage shared].friends = [sortUsers mutableCopy];
-});
-    
-    self.friends = [FBStorage shared].friends;
-    self.otherUsers = [[QBStorage shared].otherUsers mutableCopy];
-    
-    self.dialogsDataSource.friends = self.friends;
-    self.dialogsDataSource.otherUsers = self.otherUsers;
+    self.dialogsDataSource.allUsers = self.allUsers;
     [self.tableView reloadData];
+}
+
+- (void)reloadUsers
+{
+    NSMutableArray *friends = [FBStorage shared].friends;
+    NSMutableArray *otherUsers = [QBStorage shared].otherUsers;
+    
+    self.allUsers = [NSMutableArray arrayWithArray:friends];
+    [self.allUsers addObjectsFromArray:otherUsers];
+    self.allUsers = [[self sortingUsers:self.allUsers] mutableCopy];
 }
 
 
@@ -60,16 +61,9 @@ dispatch_once(&onceToken, ^{
 
 - (void)fillTableView:(NSNotification *)aNotification
 {
-    if (aNotification.userInfo != nil) {
-        NSMutableArray *allFriends = [FBStorage shared].friends;
-        NSDictionary *opponent = aNotification.userInfo;
-        NSUInteger indx = [allFriends indexOfObject:opponent];
-        [allFriends moveObjectAtIndex:indx toIndex:0];
-        
-        self.friends = [FBStorage shared].friends;
-    }
-    self.otherUsers = [QBStorage shared].otherUsers;
-    self.dialogsDataSource.otherUsers = self.otherUsers;
+    
+    [self reloadUsers];
+    self.dialogsDataSource.allUsers = self.allUsers;
     [self.tableView reloadData];
 }
 
@@ -93,29 +87,22 @@ dispatch_once(&onceToken, ^{
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
-    NSMutableDictionary *user;
-    NSMutableDictionary *conversation;
     NSIndexPath *indexPath = (NSIndexPath *)sender;
-    switch (indexPath.section) {
-        case 0:
-        {
-            user = self.friends[indexPath.row];
-            conversation = [FBService findFBConversationWithFriend:user];
-            ((DetailDialogsViewController *)segue.destinationViewController).isChatWithFacebookFriend = YES;
-        }
-            break;
-        case 1:
-        {
-            user = [self.otherUsers objectAtIndex:indexPath.row];
-            conversation = [[QBService defaultService] findConversationWithUser:user];
-            ((DetailDialogsViewController *)segue.destinationViewController).isChatWithFacebookFriend = NO;
-        }
-            break;
-            
-        default:
-            break;
+
+    NSMutableDictionary *user = [self.searchedUsers objectAtIndex:indexPath.row];
+    if (user == nil) {
+        user = [self.allUsers objectAtIndex:indexPath.row];
     }
     
+    BOOL isFriend =[[FBStorage shared] isFacebookFriend:user];
+     NSMutableDictionary *conversation;
+    if (isFriend) {
+        conversation = [FBService findFBConversationWithFriend:user];
+        ((DetailDialogsViewController *)segue.destinationViewController).isChatWithFacebookFriend = YES;
+    } else {
+        conversation = [[QBService defaultService] findConversationWithUser:user];
+        ((DetailDialogsViewController *)segue.destinationViewController).isChatWithFacebookFriend = NO;
+    }
     ((DetailDialogsViewController *)segue.destinationViewController).opponent = user;
     ((DetailDialogsViewController *)segue.destinationViewController).conversation = conversation;
 }
@@ -158,28 +145,20 @@ dispatch_once(&onceToken, ^{
 - (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText {
     self.noResultsLabel.hidden = YES;
     
-    self.friends = [[FBStorage shared].friends mutableCopy];
-    self.dialogsDataSource.friends = self.friends;
-    
-    self.otherUsers = [[QBStorage shared].otherUsers mutableCopy];
-    self.dialogsDataSource.otherUsers = self.otherUsers;
+    self.searchedUsers = [self.allUsers mutableCopy];
+    self.dialogsDataSource.allUsers = self.searchedUsers;
 
-    if ([self.friends count] == 0 && [self.otherUsers count] == 0) {
+    if ([self.searchedUsers count] == 0) {
         self.noResultsLabel.hidden = NO;
     } else if (searchText.length == 0) {
         self.noResultsLabel.hidden = YES;
         [self.tableView reloadData];
     } else {
-        NSMutableArray *foundedFriends = [self searchText:searchText inArray:self.friends];
-        NSMutableArray *foundedOpponents = [self searchText:searchText inArray:self.otherUsers];
-        
-        [self.friends removeAllObjects];
-        [self.friends addObjectsFromArray:foundedFriends];
-        
-        [self.otherUsers removeAllObjects];
-        [self.otherUsers addObjectsFromArray:foundedOpponents];
+        NSMutableArray *foundedUser = [self searchText:searchText inArray:self.searchedUsers];
+        [self.searchedUsers removeAllObjects];
+        [self.searchedUsers addObjectsFromArray:foundedUser];
     
-        if ([self.friends count] == 0 && [self.otherUsers count] == 0) {
+        if ([self.searchedUsers count] == 0) {
             self.noResultsLabel.hidden = NO;
         }
         [self.tableView reloadData];
@@ -197,16 +176,16 @@ dispatch_once(&onceToken, ^{
 
 - (NSArray *)sortingUsers:(NSArray *)users {
     NSSortDescriptor *descriptor = [NSSortDescriptor sortDescriptorWithKey:kLastName ascending:YES];
-   return [users sortedArrayUsingDescriptors:@[descriptor]];
-}
-
-
-#pragma mark -
-#pragma mark Unread Messages
-
-- (void)trackAllUnreadMessagesCount
-{
+    NSMutableArray *keySortedArray = [[users sortedArrayUsingDescriptors:@[descriptor]] mutableCopy];
     
+    [keySortedArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        //
+        if ([obj[kUnread] boolValue]) {
+            [keySortedArray moveObjectAtIndex:idx toIndex:0];
+        }
+    }];
+
+    return keySortedArray;
 }
 
 @end

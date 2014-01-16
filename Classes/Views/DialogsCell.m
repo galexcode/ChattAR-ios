@@ -10,19 +10,19 @@
 
 @implementation DialogsCell
 
-+ (void)configureDialogsCell:(DialogsCell *)cell forIndexPath:(NSIndexPath *)indexPath forFriend:(NSDictionary *)aFriend
++ (void)configureDialogsCell:(DialogsCell *)cell forIndexPath:(NSIndexPath *)indexPath forUser:(NSDictionary *)user
 {
     // cancel previous user's avatar loading
     [[AsyncImageLoader sharedLoader] cancelLoadingImagesForTarget:cell.asyncView];
     [cell.asyncView setImage:[UIImage imageNamed:@"human.png"]];
     
     // load user's avatar
-    [cell.asyncView setImageURL:[NSURL URLWithString:[aFriend objectForKey:kPhoto]]];
+    [cell.asyncView setImageURL:[NSURL URLWithString:[user objectForKey:kPhoto]]];
     
     // set user's text
-    cell.name.text = [aFriend objectForKey:kName];
+    cell.name.text = [user objectForKey:kName];
     
-    if ([aFriend[kUnread] boolValue]) {
+    if ([user[kUnread] boolValue]) {
         cell.backgroundColor = [UIColor lightGrayColor];
     } else {
         cell.backgroundColor = [UIColor whiteColor];

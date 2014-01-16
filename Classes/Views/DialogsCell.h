@@ -14,6 +14,6 @@
 @property (nonatomic, strong) IBOutlet AsyncImageView *asyncView;
 @property (strong, nonatomic) IBOutlet UILabel *name;
 
-+ (void)configureDialogsCell:(DialogsCell *)cell forIndexPath:(NSIndexPath *)indexPath forFriend:(NSDictionary *)aFriend;
++ (void)configureDialogsCell:(DialogsCell *)cell forIndexPath:(NSIndexPath *)indexPath forUser:(NSDictionary *)user;
 
 @end

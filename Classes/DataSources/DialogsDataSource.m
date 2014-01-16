@@ -12,51 +12,9 @@
 @implementation DialogsDataSource
 
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
-    return 2;
-}
-
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
-    NSString *title = [[NSString alloc] init];
-    switch (section) {
-        case 0:
-            if ([self.friends count] == 0) {
-                title = @"";
-                break;
-            }
-            title = @"Friends";
-            break;
-        case 1:
-            if ([self.otherUsers count] == 0) {
-                title = @"";
-                break;
-            }
-            title = @"Others";
-            break;
-            
-        default:
-            break;
-    }
-    return title;
-}
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    NSUInteger rows = 0;
-    switch (section) {
-        case 0:
-            rows = [self.friends count];
-            break;
-        case 1:
-            rows = [self.otherUsers count];
-            break;
-            
-        default:
-            break;
-    }
-    return rows;
+    return [self.allUsers count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -64,25 +22,9 @@
     static NSString *DialogsCellIdentifier = @"DialogsCell";
     DialogsCell *cell = [tableView dequeueReusableCellWithIdentifier:DialogsCellIdentifier forIndexPath:indexPath];
     
-    switch ([indexPath section]) {
-        case 0:{
-            NSDictionary *friend = [self.friends objectAtIndex:indexPath.row];
-            [DialogsCell configureDialogsCell:cell forIndexPath:indexPath forFriend:friend];
-            if ([friend[kUnread] boolValue]) {
-                cell.backgroundColor = [UIColor lightGrayColor];
-            }
-        }
-            break;
-            
-        case 1:{
-            NSDictionary *user = [self.otherUsers objectAtIndex:indexPath.row];
-            [DialogsCell configureDialogsCell:cell forIndexPath:indexPath forFriend:user];
-        }
-            break;
-            
-        default:
-            break;
-    }
+    NSDictionary *user = [self.allUsers objectAtIndex:indexPath.row];
+    [DialogsCell configureDialogsCell:cell forIndexPath:indexPath forUser:user];
+
     return cell;
 }
 

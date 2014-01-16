@@ -10,7 +10,7 @@
 
 @interface DialogsDataSource : NSObject <UITableViewDataSource>
 
-@property (nonatomic, strong) NSMutableArray *friends;
-@property (nonatomic, strong) NSMutableArray *otherUsers;
+@property (nonatomic, strong) NSMutableArray *allUsers;
+
 
 @end
