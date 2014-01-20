@@ -21,6 +21,8 @@
 #import "Utilites.h"
 #import "MBProgressHUD.h"
 
+#import "NSString+Parsing.h"
+
 
 @interface ChatRoomViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, QBChatDelegate, QBActionStatusDelegate, CLLocationManagerDelegate, UIActionSheetDelegate, SASlideMenuDelegate>
 
@@ -225,11 +227,18 @@
         //creating FBUser(No Friend):
         NSMutableDictionary *messageData = [[QBService defaultService] unarchiveMessageData:message.text];
         currentFriend = [[NSMutableDictionary alloc] init];
-        [currentFriend setObject:[messageData objectForKey:kUserName] forKey:kName];
-        NSString *urlString = [[NSString alloc] initWithFormat:@"https://graph.facebook.com/%@/picture?access_token=%@", [messageData objectForKey:kId], [FBStorage shared].accessToken];
-        [currentFriend setObject:urlString forKey:kPhoto];
-        [currentFriend setObject:[messageData objectForKey:kId] forKey:kId];
-        [currentFriend setObject:[messageData objectForKey:kQuickbloxID] forKey:kQuickbloxID];
+
+        NSString *fullName = messageData[kUserName];
+        currentFriend[kName] = fullName;
+        NSString *firstName = [fullName firstNameFromNameField];
+        currentFriend[kFirstName] = firstName;
+        NSString *lastName = [fullName lastNameFromNameField];
+        currentFriend[kLastName] = lastName;
+        
+        NSString *urlString = [[NSString alloc] initWithFormat:@"https://graph.facebook.com/%@/picture?access_token=%@", messageData[kId], [FBStorage shared].accessToken];
+        currentFriend[kPhoto] = urlString;
+        currentFriend[kId] = messageData[kId];
+        currentFriend[kQuickbloxID] = messageData[kQuickbloxID];
         // caching created user:
         [[QBStorage shared].otherUsers addObject:currentFriend];
     }

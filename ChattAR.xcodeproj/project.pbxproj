@@ -92,6 +92,7 @@
 		69601BE01820070800E842C8 /* DetailDialogsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 69601BDF1820070800E842C8 /* DetailDialogsViewController.m */; };
 		696B59F617E99EF900D60537 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 696B59F417E99EF900D60537 /* Icon.png */; };
 		696B59F717E99EF900D60537 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 696B59F517E99EF900D60537 /* Icon@2x.png */; };
+		6971BA40188D8CCF0008FDB4 /* NSString+Parsing.m in Sources */ = {isa = PBXBuildFile; fileRef = 6971BA3F188D8CCF0008FDB4 /* NSString+Parsing.m */; };
 		6981247817DDFF2C00974C6A /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 6981247617DDFF2C00974C6A /* Default.png */; };
 		6981247917DDFF2C00974C6A /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6981247717DDFF2C00974C6A /* Default@2x.png */; };
 		69864D3A180D2CD700AAA554 /* ARViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 69864D39180D2CD700AAA554 /* ARViewController.m */; };
@@ -422,6 +423,8 @@
 		69601BDF1820070800E842C8 /* DetailDialogsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetailDialogsViewController.m; sourceTree = "<group>"; };
 		696B59F417E99EF900D60537 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
 		696B59F517E99EF900D60537 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon@2x.png"; sourceTree = "<group>"; };
+		6971BA3E188D8CCF0008FDB4 /* NSString+Parsing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+Parsing.h"; sourceTree = "<group>"; };
+		6971BA3F188D8CCF0008FDB4 /* NSString+Parsing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+Parsing.m"; sourceTree = "<group>"; };
 		6981247617DDFF2C00974C6A /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		6981247717DDFF2C00974C6A /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		69864D38180D2CD700AAA554 /* ARViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ARViewController.h; sourceTree = "<group>"; };
@@ -1040,6 +1043,8 @@
 				69C1C29F1875AE0D00C7D137 /* ChattARAppDelegate+PushNotifications.m */,
 				69A7E0201885A25D00D553C5 /* NSMutableArray+MoveObjects.h */,
 				69A7E0211885A25D00D553C5 /* NSMutableArray+MoveObjects.m */,
+				6971BA3E188D8CCF0008FDB4 /* NSString+Parsing.h */,
+				6971BA3F188D8CCF0008FDB4 /* NSString+Parsing.m */,
 			);
 			path = Categories;
 			sourceTree = "<group>";
@@ -2289,6 +2294,7 @@
 				69E8ECD017E0AB0300D614AA /* TrendingChatRoomsDataSource.m in Sources */,
 				BF000321185A2FDF00F83907 /* XMPPvCardTempLabel.m in Sources */,
 				BF000346185A2FDF00F83907 /* XMPPMessage+XEP_0224.m in Sources */,
+				6971BA40188D8CCF0008FDB4 /* NSString+Parsing.m in Sources */,
 				69E8ECD417E0B4E900D614AA /* ChatRoomViewController.m in Sources */,
 				BF00030E185A2FDF00F83907 /* XMPPUserMemoryStorageObject.m in Sources */,
 				69165AE3182A91D300486DA8 /* ProfileViewController.m in Sources */,
@@ -2426,7 +2432,7 @@
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_EMPTY_BODY = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Injoit LTD (8885H5G2YX)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Khomenko Igor (67859YS754)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/External",
