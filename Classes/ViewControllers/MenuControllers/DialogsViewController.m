@@ -52,7 +52,7 @@
     
     self.allUsers = [NSMutableArray arrayWithArray:friends];
     [self.allUsers addObjectsFromArray:otherUsers];
-    self.allUsers = [[self sortingUsers:self.allUsers] mutableCopy];
+    self.allUsers = [self sortingUsers:self.allUsers];
 }
 
 
@@ -174,11 +174,11 @@
 #pragma mark -
 #pragma mark Sort
 
-- (NSArray *)sortingUsers:(NSArray *)users {
+- (NSMutableArray *)sortingUsers:(NSArray *)users {
     NSSortDescriptor *descriptor = [NSSortDescriptor sortDescriptorWithKey:kLastName ascending:YES];
     NSMutableArray *keySortedArray = [[users sortedArrayUsingDescriptors:@[descriptor]] mutableCopy];
     
-    [keySortedArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+    [users enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         //
         if ([obj[kUnread] boolValue]) {
             [keySortedArray moveObjectAtIndex:idx toIndex:0];

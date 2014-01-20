@@ -142,15 +142,16 @@
         [[NSNotificationCenter defaultCenter] postNotificationName:CAChatDidReceiveOrSendMessageNotification object:nil];
     } else {
         NSMutableArray *messages = [[NSMutableArray alloc] initWithObjects:message, nil];
-        if (received == YES) {
-            temporary = [@{kMessage: messages} mutableCopy];
-            temporary[kUnread] = @(1);
-        }
+        temporary = [@{kMessage: messages} mutableCopy];
+        
         [QBStorage shared].allQuickBloxHistoryConversation[userID] = temporary;
         // load user:
         NSMutableDictionary *opponent = [self findUserWithID:userID];
         if (opponent != nil) {
-            opponent[kUnread] = @YES;
+            if (received == YES) {
+                temporary[kUnread] = @(1);
+                opponent[kUnread] = @YES;
+            }
             [[NSNotificationCenter defaultCenter] postNotificationName:CAChatDidReceiveOrSendMessageNotification object:nil];
             return;
         }
