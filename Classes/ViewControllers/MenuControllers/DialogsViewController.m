@@ -45,6 +45,12 @@
     [self.tableView reloadData];
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:NO];
+    [self.tableView reloadData];
+}
+
 - (void)reloadUsers
 {
     NSMutableArray *friends = [FBStorage shared].friends;
@@ -64,6 +70,7 @@
     
     [self reloadUsers];
     self.dialogsDataSource.allUsers = self.allUsers;
+    self.searchedUsers = nil;
     [self.tableView reloadData];
 }
 

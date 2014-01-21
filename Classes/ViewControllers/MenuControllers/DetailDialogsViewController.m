@@ -72,11 +72,13 @@
 {
     [super viewWillAppear:NO];
     [ControllerStateService shared].isInDialog = YES;
+    [QBStorage shared].opponentDialogID = self.opponent[kId];
     [self reloadTableView];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [ControllerStateService shared].isInDialog = NO;
+    [QBStorage shared].opponentDialogID = nil;
     [super viewWillDisappear:NO];
 }
 

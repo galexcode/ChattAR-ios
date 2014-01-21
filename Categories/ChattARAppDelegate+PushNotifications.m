@@ -68,6 +68,10 @@ static NSString *chatRoomIdentifier = @"chatRoomController";
             }
             
         } else {
+            
+            if ([opponentID isEqual:[QBStorage shared].opponentDialogID]) {
+                return;
+            }
             // DIALOG:
             viewController = [myStoryboard instantiateViewControllerWithIdentifier:dialogIdentifier];
             if ([viewController isKindOfClass:[DetailDialogsViewController class]]) {

@@ -102,6 +102,7 @@
 {
     [super viewWillAppear:animated];
     [ControllerStateService shared].isInChatRoom = YES;
+    [self.chatRoomTable reloadData];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

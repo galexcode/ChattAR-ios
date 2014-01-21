@@ -178,10 +178,10 @@
     NSString *urlString = [[NSString alloc] initWithFormat:@"https://graph.facebook.com/%@/picture?access_token=%@", [FBStorage shared].me[kId], [FBStorage shared].accessToken];
     
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-    [dict setValue:myLatitude forKey:kLatitude];
-    [dict setValue:myLongitude forKey:kLongitude];
-    [dict setValue:urlString forKey:kPhoto];
-    [dict setValue:userName forKey:kUserName];
+    dict[kLatitude] = myLatitude;
+    dict[kLongitude] = myLongitude;
+    dict[kPhoto] = urlString;
+    dict[kUserName] = userName;
     
     dict[kId] = [FBStorage shared].me[kId];
     dict[kQuickbloxID] = [FBStorage shared].me[kQuickbloxID];
@@ -293,21 +293,60 @@
 {
     NSLog(@"Chat login success");
     self.presenceTimer = [NSTimer scheduledTimerWithTimeInterval:30 target:[QBChat instance] selector:@selector(sendPresence) userInfo:nil repeats:YES];
-    //start getting location:
-    //UIWindow *currentWindow = [[UIApplication sharedApplication].windows lastObject];
     [[LocationService shared] startUpdateLocation];
     [[Utilites shared].progressHUD performSelector:@selector(hide:) withObject:nil];
-    
-    if ([QBService defaultService].userIsJoinedChatRoom) {
-        [[QBService defaultService] loginToChatFromBackground];
-        [[Utilites shared].progressHUD performSelector:@selector(show:) withObject:nil];
-        return;
-    }
-    
+    NSDictionary *aps = [QBStorage shared].pushNotification[@"aps"];
+    //
     if ([QBStorage shared].pushNotification != nil) {
-        [ (ChattARAppDelegate *)[UIApplication sharedApplication].delegate processRemoteNotification:[QBStorage shared].pushNotification];
+        [[Utilites shared].progressHUD performSelector:@selector(show:) withObject:nil];
+        if ([QBService defaultService].userIsJoinedChatRoom) {
+            if (aps[kRoomName] == nil) {
+                [[QBService defaultService] loginToChatFromBackground];
+            }
+            if (![[QBStorage shared].chatRoomName isEqualToString:aps[kRoomName]]) {
+                [(ChattARAppDelegate *)[UIApplication sharedApplication].delegate processRemoteNotification:[QBStorage shared].pushNotification];
+            } else {
+                [[QBService defaultService] loginToChatFromBackground];
+            }
+        } else {
+            [(ChattARAppDelegate *)[UIApplication sharedApplication].delegate processRemoteNotification:[QBStorage shared].pushNotification];
+        }
         [QBStorage shared].pushNotification = nil;
+        return;
+    } else {
+        if ([QBService defaultService].userIsJoinedChatRoom) {
+            [[Utilites shared].progressHUD performSelector:@selector(show:) withObject:nil];
+            [[QBService defaultService] loginToChatFromBackground];
+        }
     }
+    
+    
+    
+    
+    
+    
+//    if ([QBService defaultService].userIsJoinedChatRoom) {
+//        if ([QBStorage shared].pushNotification == nil) {
+//            [[QBService defaultService] loginToChatFromBackground];
+//        }
+//        [[Utilites shared].progressHUD performSelector:@selector(show:) withObject:nil];
+//    }
+//    
+//    if ([QBStorage shared].pushNotification != nil) {
+//        [(ChattARAppDelegate *)[UIApplication sharedApplication].delegate processRemoteNotification:[QBStorage shared].pushNotification];
+//        [QBStorage shared].pushNotification = nil;
+//    }
+//    
+//    
+//    
+//    NSDictionary *aps = userInfo[@"aps"];
+//    if ([QBService defaultService].userIsJoinedChatRoom && [[QBStorage shared].chatRoomName isEqualToString:aps[kRoomName]]) {
+//        [QBService defaultService].userIsJoinedChatRoom = NO;
+//    }
+    
+    
+    
+    
 
     [[NSNotificationCenter defaultCenter] postNotificationName:kNotificationDidLogin object:nil];
 }
