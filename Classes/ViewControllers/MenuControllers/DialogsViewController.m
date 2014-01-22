@@ -185,7 +185,8 @@
     NSSortDescriptor *descriptor = [NSSortDescriptor sortDescriptorWithKey:kLastName ascending:YES];
     NSMutableArray *keySortedArray = [[users sortedArrayUsingDescriptors:@[descriptor]] mutableCopy];
     
-    [keySortedArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+    NSMutableArray *copiedArray = [keySortedArray mutableCopy];
+    [copiedArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         //
         if ([obj[kUnread] boolValue] == YES) {
             [keySortedArray moveObjectAtIndex:idx toIndex:0];

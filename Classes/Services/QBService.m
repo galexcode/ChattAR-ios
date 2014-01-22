@@ -205,6 +205,9 @@
 
 - (void)sendPushNotificationWithMessage:(NSString *)message toUser:(NSString *)quickbloxUserID roomName:(NSString *)roomName
 {
+    if (quickbloxUserID == nil) {
+        return;
+    }
     NSMutableDictionary *payload = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *aps = [[NSMutableDictionary alloc] init];
     aps[QBMPushMessageSoundKey] = @"default";
@@ -298,8 +301,8 @@
     NSDictionary *aps = [QBStorage shared].pushNotification[@"aps"];
     //
     if ([QBStorage shared].pushNotification != nil) {
-        [[Utilites shared].progressHUD performSelector:@selector(show:) withObject:nil];
         if ([QBService defaultService].userIsJoinedChatRoom) {
+            [[Utilites shared].progressHUD performSelector:@selector(show:) withObject:nil];
             if (aps[kRoomName] == nil) {
                 [[QBService defaultService] loginToChatFromBackground];
             }
@@ -312,6 +315,7 @@
             [(ChattARAppDelegate *)[UIApplication sharedApplication].delegate processRemoteNotification:[QBStorage shared].pushNotification];
         }
         [QBStorage shared].pushNotification = nil;
+        [[NSNotificationCenter defaultCenter] postNotificationName:kNotificationDidLogin object:nil];
         return;
     } else {
         if ([QBService defaultService].userIsJoinedChatRoom) {
@@ -319,35 +323,6 @@
             [[QBService defaultService] loginToChatFromBackground];
         }
     }
-    
-    
-    
-    
-    
-    
-//    if ([QBService defaultService].userIsJoinedChatRoom) {
-//        if ([QBStorage shared].pushNotification == nil) {
-//            [[QBService defaultService] loginToChatFromBackground];
-//        }
-//        [[Utilites shared].progressHUD performSelector:@selector(show:) withObject:nil];
-//    }
-//    
-//    if ([QBStorage shared].pushNotification != nil) {
-//        [(ChattARAppDelegate *)[UIApplication sharedApplication].delegate processRemoteNotification:[QBStorage shared].pushNotification];
-//        [QBStorage shared].pushNotification = nil;
-//    }
-//    
-//    
-//    
-//    NSDictionary *aps = userInfo[@"aps"];
-//    if ([QBService defaultService].userIsJoinedChatRoom && [[QBStorage shared].chatRoomName isEqualToString:aps[kRoomName]]) {
-//        [QBService defaultService].userIsJoinedChatRoom = NO;
-//    }
-    
-    
-    
-    
-
     [[NSNotificationCenter defaultCenter] postNotificationName:kNotificationDidLogin object:nil];
 }
 
