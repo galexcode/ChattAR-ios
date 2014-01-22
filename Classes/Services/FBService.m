@@ -274,22 +274,28 @@
             NSString *urlString = [[NSString alloc] initWithFormat:@"https://graph.facebook.com/%@/picture?access_token=%@",[frend objectForKey:kId],[FBStorage shared].accessToken];
             [frend setValue:urlString forKey:kPhoto];
         }
-        NSMutableArray *facebookUserIDs = [self gettingAllIDsOfFacebookUsers:myFriends];
-        if ([facebookUserIDs count] != 0) {
         
+        
+        NSMutableArray *facebookUserIDs = [self gettingAllIDsOfFacebookUsers:myFriends];
+        
+        if ([facebookUserIDs count] != 0) {
             // qb users will come here:
             void (^block) (Result *) = ^(Result *result) {
                 if ([result isKindOfClass:[QBUUserPagedResult class]]) {
-                    QBUUserPagedResult *pagedResult = (QBUUserPagedResult *)result;
-                    NSArray *qbUsers = pagedResult.users;
-                    // putting quickbloxIDs to facebook users:
-                    [FBStorage shared].friends = [self putQuickbBloxIDsToFacebookUsers:[FBStorage shared].friends fromQuickbloxUsers:qbUsers];
+                    if(result.success){
+                        QBUUserPagedResult *pagedResult = (QBUUserPagedResult *)result;
+                        NSArray *qbUsers = pagedResult.users;
+                        // putting quickbloxIDs to facebook users:
+                        [FBStorage shared].friends = [self putQuickbBloxIDsToFacebookUsers:[FBStorage shared].friends fromQuickbloxUsers:qbUsers];
+                    }else{
+                        QBDLog(@"FB search responce: %@", result.errors);
+                    }
                 }
             };
             // request for qb users:
             [QBUsers usersWithFacebookIDs:facebookUserIDs delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:block]];
             
-            
+            // Save facebook friends
             [[FBStorage shared] setFriends:myFriends];
         }
     }];

@@ -143,7 +143,11 @@
     }
     // sending push notification:
     NSString *pushMessage = [NSString stringWithFormat:@"%@: %@", [FBStorage shared].me[kName], trimmedString];
+    
+    // Send push notification
+    //
     [[QBService defaultService] sendPushNotificationWithMessage:pushMessage toUser:_opponent[kQuickbloxID] roomName:nil];
+   
     NSString *friendID = _opponent[kId];
     if (_isChatWithFacebookFriend) {
         [[FBService shared] sendMessage:trimmedString toUserWithID:friendID];
