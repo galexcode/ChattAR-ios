@@ -274,12 +274,66 @@
             NSString *urlString = [[NSString alloc] initWithFormat:@"https://graph.facebook.com/%@/picture?access_token=%@",[frend objectForKey:kId],[FBStorage shared].accessToken];
             [frend setValue:urlString forKey:kPhoto];
         }
+        NSMutableArray *facebookUserIDs = [self gettingAllIDsOfFacebookUsers:myFriends];
         
+        //////
+        NSMutableArray *termFBIDs = [[NSMutableArray alloc] init];
+        NSMutableArray *allQBUsers = [[NSMutableArray alloc] init];
+        __block int idx = 0;
+        void (^block) (Result *) = ^(Result *result) {
+            if (result.success && [result isKindOfClass:[QBUUserPagedResult class]]) {
+                idx--;
+                QBUUserPagedResult *pagedResult = (QBUUserPagedResult *)result;
+                NSArray *qbUsers = pagedResult.users;
+                [allQBUsers addObjectsFromArray:qbUsers];
+                if (idx == 0) {
+                    [FBStorage shared].friends = [self putQuickbBloxIDsToFacebookUsers:[FBStorage shared].friends fromQuickbloxUsers:allQBUsers];
+                    return;
+                }
+            }
+        };
+        for (NSMutableDictionary *userID in facebookUserIDs) {
+            if ([termFBIDs count] <= 199) {
+                [termFBIDs addObject:userID];
+            } else {
+                // QBUsers request:
+                [QBUsers usersWithFacebookIDs:termFBIDs delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:block]];
+                idx++;
+                // remove terminatearray and add one new object:
+                [termFBIDs removeAllObjects];
+                [termFBIDs addObject:userID];
+            }
+        }
+        if ([termFBIDs count] > 0) {
+            [QBUsers usersWithFacebookIDs:termFBIDs delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:block]];
+            idx++;
+            
+            NSMutableArray *facebookUserIDs = [self gettingAllIDsOfFacebookUsers:myFriends];
+            
+            if ([facebookUserIDs count] != 0) {
+                // qb users will come here:
+                void (^block) (Result *) = ^(Result *result) {
+                    if ([result isKindOfClass:[QBUUserPagedResult class]]) {
+                        if(result.success){
+                            QBUUserPagedResult *pagedResult = (QBUUserPagedResult *)result;
+                            NSArray *qbUsers = pagedResult.users;
+                            // putting quickbloxIDs to facebook users:
+                            [FBStorage shared].friends = [self putQuickbBloxIDsToFacebookUsers:[FBStorage shared].friends fromQuickbloxUsers:qbUsers];
+                        }else{
+                            QBDLog(@"FB search responce: %@", result.errors);
+                        }
+                    }
+                };
+                // request for qb users:
+                [QBUsers usersWithFacebookIDs:facebookUserIDs delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:block]];
+                
+                // Save facebook friends
+                [[FBStorage shared] setFriends:myFriends];
         
         }
         [[FBStorage shared] setFriends:myFriends];
     
-    }];
+    }
 }
 
 - (NSMutableDictionary *)handleFacebookHistoryConversation:(NSMutableArray *)conversation {
