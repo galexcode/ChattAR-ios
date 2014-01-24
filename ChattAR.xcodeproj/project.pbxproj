@@ -2022,7 +2022,7 @@
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "Stefano Antonelli";
 			};
-			buildConfigurationList = 7B8C3FD415D8D55800E42A41 /* Build configuration list for PBXProject "ChattAR" */;
+			buildConfigurationList = 7B8C3FD415D8D55800E42A41 /* Build configuration list for PBXProject "Chattar" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -2460,7 +2460,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		7B8C3FD415D8D55800E42A41 /* Build configuration list for PBXProject "ChattAR" */ = {
+		7B8C3FD415D8D55800E42A41 /* Build configuration list for PBXProject "Chattar" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7B8C3FF615D8D55800E42A41 /* Debug */,
