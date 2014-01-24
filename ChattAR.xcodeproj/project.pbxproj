@@ -2398,8 +2398,8 @@
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_EMPTY_BODY = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Injoit LTD (8885H5G2YX)";
-				"CODE_SIGN_IDENTITY[sdk=*]" = "iPhone Distribution: Injoit LTD (8885H5G2YX)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Khomenko Igor (67859YS754)";
+				"CODE_SIGN_IDENTITY[sdk=*]" = "iPhone Developer: Khomenko Igor (67859YS754)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Khomenko Igor (67859YS754)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

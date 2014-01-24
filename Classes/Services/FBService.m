@@ -283,6 +283,7 @@
         __block int idx = 0;
         void (^block) (Result *) = ^(Result *result) {
             if (result.success && [result isKindOfClass:[QBUUserPagedResult class]]) {
+                idx--;
                 QBUUserPagedResult *pagedResult = (QBUUserPagedResult *)result;
                 NSArray *qbUsers = pagedResult.users;
                 [allQBUsers addObjectsFromArray:qbUsers];
@@ -290,7 +291,6 @@
                     [FBStorage shared].friends = [self putQuickbBloxIDsToFacebookUsers:[FBStorage shared].friends fromQuickbloxUsers:allQBUsers];
                     return;
                 }
-                idx--;
             }
         };
         for (NSMutableDictionary *userID in facebookUserIDs) {
@@ -305,7 +305,7 @@
                 [termFBIDs addObject:userID];
             }
         }
-        if ([allQBUsers count] > 0) {
+        if ([termFBIDs count] > 0) {
             [QBUsers usersWithFacebookIDs:termFBIDs delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:block]];
             idx++;
         }
