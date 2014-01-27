@@ -16,6 +16,7 @@
 #import "AppSettingsService.h"
 #import "CaptureSessionService.h"
 #import "ChatRoomStorage.h"
+#import "ProcessStateService.h"
 
 #import "ChattARAppDelegate+PushNotifications.h"
 
@@ -33,7 +34,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(chatDidLogin) name:kNotificationDidLogin object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(chatDidLogin:) name:CAStateDataLoadedNotification object:nil];
     // if iPhone 5
     if(IS_HEIGHT_GTE_568){
         [backgroundImage setImage:[UIImage imageNamed:@"Default-568h@2x.png"]];
@@ -192,7 +193,6 @@
         // subscribe user to push notifications:
         [QBMessages TRegisterSubscriptionWithDelegate:self];
         
-        
         // retrieve friends/users info
         [[FBService shared] loadAndHandleDataAboutMeAndMyFriends];
         //
@@ -209,11 +209,26 @@
 #pragma mark -
 #pragma mark Notifications
 
-- (void)chatDidLogin
+- (void)chatDidLogin:(NSNotification *)aNotification
 {
-    [Flurry logEvent:kFlurryEventUserWasLoggedIn];
-    [self.activityIndicatior stopAnimating];
-    [self dismissViewControllerAnimated:YES completion:nil];
+    NSDictionary *usrInfo = aNotification.userInfo;
+    NSString *userInfoKey = [[usrInfo allKeys] lastObject];
+    if ([userInfoKey isEqualToString:kFriendsLoaded]) {
+        [ProcessStateService shared].facebookFriendsLoaded = [usrInfo[userInfoKey] boolValue];
+    } else if ([userInfoKey isEqualToString:kUsersLoaded]) {
+        [ProcessStateService shared].facebookUsersLoaded = [usrInfo[userInfoKey] boolValue];
+    } else if ([userInfoKey isEqualToString:kTrendingRoomListLoaded]) {
+        [ProcessStateService shared].chatTrengingRoomsLoaded = [usrInfo[userInfoKey] boolValue];
+    } else if ([userInfoKey isEqualToString:kLocalRoomListLoaded]) {
+        [ProcessStateService shared].chatLocalRoomsLoaded = [usrInfo[userInfoKey] boolValue];
+    }
+    
+    if ([[ProcessStateService shared] splashCanBeDismissed]) {
+        [Flurry logEvent:kFlurryEventUserWasLoggedIn];
+        [self.activityIndicatior stopAnimating];
+        [self dismissViewControllerAnimated:YES completion:nil];
+        [[NSNotificationCenter defaultCenter] removeObserver:CAStateDataLoadedNotification];
+    }
 }
 
 @end

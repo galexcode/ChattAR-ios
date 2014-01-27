@@ -148,6 +148,7 @@
 		69AF72EF186C27F3005FFAD1 /* btn@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 69AF72EB186C27F3005FFAD1 /* btn@2x.png */; };
 		69AF72F0186C27F3005FFAD1 /* create_btn.png in Resources */ = {isa = PBXBuildFile; fileRef = 69AF72EC186C27F3005FFAD1 /* create_btn.png */; };
 		69AF72F1186C27F3005FFAD1 /* create_btn@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 69AF72ED186C27F3005FFAD1 /* create_btn@2x.png */; };
+		69B04774189697D1005DD497 /* ProcessStateService.m in Sources */ = {isa = PBXBuildFile; fileRef = 69B04773189697D1005DD497 /* ProcessStateService.m */; };
 		69B96E3117E89EED00C94DB7 /* MenuCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 69B96E2C17E89EED00C94DB7 /* MenuCell.m */; };
 		69B96E3217E89EED00C94DB7 /* UserProfileCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 69B96E2E17E89EED00C94DB7 /* UserProfileCell.m */; };
 		69C146E2184726C800FBCC86 /* DialogsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C146E1184726C800FBCC86 /* DialogsDataSource.m */; };
@@ -493,6 +494,8 @@
 		69AF72EB186C27F3005FFAD1 /* btn@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "btn@2x.png"; sourceTree = "<group>"; };
 		69AF72EC186C27F3005FFAD1 /* create_btn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = create_btn.png; sourceTree = "<group>"; };
 		69AF72ED186C27F3005FFAD1 /* create_btn@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "create_btn@2x.png"; sourceTree = "<group>"; };
+		69B04772189697D1005DD497 /* ProcessStateService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProcessStateService.h; sourceTree = "<group>"; };
+		69B04773189697D1005DD497 /* ProcessStateService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProcessStateService.m; sourceTree = "<group>"; };
 		69B96E2B17E89EED00C94DB7 /* MenuCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuCell.h; sourceTree = "<group>"; };
 		69B96E2C17E89EED00C94DB7 /* MenuCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MenuCell.m; sourceTree = "<group>"; };
 		69B96E2D17E89EED00C94DB7 /* UserProfileCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserProfileCell.h; sourceTree = "<group>"; };
@@ -985,6 +988,8 @@
 				698BB9D2186987F00000C1C9 /* CaptureSessionService.m */,
 				69C1C29B187578A200C7D137 /* ControllerStateService.h */,
 				69C1C29C187578A200C7D137 /* ControllerStateService.m */,
+				69B04772189697D1005DD497 /* ProcessStateService.h */,
+				69B04773189697D1005DD497 /* ProcessStateService.m */,
 				698BB9D6186996000000C1C9 /* AppSettingsService.h */,
 				698BB9D7186996000000C1C9 /* AppSettingsService.m */,
 				694746431805A71600928ED4 /* LocationService.h */,
@@ -2022,7 +2027,7 @@
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "Stefano Antonelli";
 			};
-			buildConfigurationList = 7B8C3FD415D8D55800E42A41 /* Build configuration list for PBXProject "Chattar" */;
+			buildConfigurationList = 7B8C3FD415D8D55800E42A41 /* Build configuration list for PBXProject "ChattAR" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -2226,6 +2231,7 @@
 				69601BE01820070800E842C8 /* DetailDialogsViewController.m in Sources */,
 				6947462F1805469100928ED4 /* MapAnnotation.m in Sources */,
 				BF00034C185A2FDF00F83907 /* RFImageToDataTransformer.m in Sources */,
+				69B04774189697D1005DD497 /* ProcessStateService.m in Sources */,
 				BF00030C185A2FDF00F83907 /* XMPPResourceMemoryStorageObject.m in Sources */,
 				BF000313185A2FDF00F83907 /* XMPPJabberRPCModule.m in Sources */,
 				BF00033C185A2FDF00F83907 /* XMPPPresence+XEP_0172.m in Sources */,
@@ -2460,7 +2466,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		7B8C3FD415D8D55800E42A41 /* Build configuration list for PBXProject "Chattar" */ = {
+		7B8C3FD415D8D55800E42A41 /* Build configuration list for PBXProject "ChattAR" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7B8C3FF615D8D55800E42A41 /* Debug */,

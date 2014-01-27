@@ -13,7 +13,17 @@
 #define IS_HEIGHT_GTE_568 [[UIScreen mainScreen ] bounds].size.height >= 568.0f
 #define IS_IOS_6 ([[[UIDevice currentDevice] systemVersion] floatValue] <= 6.1f)
 
-#define kNotificationDidLogin           @"kNotificationDidLogin"
+#define kNotificationDidLogin   @"kNotificationDidLogin"
+
+// Data loading & splash dismissing:
+#define kChatStateDidLoginNotification      @"kChatStateDidLogin"
+#define CAStateDataLoadedNotification       @"StateDataLoaded"
+
+#define kFriendsLoaded              @"friends_loaded"
+#define kUsersLoaded                @"users_loaded"
+#define kTrendingRoomListLoaded     @"trendings_loaded"
+#define kLocalRoomListLoaded        @"locals_loaded"
+
 
 // QBCO Request keys:
 #define  kLimit      @"limit"

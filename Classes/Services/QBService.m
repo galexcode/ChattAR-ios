@@ -52,6 +52,7 @@
 
 - (void)loadAndHandleOtherFacebookUsers:(NSArray *)userIDs {
     if([userIDs count] == 0){
+        [[NSNotificationCenter defaultCenter] postNotificationName:CAStateDataLoadedNotification object:nil userInfo:@{kUsersLoaded:@YES}];
         return;
     }
     [[FBService shared] usersProfilesWithIDs:userIDs resultBlock:^(id result) {
@@ -60,6 +61,7 @@
         
         NSMutableArray *quickbloxIDs = [[FBService shared] gettingAllIDsOfFacebookUsers:users];
         if(quickbloxIDs.count == 0){
+            [[NSNotificationCenter defaultCenter] postNotificationName:CAStateDataLoadedNotification object:nil userInfo:@{kUsersLoaded:@YES}];
             return;
         }
         // adding photos:
@@ -68,16 +70,17 @@
             [user setObject:photoURL forKey:kPhoto];
         }
         // qb users will come here:
-        void (^block) (Result *) = ^(Result *result) {
+        void (^usersResultBlock) (Result *) = ^(Result *result) {
             if ([result isKindOfClass:[QBUUserPagedResult class]]) {
                 QBUUserPagedResult *pagedResult = (QBUUserPagedResult *)result;
                 NSArray *qbUsers = pagedResult.users;
                 // putting quickbloxIDs to facebook users:
                 [QBStorage shared].otherUsers = [[FBService shared] putQuickbBloxIDsToFacebookUsers:[QBStorage shared].otherUsers fromQuickbloxUsers:qbUsers];
+                [[NSNotificationCenter defaultCenter] postNotificationName:CAStateDataLoadedNotification object:nil userInfo:@{kUsersLoaded:@YES}];
             }
         };
         // request for qb users:
-        [QBUsers usersWithFacebookIDs:quickbloxIDs delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:block]];
+        [QBUsers usersWithFacebookIDs:quickbloxIDs delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:usersResultBlock]];
         
         [QBStorage shared].otherUsers = users;
     }];

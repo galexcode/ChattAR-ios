@@ -280,7 +280,7 @@
         NSMutableArray *termFBIDs = [[NSMutableArray alloc] init];
         NSMutableArray *allQBUsers = [[NSMutableArray alloc] init];
         __block int idx = 0;
-        void (^block)(Result *) = ^(Result *result) {
+        void (^friendsResultBlock)(Result *) = ^(Result *result) {
             if (result.success && [result isKindOfClass:[QBUUserPagedResult class]]) {
                 idx--;
                 QBUUserPagedResult *pagedResult = (QBUUserPagedResult *)result;
@@ -288,6 +288,8 @@
                 [allQBUsers addObjectsFromArray:qbUsers];
                 if (idx == 0) {
                     [FBStorage shared].friends = [self putQuickbBloxIDsToFacebookUsers:[FBStorage shared].friends fromQuickbloxUsers:allQBUsers];
+                    // post notification
+                    [[NSNotificationCenter defaultCenter] postNotificationName:CAStateDataLoadedNotification object:nil userInfo:@{kFriendsLoaded:@YES}];
                     return;
                 }
             }
@@ -298,14 +300,14 @@
             } else {
                 // QBUsers request:
                 idx++;
-                [QBUsers usersWithFacebookIDs:termFBIDs delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:block]];
+                [QBUsers usersWithFacebookIDs:termFBIDs delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:friendsResultBlock]];
                 // remove terminatearray and add one new object:
                 [termFBIDs removeAllObjects];
                 [termFBIDs addObject:userID];
             }
         }
         if ([termFBIDs count] > 0) {
-            [QBUsers usersWithFacebookIDs:termFBIDs delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:block]];
+            [QBUsers usersWithFacebookIDs:termFBIDs delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:friendsResultBlock]];
             idx++;
         }
         [[FBStorage shared] setFriends:myFriends];

@@ -25,7 +25,6 @@
 @property (strong, nonatomic) IBOutlet UISearchBar *searchBar;
 @property (strong, nonatomic) IBOutlet UIView *noMatchResultsView;
 
-
 @property (nonatomic, strong) NSMutableArray *trendings;
 @property (nonatomic, strong) NSMutableArray *locals;
 
@@ -49,12 +48,12 @@
 {
     [super viewDidLoad];
     [Flurry logEvent:kFlurryEventChatScreenWasOpened];
-    [NSThread callStackSymbols];
+    
     self.searchBar.autocorrectionType= UITextAutocorrectionTypeNo;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loadRooms) name:kNotificationDidLogin object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(newRoomCreated:) name:CAChatRoomDidCreateNotification object:nil];
-    
+
     _trendings = [[NSMutableArray alloc] initWithArray:[[ChatRoomStorage shared] allTrendingRooms]];
     _locals = [[NSMutableArray alloc] initWithArray:[[ChatRoomStorage shared] allLocalRooms]];
     
@@ -122,12 +121,6 @@
     [self.locationTableView reloadData];
 }
 
-- (void)loadLocalRooms {
-    
-    NSMutableDictionary *extendedRequest = [@{@"limit": @1000} mutableCopy];
-    [QBCustomObjects objectsWithClassName:kChatRoom extendedRequest:extendedRequest delegate:self];
-}
-
 
 #pragma mark -
 #pragma mark Notifications
@@ -139,7 +132,21 @@
         [self.trendingPaginator fetchFirstPage];
     }
     if ([[ChatRoomStorage shared] allLocalRooms] == nil) {
-        [self loadLocalRooms];
+        NSMutableDictionary *extendedRequest = [@{@"limit": @1000} mutableCopy];
+        [QBCustomObjects objectsWithClassName:kChatRoom extendedRequest:extendedRequest delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:^(Result *result) {
+            // to do
+            if ([result success] && [result isKindOfClass:[QBCOCustomObjectPagedResult class]]) {
+                // todo:
+                QBCOCustomObjectPagedResult *pagedResult = (QBCOCustomObjectPagedResult *)result;
+                _locals = [[ChatRoomStorage shared] sortingRoomsByDistance:[LocationService shared].myLocation toChatRooms:pagedResult.objects];
+                [[ChatRoomStorage shared] setAllLocalRooms:_locals];
+                _locationDataSource.chatRooms = _locals;
+                _locationDataSource.distances = [self arrayOfDistances:_locals];
+                [[ChatRoomStorage shared] setDistances:[self arrayOfDistances:[[ChatRoomStorage shared] allLocalRooms]]];
+                [self.locationTableView reloadData];
+                [[NSNotificationCenter defaultCenter] postNotificationName:CAStateDataLoadedNotification object:nil userInfo:@{kLocalRoomListLoaded: @YES}];
+            }
+        }]];
     }else {
         _locationDataSource.chatRooms = [[ChatRoomStorage shared] allLocalRooms];
         _locationDataSource.distances = [self arrayOfDistances:[[ChatRoomStorage shared] allLocalRooms]];
@@ -159,23 +166,6 @@
     [self.locationDataSource.distances insertObject:[NSNumber numberWithDouble:distance] atIndex:0];
 }
 
-#pragma mark -
-#pragma mark QBActionStatusDelegate
-
-- (void)completedWithResult:(Result *)result {
-    if ([result success]) {
-        if ([result isKindOfClass:[QBCOCustomObjectPagedResult class]]) {
-            // todo:
-            QBCOCustomObjectPagedResult *pagedResult = (QBCOCustomObjectPagedResult *)result;
-            _locals = [[ChatRoomStorage shared] sortingRoomsByDistance:[LocationService shared].myLocation toChatRooms:pagedResult.objects];
-            [[ChatRoomStorage shared] setAllLocalRooms:_locals];
-            _locationDataSource.chatRooms = _locals;
-            _locationDataSource.distances = [self arrayOfDistances:_locals];
-            [[ChatRoomStorage shared] setDistances:[self arrayOfDistances:[[ChatRoomStorage shared] allLocalRooms]]];
-            [self.locationTableView reloadData];
-        }
-    }
-}
 
 #pragma mark - Paginator
 
@@ -256,6 +246,7 @@
     [self updateTableViewFooterWithPaginator:paginator];
     //reload table
     [self.trendingTableView reloadData];
+    [[NSNotificationCenter defaultCenter] postNotificationName:CAStateDataLoadedNotification object:nil userInfo:@{kTrendingRoomListLoaded:@YES}];
 }
 
 - (void)paginatorDidReset:(id)paginator
