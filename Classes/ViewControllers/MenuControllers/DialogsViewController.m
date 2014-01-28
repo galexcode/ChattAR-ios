@@ -124,18 +124,15 @@
 }
 
 // options:
-- (BOOL)searchingString:(NSString *)source inString:(NSString *)searchString {
-    BOOL answer;
-    
+- (BOOL)searchingString:(NSString *)source inString:(NSString *)searchString
+{
     NSString *sourceString = [source stringByReplacingOccurrencesOfString:@"  " withString:@" "];
     
     NSRange range = [sourceString rangeOfString:searchString options:NSCaseInsensitiveSearch];
     if (range.location == NSNotFound) {
-        answer = NO;
-    } else {
-        answer = YES;
+        return NO;
     }
-    return answer;
+    return YES;
 }
 
 - (NSMutableArray *)searchText:(NSString *)text  inArray:(NSMutableArray *)array {

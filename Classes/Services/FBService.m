@@ -173,18 +173,10 @@
     return newConversation;
 }
 
-- (NSMutableArray *)gettingAllIDsOfFacebookUsers:(NSMutableArray *)facebookUsers {
-    NSMutableArray *allUserIDs = [[NSMutableArray alloc] init];
-    for (NSMutableDictionary *user in facebookUsers) {
-        NSString *userID = user[kId];
-        [allUserIDs addObject:userID];
-    }
-    return allUserIDs;
-}
-
-- (NSMutableArray *)putQuickbBloxIDsToFacebookUsers:(NSMutableArray *)facebookUsers fromQuickbloxUsers:(NSArray *)quickbloxUsers {
+- (void)putQuickbBloxIDsToFacebookUsers:(NSMutableArray *)facebookUsers fromQuickbloxUsers:(NSArray *)quickbloxUsers {
     for (NSMutableDictionary *facebookUser in facebookUsers) {
         NSString *facebookUserID = facebookUser[kId];
+        
         for (QBUUser *quickbloxUser in quickbloxUsers) {
             if ([quickbloxUser.facebookID isEqualToString:facebookUserID]) {
                 facebookUser[kQuickbloxID] = [@(quickbloxUser.ID) stringValue];
@@ -192,7 +184,6 @@
             }
         }
     }
-    return facebookUsers;
 }
 
 - (NSDictionary *)findFriendWithID:(NSString *)facebookID {
@@ -254,7 +245,7 @@
 
 - (void)loadAndHandleDataAboutMeAndMyFriends
 {
-    // me:
+    // get info about me:
     [self userProfileWithResultBlock:^(id result) {
         FBGraphObject *user = (FBGraphObject *)result;
         [FBStorage shared].me = [user mutableCopy];
@@ -266,52 +257,78 @@
         }]];
     }];
     
-    // getting my friends:
+    
+    // get my friends:
     [self userFriendsUsingBlock:^(id result) {
-        // adding photo urls to facebook users:
+        
+        // save friends
         NSMutableArray *myFriends = [(FBGraphObject *)result objectForKey:kData];
-        for (NSMutableDictionary *frend in myFriends) {
-            NSString *urlString = [[NSString alloc] initWithFormat:@"https://graph.facebook.com/%@/picture?access_token=%@",frend[kId],[FBStorage shared].accessToken];
-            [frend setValue:urlString forKey:kPhoto];
+        [FBStorage shared].friends = myFriends;
+        
+        NSMutableArray *friendsIDs = [[NSMutableArray alloc] init];
+        
+        // add photo urls to friends, collect ids
+        for (NSMutableDictionary *friend in myFriends) {
+            // add photo
+            NSString *urlString = [[NSString alloc] initWithFormat:@"https://graph.facebook.com/%@/picture?access_token=%@",friend[kId],[FBStorage shared].accessToken];
+            [friend setValue:urlString forKey:kPhoto];
+            
+            // collect id
+            NSString *userID = friend[kId];
+            [friendsIDs addObject:userID];
         }
         
-        NSMutableArray *facebookUserIDs = [self gettingAllIDsOfFacebookUsers:myFriends];
-        //////
-        NSMutableArray *termFBIDs = [[NSMutableArray alloc] init];
-        NSMutableArray *allQBUsers = [[NSMutableArray alloc] init];
-        __block int idx = 0;
+        
+        // Search QB Users by FB friends
+        //
+        NSMutableArray *chunkIDs = [[NSMutableArray alloc] init];
+        NSMutableArray *findQBUser = [[NSMutableArray alloc] init];
+        
+        __block int friendsChunks = 0;
         void (^friendsResultBlock)(Result *) = ^(Result *result) {
             if (result.success && [result isKindOfClass:[QBUUserPagedResult class]]) {
-                idx--;
+                friendsChunks--;
+                
                 QBUUserPagedResult *pagedResult = (QBUUserPagedResult *)result;
                 NSArray *qbUsers = pagedResult.users;
-                [allQBUsers addObjectsFromArray:qbUsers];
-                if (idx == 0) {
-                    [FBStorage shared].friends = [self putQuickbBloxIDsToFacebookUsers:[FBStorage shared].friends fromQuickbloxUsers:allQBUsers];
+                
+                [findQBUser addObjectsFromArray:qbUsers];
+                
+                // Received all friends
+                if (friendsChunks == 0) {
+                    
+                    // set QB user id to facebook friend
+                    for (QBUUser *quickbloxUser in findQBUser) {
+                        NSMutableDictionary *facebookFriend = [FBStorage shared].friendsAsDictionary[quickbloxUser.facebookID];
+                        facebookFriend[kQuickbloxID] = [@(quickbloxUser.ID) stringValue];
+                    }
+
                     // post notification
                     [[NSNotificationCenter defaultCenter] postNotificationName:CAStateDataLoadedNotification object:nil userInfo:@{kFriendsLoaded:@YES}];
                     return;
                 }
             }
         };
-        for (NSMutableDictionary *userID in facebookUserIDs) {
-            if ([termFBIDs count] <= 199) {
-                [termFBIDs addObject:userID];
+        for (NSMutableDictionary *userID in friendsIDs) {
+            if ([chunkIDs count] <= 199) {
+                [chunkIDs addObject:userID];
+           
             } else {
+                friendsChunks++;
+                
                 // QBUsers request:
-                idx++;
-                [QBUsers usersWithFacebookIDs:termFBIDs delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:friendsResultBlock]];
+                [QBUsers usersWithFacebookIDs:[chunkIDs copy] delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:friendsResultBlock]];
+                
                 // remove terminatearray and add one new object:
-                [termFBIDs removeAllObjects];
-                [termFBIDs addObject:userID];
+                [chunkIDs removeAllObjects];
+                [chunkIDs addObject:userID];
             }
         }
-        if ([termFBIDs count] > 0) {
-            [QBUsers usersWithFacebookIDs:termFBIDs delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:friendsResultBlock]];
-            idx++;
+        // last chunk
+        if ([chunkIDs count] > 0) {
+            [QBUsers usersWithFacebookIDs:[chunkIDs copy] delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:friendsResultBlock]];
+            friendsChunks++;
         }
-        [[FBStorage shared] setFriends:myFriends];
-    
     }];
 }
       

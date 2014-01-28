@@ -127,6 +127,7 @@
 }
 
 - (NSString*)segueIdForIndexPath:(NSIndexPath *)indexPath {
+    [QBService defaultService].userIsJoinedChatRoom = NO;
     NSString *segue = nil;
     switch ([indexPath row]) {
         case 2:

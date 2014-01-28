@@ -55,34 +55,54 @@
         [[NSNotificationCenter defaultCenter] postNotificationName:CAStateDataLoadedNotification object:nil userInfo:@{kUsersLoaded:@YES}];
         return;
     }
+    
+    
+    // get facebook profiles of other users
+    //
     [[FBService shared] usersProfilesWithIDs:userIDs resultBlock:^(id result) {
+        
+        // set other users
         NSMutableDictionary *searchResult = (FBGraphObject *)result;
         NSMutableArray *users = [NSMutableArray arrayWithArray:[searchResult allValues]];
+        [QBStorage shared].otherUsers = users;
+
+        NSMutableArray *facebookUsersIDs = [[NSMutableArray alloc] init];
         
-        NSMutableArray *quickbloxIDs = [[FBService shared] gettingAllIDsOfFacebookUsers:users];
-        if(quickbloxIDs.count == 0){
+        // add photos to other user, collect ids
+        for (NSMutableDictionary *user in users) {
+            // add photo
+            NSString *photoURL = [NSString stringWithFormat:@"https://graph.facebook.com/%@/picture?access_token=%@", [user objectForKey:kId], [FBStorage shared].accessToken];
+            [user setObject:photoURL forKey:kPhoto];
+            
+            // collect id
+            NSString *userID = user[kId];
+            [facebookUsersIDs addObject:userID];
+        }
+        
+        if(facebookUsersIDs.count == 0){
             [[NSNotificationCenter defaultCenter] postNotificationName:CAStateDataLoadedNotification object:nil userInfo:@{kUsersLoaded:@YES}];
             return;
         }
-        // adding photos:
-        for (NSMutableDictionary *user in users) {
-            NSString *photoURL = [NSString stringWithFormat:@"https://graph.facebook.com/%@/picture?access_token=%@", [user objectForKey:kId], [FBStorage shared].accessToken];
-            [user setObject:photoURL forKey:kPhoto];
-        }
+
+        
         // qb users will come here:
         void (^usersResultBlock) (Result *) = ^(Result *result) {
             if ([result isKindOfClass:[QBUUserPagedResult class]]) {
                 QBUUserPagedResult *pagedResult = (QBUUserPagedResult *)result;
                 NSArray *qbUsers = pagedResult.users;
-                // putting quickbloxIDs to facebook users:
-                [QBStorage shared].otherUsers = [[FBService shared] putQuickbBloxIDsToFacebookUsers:[QBStorage shared].otherUsers fromQuickbloxUsers:qbUsers];
+                
+                // put quickbloxIDs to facebook users
+                for (QBUUser *quickbloxUser in qbUsers) {
+                    NSMutableDictionary *otherUser = [QBStorage shared].otherUsersAsDictionary[quickbloxUser.facebookID];
+                    otherUser[kQuickbloxID] = [@(quickbloxUser.ID) stringValue];
+                }
+                
                 [[NSNotificationCenter defaultCenter] postNotificationName:CAStateDataLoadedNotification object:nil userInfo:@{kUsersLoaded:@YES}];
             }
         };
-        // request for qb users:
-        [QBUsers usersWithFacebookIDs:quickbloxIDs delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:usersResultBlock]];
         
-        [QBStorage shared].otherUsers = users;
+        // search QB users by Facebook ids
+        [QBUsers usersWithFacebookIDs:facebookUsersIDs delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:usersResultBlock]];
     }];
 }
 
@@ -302,7 +322,7 @@
     [[LocationService shared] startUpdateLocation];
     [[Utilites shared].progressHUD performSelector:@selector(hide:) withObject:nil];
     NSDictionary *aps = [QBStorage shared].pushNotification[@"aps"];
-    //
+    
     if ([QBStorage shared].pushNotification != nil) {
         if ([QBService defaultService].userIsJoinedChatRoom) {
             [[Utilites shared].progressHUD performSelector:@selector(show:) withObject:nil];

@@ -15,6 +15,7 @@
 @property (nonatomic, strong) QBChatRoom            *joinedChatRoom;
 @property (nonatomic, strong) QBUUser               *me;
 @property (nonatomic, strong) NSMutableArray        *otherUsers;
+@property (nonatomic, strong) NSMutableDictionary   *otherUsersAsDictionary;
 @property (nonatomic, copy)   NSString              *chatRoomName;
 @property (nonatomic, copy)   NSString              *opponentDialogID;
 @property (nonatomic, strong) NSDictionary          *pushNotification;

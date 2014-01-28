@@ -24,6 +24,7 @@
 @property (strong, nonatomic) IBOutlet UITableView *locationTableView;
 @property (strong, nonatomic) IBOutlet UISearchBar *searchBar;
 @property (strong, nonatomic) IBOutlet UIView *noMatchResultsView;
+@property (strong, nonatomic) IBOutlet UIButton *searchGlobalButton;
 
 @property (nonatomic, strong) NSMutableArray *trendings;
 @property (nonatomic, strong) NSMutableArray *locals;
@@ -375,6 +376,7 @@
         [self.trendings addObjectsFromArray:foundedFriends];
         if ([self.trendings count] == 0) {
             self.noMatchResultsView.hidden = NO;
+            self.searchGlobalButton.hidden = NO;
             self.trendingFooterLabel.text = nil;
         }
         [self.trendingTableView reloadData];
@@ -387,8 +389,7 @@
     NSString *sourceString = [source stringByReplacingOccurrencesOfString:@"  " withString:@" "];
     NSRange range = [sourceString rangeOfString:searchString options:NSCaseInsensitiveSearch];
     if (range.location == NSNotFound) {
-        answer = NO;
-    } else {
+        answer = NO;       } else {
         answer = YES;
     }
     return answer;
@@ -437,6 +438,7 @@
         
         if ([[ChatRoomStorage shared].searchedRooms count] == 0) {
             self.noMatchResultsView.hidden = NO;
+            self.searchGlobalButton.hidden = YES;
         }
         [self.searchIndicatorView stopAnimating];
     }]];

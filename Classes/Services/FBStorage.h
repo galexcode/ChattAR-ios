@@ -14,6 +14,7 @@
 @property (nonatomic, strong) NSString				*accessToken;
 @property (nonatomic, strong) NSMutableDictionary	*me;
 @property (nonatomic, strong) NSMutableArray        *friends;
+@property (nonatomic, strong) NSMutableDictionary   *friendsAsDictionary;
 @property (nonatomic, strong) NSMutableDictionary   *allFriendsHistoryConversation;
 
 + (instancetype)shared;

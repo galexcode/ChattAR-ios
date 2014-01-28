@@ -182,9 +182,6 @@
 
 // This is needed to start showing the Camera of the Augemented Reality Toolkit.
 - (void)displayAR {
-//    [[CaptureSessionService shared].captureSession stopRunning];
-//    [[CaptureSessionService shared].captureSession startRunning];
-
     // show Camera capture preview
     CGRect layerRect = [[self.displayView layer] bounds];
     [[CaptureSessionService shared].prewiewLayer setBounds:layerRect];

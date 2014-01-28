@@ -13,7 +13,6 @@
 @implementation FBStorage
 
 @synthesize accessToken;
-@synthesize friends;
 @synthesize me;
 
 + (instancetype)shared {
@@ -30,6 +29,16 @@
         self.allFriendsHistoryConversation = [[NSMutableDictionary alloc] init];
     }
     return self;
+}
+
+- (void)setFriends:(NSMutableArray *)friends{
+    _friends = friends;
+    
+    // make friends as dictionary
+    self.friendsAsDictionary = [NSMutableDictionary dictionary];
+    for(NSMutableDictionary *friend in friends){
+        [self.friendsAsDictionary setObject:friend forKey:friend[kId]];
+    }
 }
 
 

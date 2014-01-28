@@ -29,6 +29,16 @@
     return self;
 }
 
+- (void)setOtherUsers:(NSMutableArray *)otherUsers{
+    _otherUsers = otherUsers;
+    
+    // make friends as dictionary
+    self.otherUsersAsDictionary = [NSMutableDictionary dictionary];
+    for(NSMutableDictionary *user in otherUsers){
+        [self.otherUsersAsDictionary setObject:user forKey:user[kId]];
+    }
+}
+
 
 #pragma mark -
 #pragma mark Cache
