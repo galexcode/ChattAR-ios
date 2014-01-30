@@ -32,6 +32,7 @@
 
 
 // NOTIFICATIONS:
+#define CAUpdateLocationNotification   @"LocationUpdated"
 #define CAChatDidReceiveOrSendMessageNotification           @"CAChatDidReceiveOrSendMessageNotification"
 #define CAChatRoomDidReceiveOrSendMessageNotification       @"CAChatRoomDidReceiveOrSendMessageNotification"
 #define CADialogsHideUnreadMessagesLabelNotification        @"CADialogsHideUnreadMessagesLabelNotification"
@@ -46,8 +47,13 @@
 #define kTrendingPaginatorTag       1001
 #define kLocalPaginatorTag          1002
 
-// Map View Tag
+// Map View Tag:
 #define kMapViewControllerTag       1231
+
+// Footer View Tags:
+#define kSearchresultsFooterTag     12263
+#define kGlobalSearchFooterTag      12363
+
 
 // TableViewCell definitions:
 #define kUserName           @"username"

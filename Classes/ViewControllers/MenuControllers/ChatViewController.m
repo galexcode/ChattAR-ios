@@ -23,8 +23,6 @@
 @property (nonatomic, strong) IBOutlet UITableView *trendingTableView;
 @property (strong, nonatomic) IBOutlet UITableView *locationTableView;
 @property (strong, nonatomic) IBOutlet UISearchBar *searchBar;
-@property (strong, nonatomic) IBOutlet UIView *noMatchResultsView;
-@property (strong, nonatomic) IBOutlet UIButton *searchGlobalButton;
 
 @property (nonatomic, strong) NSMutableArray *trendings;
 @property (nonatomic, strong) NSMutableArray *locals;
@@ -51,7 +49,9 @@
     [Flurry logEvent:kFlurryEventChatScreenWasOpened];
     
     self.searchBar.autocorrectionType= UITextAutocorrectionTypeNo;
-    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide) name:UIKeyboardWillHideNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateDistanceLabels) name:CAUpdateLocationNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loadRooms) name:kNotificationDidLogin object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(newRoomCreated:) name:CAChatRoomDidCreateNotification object:nil];
 
@@ -67,7 +67,6 @@
     }
     if(_locals.count > 0){
         self.locationDataSource.chatRooms = [[ChatRoomStorage shared] allLocalRooms];
-        self.locationDataSource.distances = [[ChatRoomStorage shared] distances];
     }
     
     self.trendingTableView.dataSource = self.trendingDataSource;
@@ -115,9 +114,10 @@
     }
 }
 
-- (void)viewWillAppear:(BOOL)animated {
+- (void)viewWillAppear:(BOOL)animated
+{
     [super viewWillAppear:animated];
-
+    self.locationDataSource.distances = [self arrayOfDistances:[[ChatRoomStorage shared] allLocalRooms]];
     [self.trendingTableView reloadData];
     [self.locationTableView reloadData];
 }
@@ -126,7 +126,21 @@
 #pragma mark -
 #pragma mark Notifications
 
-- (void)loadRooms {
+- (void)updateDistanceLabels
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:CAUpdateLocationNotification];
+    if ([ChatRoomStorage shared].allLocalRooms == nil) {
+        return;
+    }
+    NSArray *localRooms = [[ChatRoomStorage shared] sortingRoomsByDistance:[LocationService shared].myLocation toChatRooms:[ChatRoomStorage shared].allLocalRooms];
+    [ChatRoomStorage shared].allLocalRooms = localRooms;
+    self.locationDataSource.chatRooms = localRooms;
+    self.locationDataSource.distances = [self arrayOfDistances:localRooms];
+    [self.locationTableView reloadData];
+}
+
+- (void)loadRooms
+{
     [[NSNotificationCenter defaultCenter]  removeObserver:self name:kNotificationDidLogin object:nil];
     
     if ([_trendings count] == 0) {
@@ -154,17 +168,32 @@
     }
 }
 
-- (void)searchForResults {
-
-}
-
-- (void)newRoomCreated:(NSNotification *)notification {
+- (void)newRoomCreated:(NSNotification *)notification
+{
     QBCOCustomObject *room = notification.object;
     [self.locals insertObject:room atIndex:0];
     [ChatRoomStorage shared].allLocalRooms = self.locals;
     self.locationDataSource.chatRooms = self.locals;
     double_t distance = [self distanceFromNewRoom:room];
     [self.locationDataSource.distances insertObject:[NSNumber numberWithDouble:distance] atIndex:0];
+}
+
+- (void)keyboardWillShow
+{
+    CGRect tableFrame = self.trendingTableView.frame;
+    tableFrame.size.height -= 215;
+    [UIView animateWithDuration:0.25 animations:^{
+        [self.trendingTableView setFrame:tableFrame];
+    }];
+}
+
+- (void)keyboardWillHide
+{
+    CGRect tableFrame = self.trendingTableView.frame;
+    tableFrame.size.height += 215;
+    [UIView animateWithDuration:0.25 animations:^{
+        [self.trendingTableView setFrame:tableFrame];
+    }];
 }
 
 
@@ -189,7 +218,8 @@
     }
 }
 
-- (UIView *)creatingTrendingFooter {
+- (UIView *)creatingTrendingFooter
+{
     UIView *footerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, _trendingTableView.frame.size.width, 44.0f)];
     footerView.backgroundColor = [UIColor clearColor];
     _trendingFooterLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, _trendingTableView.frame.size.width, 44.0f)];
@@ -359,25 +389,48 @@
 
 
 #pragma mark -
-#pragma mark UISearchBarDelegate
+#pragma mark UISearchBar
+
+- (UIView *)createSearchFooterView
+{
+    UIView *noResultsFoundView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.trendingTableView.frame.size.width, 88.0f)];
+    noResultsFoundView.tag = kSearchresultsFooterTag;
+    [noResultsFoundView setBackgroundColor:[UIColor clearColor]];
+    
+    UILabel *noResultsFoundLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.trendingTableView.frame.size.width, 44.0f)];
+    noResultsFoundLabel.text = @"No results found";
+    noResultsFoundLabel.backgroundColor = [UIColor clearColor];
+    noResultsFoundLabel.textAlignment = NSTextAlignmentCenter;
+    [noResultsFoundView addSubview:noResultsFoundLabel];
+    
+    UIButton *searchGlobalButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    searchGlobalButton.frame = CGRectMake(0.0f, 44.0f, self.trendingTableView.frame.size.width, 44.0f);
+    searchGlobalButton.tag = kGlobalSearchFooterTag;
+//    searchGlobalButton.titleLabel.textAlignment = NSTextAlignmentCenter;
+//    searchGlobalButton.titleLabel.textColor = [UIColor blueColor];
+    [searchGlobalButton setTitle:@"Global Search" forState:UIControlStateNormal];
+    searchGlobalButton.backgroundColor = [UIColor clearColor];
+    [searchGlobalButton addTarget:self action:@selector(globalSearch:) forControlEvents:UIControlEventTouchUpInside];
+    [noResultsFoundView addSubview:searchGlobalButton];
+    
+    return noResultsFoundView;
+}
 
 - (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
 {
     self.trendings = [[ChatRoomStorage shared].allTrendingRooms mutableCopy];
     self.trendingDataSource.chatRooms = _trendings;
-    self.noMatchResultsView.hidden = YES;
+    self.trendingTableView.tableFooterView = nil;
     self.trendingFooterLabel.text = [NSString stringWithFormat:@"Load more..."];
     if (searchText.length == 0) {
+        self.trendingTableView.tableFooterView = [self creatingTrendingFooter];
         [self.trendingTableView reloadData];
     } else {
         NSMutableArray *foundedFriends = [self searchText:searchText inArray:self.trendings];
-        
         [self.trendings removeAllObjects];
         [self.trendings addObjectsFromArray:foundedFriends];
         if ([self.trendings count] == 0) {
-            self.noMatchResultsView.hidden = NO;
-            self.searchGlobalButton.hidden = NO;
-            self.trendingFooterLabel.text = nil;
+            self.trendingTableView.tableFooterView = [self createSearchFooterView];
         }
         [self.trendingTableView reloadData];
     }
@@ -385,14 +438,12 @@
 
 - (BOOL)searchingString:(NSString *)source inString:(NSString *)searchString
 {
-    BOOL answer;
     NSString *sourceString = [source stringByReplacingOccurrencesOfString:@"  " withString:@" "];
     NSRange range = [sourceString rangeOfString:searchString options:NSCaseInsensitiveSearch];
     if (range.location == NSNotFound) {
-        answer = NO;       } else {
-        answer = YES;
+        return NO;
     }
-    return answer;
+    return YES;
 }
 
 - (NSMutableArray *)searchText:(NSString *)text  inArray:(NSMutableArray *)array
@@ -406,17 +457,24 @@
     return founded;
 }
 
-- (BOOL)searchBarShouldBeginEditing:(UISearchBar *)searchBar {
+- (BOOL)searchBarShouldBeginEditing:(UISearchBar *)searchBar
+{
     [searchBar setShowsCancelButton:YES animated:YES];
     return YES;
 }
 
-- (void)searchBarCancelButtonClicked:(UISearchBar *) searchBar {
+- (void)searchBarCancelButtonClicked:(UISearchBar *) searchBar
+{
+    if (self.trendingTableView.tableFooterView != nil) {
+        self.trendingTableView.tableFooterView = nil;
+        self.trendingTableView.tableFooterView = [self creatingTrendingFooter];
+    } else {
+        self.trendingTableView.tableFooterView = [self creatingTrendingFooter];
+    }
     self.trendings = [[ChatRoomStorage shared].allTrendingRooms mutableCopy];
     self.trendingDataSource.chatRooms = _trendings;
     [searchBar setShowsCancelButton:NO animated:YES];
     [searchBar resignFirstResponder];
-    self.noMatchResultsView.hidden = YES;
     self.trendingFooterLabel.text = @"Load more...";
     [self.trendingTableView reloadData];
 }
@@ -430,15 +488,17 @@
         NSArray *searchedRooms = pagedResult.objects;
         [ChatRoomStorage shared].searchedRooms = searchedRooms;
         
-        self.noMatchResultsView.hidden = YES;
+        self.trendingTableView.tableFooterView = nil;
         self.trendings = [[ChatRoomStorage shared].searchedRooms mutableCopy];
         self.trendingDataSource.chatRooms = [ChatRoomStorage shared].searchedRooms;
         [self.trendingTableView reloadData];
         self.trendingFooterLabel.text = nil;
         
         if ([[ChatRoomStorage shared].searchedRooms count] == 0) {
-            self.noMatchResultsView.hidden = NO;
-            self.searchGlobalButton.hidden = YES;
+            self.trendingTableView.tableFooterView = [self createSearchFooterView];
+            UIView *noResultsView = [self.trendingTableView.tableFooterView viewWithTag:kSearchresultsFooterTag];
+            UIButton *globalSearchButton = (UIButton *)[noResultsView viewWithTag:kGlobalSearchFooterTag];
+            [globalSearchButton setHidden:YES];
         }
         [self.searchIndicatorView stopAnimating];
     }]];

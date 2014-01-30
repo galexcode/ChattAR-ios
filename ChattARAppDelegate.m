@@ -21,6 +21,7 @@
 
 @implementation ChattARAppDelegate
 
+
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
 {
     // attempt to extract a token from the url
@@ -34,6 +35,7 @@
 -(void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
 {
     [QBStorage shared].pushNotification = userInfo;
+    //[[UIApplication sharedApplication] cancelAllLocalNotifications];
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions

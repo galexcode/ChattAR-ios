@@ -67,7 +67,9 @@
 
 - (void)fillTableView:(NSNotification *)aNotification
 {
-    
+    if (self.searchedUsers != nil) {
+        return;
+    }
     [self reloadUsers];
     self.dialogsDataSource.allUsers = self.allUsers;
     self.searchedUsers = nil;

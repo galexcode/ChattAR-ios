@@ -310,14 +310,16 @@
             }
         };
         for (NSMutableDictionary *userID in friendsIDs) {
-            if ([chunkIDs count] <= 199) {
+            if ([chunkIDs count] <= 99) {
                 [chunkIDs addObject:userID];
            
             } else {
                 friendsChunks++;
                 
                 // QBUsers request:
-                [QBUsers usersWithFacebookIDs:[chunkIDs copy] delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:friendsResultBlock]];
+                PagedRequest *pagedRequest = [PagedRequest request];
+                pagedRequest.perPage = 100;
+                [QBUsers usersWithFacebookIDs:[chunkIDs copy] pagedRequest:pagedRequest delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:friendsResultBlock]];
                 
                 // remove terminatearray and add one new object:
                 [chunkIDs removeAllObjects];
@@ -326,7 +328,9 @@
         }
         // last chunk
         if ([chunkIDs count] > 0) {
-            [QBUsers usersWithFacebookIDs:[chunkIDs copy] delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:friendsResultBlock]];
+            PagedRequest *pagedRequest = [PagedRequest request];
+            pagedRequest.perPage = 100;
+            [QBUsers usersWithFacebookIDs:[chunkIDs copy] pagedRequest:pagedRequest delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:friendsResultBlock]];
             friendsChunks++;
         }
     }];

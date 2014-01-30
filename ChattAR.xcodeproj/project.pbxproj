@@ -2404,7 +2404,7 @@
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_EMPTY_BODY = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Khomenko Igor (67859YS754)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Injoit LTD (8885H5G2YX)";
 				"CODE_SIGN_IDENTITY[sdk=*]" = "iPhone Developer: Khomenko Igor (67859YS754)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Khomenko Igor (67859YS754)";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2428,7 +2428,7 @@
 					"-lstdc++",
 				);
 				PRODUCT_NAME = "ChattAR 2";
-				PROVISIONING_PROFILE = "6FEA5496-FFBF-4739-BDF9-3BB9C8D4265E";
+				PROVISIONING_PROFILE = "4B1B1E94-B6E0-4E61-93B2-C288C29F3B99";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2458,7 +2458,7 @@
 					"-lstdc++",
 				);
 				PRODUCT_NAME = "ChattAR 2";
-				PROVISIONING_PROFILE = "6FEA5496-FFBF-4739-BDF9-3BB9C8D4265E";
+				PROVISIONING_PROFILE = "4B1B1E94-B6E0-4E61-93B2-C288C29F3B99";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

@@ -102,7 +102,9 @@
         };
         
         // search QB users by Facebook ids
-        [QBUsers usersWithFacebookIDs:facebookUsersIDs delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:usersResultBlock]];
+        PagedRequest *pagedRequest = [PagedRequest request];
+        pagedRequest.perPage = 100;
+        [QBUsers usersWithFacebookIDs:facebookUsersIDs pagedRequest:pagedRequest delegate:[QBEchoObject instance] context:[QBEchoObject makeBlockForEchoObject:usersResultBlock]];
     }];
 }
 

@@ -642,33 +642,6 @@
                                         <rect key="frame" x="250" y="0.0" width="13" height="506"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     </imageView>
-                                    <view hidden="YES" contentMode="scaleToFill" id="7sz-uq-NYG">
-                                        <rect key="frame" x="0.0" y="88" width="250" height="81"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <subviews>
-                                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No results found" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="3a8-h6-3a1">
-                                                <rect key="frame" x="45" y="5" width="160" height="21"/>
-                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                                <nil key="highlightedColor"/>
-                                            </label>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="lnZ-AS-M3c">
-                                                <rect key="frame" x="0.0" y="42" width="250" height="30"/>
-                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                                <state key="normal" title="Search global">
-                                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                                </state>
-                                                <connections>
-                                                    <action selector="globalSearch:" destination="x2E-WD-CCp" eventType="touchUpInside" id="R5c-3k-HIy"/>
-                                                </connections>
-                                            </button>
-                                        </subviews>
-                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                    </view>
                                 </subviews>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                             </scrollView>
@@ -701,10 +674,8 @@
                     <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="lightContent"/>
                     <connections>
                         <outlet property="locationTableView" destination="AMp-bx-rym" id="xYP-xx-TIN"/>
-                        <outlet property="noMatchResultsView" destination="7sz-uq-NYG" id="Nvs-sa-ifD"/>
                         <outlet property="scrollView" destination="G8h-07-dLG" id="Np0-Cs-TLr"/>
                         <outlet property="searchBar" destination="Eti-gy-kH0" id="Uit-rA-aOR"/>
-                        <outlet property="searchGlobalButton" destination="lnZ-AS-M3c" id="UTy-Pg-K4Q"/>
                         <outlet property="trendingTableView" destination="10X-Ra-BBE" id="NYG-iK-REh"/>
                         <segue destination="Vch-rc-7Oy" kind="push" identifier="ChatToChatRoomSegue" id="08e-u6-zeQ"/>
                     </connections>
@@ -1284,9 +1255,9 @@
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="YmU-iS-597"/>
-        <segue reference="gGZ-kD-fDC"/>
         <segue reference="i69-BF-qyq"/>
         <segue reference="08e-u6-zeQ"/>
+        <segue reference="wsq-0v-N34"/>
+        <segue reference="7Mb-AF-cFY"/>
     </inferredMetricsTieBreakers>
 </document>

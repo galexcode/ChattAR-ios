@@ -60,6 +60,7 @@
 
 - (void) locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
     _myLocation = [locations lastObject];
+    [[NSNotificationCenter defaultCenter] postNotificationName:CAUpdateLocationNotification object:nil];
 }
 
 @end
