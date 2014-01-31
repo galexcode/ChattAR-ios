@@ -23,11 +23,11 @@
     cell.name.text = [user objectForKey:kName];
     
     if ([user[kUnread] boolValue]) {
-        cell.backgroundColor = [UIColor lightGrayColor];
+        cell.backgroundColor = [UIColor colorWithRed:62/255.0 green:136/255.0 blue:203/255.0 alpha:0.09];
     } else {
         cell.backgroundColor = [UIColor whiteColor];
     }
 }
-
-
+// 14,97,147
+// 62,136,203
 @end
